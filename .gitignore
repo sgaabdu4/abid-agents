@@ -1,0 +1,17 @@
+.DS_Store
+
+# Local agent/runtime state
+.codebase/
+.codebase-memory/
+.skill-lock.json
+hooks/logs/
+
+# Backups are local migration artifacts, not source of truth.
+backups/
+
+# Generated caches
+__pycache__/
+*.pyc
+
+# Nested generated state inside bundled skills.
+skills/*/.codebase/

@@ -1,0 +1,92 @@
+# Vertical slices/evals module
+
+Use after backend/infra tech stack or when implementation planning is requested, when mapped `run` or `brief`. During Q&A, update only `plan_draft.md`; write `07-vertical-slices.md` only at stage close, user request, or final synthesis.
+
+## Scope
+
+Plan delivery as vertical slices + task waves.
+
+Definitions:
+- Vertical slice = narrow end-to-end user value through UI/API/data that can be built, tested, and reviewed independently.
+- Task wave = set of tasks safe to run in parallel because they do not conflict on files, schemas, data, routes, or decisions.
+- Acceptance criteria = observable pass/fail conditions for user value.
+- Verification/eval = tests, commands, manual checks, rubric, or prototype review proving criteria.
+
+Owns:
+- Slice inventory.
+- Dependencies + execution order.
+- Small reviewable tasks.
+- Acceptance criteria per slice.
+- Verification/eval per slice.
+- Parallel-safe waves.
+- High-risk controls.
+
+Out of scope:
+- Re-opening product/UI/backend choices unless blockers conflict.
+- Implementing code.
+- Changing schemas/routes/storage keys; record blast-radius requirement only.
+
+## Stage handoff plan
+
+At stage close/final synthesis, `07-vertical-slices.md` includes only relevant decisions:
+- Source requirements/decisions consumed.
+- Slice table or bullet list, whichever is clearer.
+- Task waves.
+- Acceptance criteria.
+- Verification/eval plan.
+- High-risk controls only when risk exists.
+- Final plan inputs.
+
+Slice table when useful:
+
+```md
+| Slice ID | User value | Layers touched | Dependencies | Tasks | Acceptance criteria | Verification/eval | Risks | Gate |
+|---|---|---|---|---|---|---|---|---|
+| S1 | <value> | <UI/API/data/tests> | <deps> | <small tasks> | <pass/fail> | <cmd/manual/eval> | <risk/owner> | <ready/blocked> |
+```
+
+Clarity gate:
+- Every required capability maps to at least one slice.
+- Each slice has user value, layers touched, dependencies, tasks, acceptance criteria, verification/eval, risks.
+- First slice is a walking skeleton when useful: minimal end-to-end path proving architecture.
+- Parallel waves avoid file/schema/data/API conflicts.
+- High-risk changes name human review, rollback/migration notes, and telemetry/audit expectations.
+
+## Q pattern
+
+Show a clear user-facing terminal card. Keep slice/task-wave definitions, evidence, and review/failure scenario for stage close or final synthesis.
+
+```text
+Q<N>: What should we build first?
+
+Meaning:
+<explain the small working piece the user can test first>
+
+Why it matters:
+This sets the first reviewable build slice.
+
+Suggested default:
+<A/B/C> — <one clear reason>
+
+Options:
+A) <small end-to-end slice with user value>
+
+B) <small end-to-end slice with user value>
+
+C) <small end-to-end slice or "Not sure — use the default">
+
+Reply: A/B/C, "use default", "not sure", "skip for now", or your own answer.
+```
+
+Internal notes for stage close/final synthesis: vertical slice/task wave definitions, options/tradeoffs, evidence, why, user/failure/review scenario.
+
+## Rules
+
+- Prefer thin end-to-end slices over horizontal layers.
+- Put the smallest useful walking skeleton first unless code/evidence proves another order.
+- Make tasks small enough for one focused agent/review.
+- Do not parallelize tasks touching the same schema, route, storage key, generated file, shared type, or migration.
+- Acceptance criteria should include happy path plus relevant fail/edge/permission/offline/perf/security cases.
+- Verification/eval should include exact command/check where known; otherwise mark `unknown` and block only if high risk.
+- Schema/data/auth/security/deploy/stateful slices require human review gate, rollback/migration notes, and telemetry/audit expectations.
+- Do not update `07-vertical-slices.md` per question; record answers in `plan_draft.md` and summarize here only at stage close/final synthesis.
