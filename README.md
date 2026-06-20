@@ -1,139 +1,201 @@
-# Agent config
+# Abid Agents
 
-Portable source of truth for agent instructions, skills, hooks, subagent prompts, and MCP defaults across multiple agent harnesses.
+Shared global agent config for Codex, Claude, Copilot, Pi, and compatible coding-agent runtimes.
 
-This repo is meant to be cloned into `~/.agents` on any local or remote machine, then linked into the harness-specific homes that need it: Codex, Claude, Copilot, Pi, and compatible agent runtimes.
+This repo is designed to be cloned to `~/.agents`. From there it links one set of rules, skills, hooks, and MCP defaults into each agent home so every machine behaves the same way.
 
-## What Is Included
+---
 
-| Path | Purpose |
+## 1. Install
+
+New machine:
+
+```sh
+git clone --recurse-submodules https://github.com/sgaabdu4/abid-agents.git "$HOME/.agents"
+"$HOME/.agents/scripts/install.sh"
+```
+
+Existing clone:
+
+```sh
+cd "$HOME/.agents"
+git pull --ff-only
+./scripts/update-submodules.sh --init
+./scripts/install.sh
+```
+
+The installer is conservative:
+
+- backs up existing non-symlink config files before replacing them
+- skips conflicting skill folders instead of overwriting them
+- initializes pinned submodules
+- installs local Git hooks for this repo
+- leaves cron disabled unless you explicitly enable it
+
+---
+
+## 2. What gets linked
+
+| Agent/runtime | Linked config |
 | --- | --- |
-| `AGENTS.md` | Global agent rules and tool-routing policy. |
-| `COPILOT.md` | Copilot-facing entrypoint that points back to the shared rules. |
-| `skills/` | Canonical skill set shared across harnesses. |
-| `hooks/` | Shared safety hooks. |
-| `codex/hooks.json` | Global Codex hook defaults: security gate plus quiet context-mode continuity hooks. |
+| Codex | `~/.codex/AGENTS.md`, `~/.codex/mcp-config.json`, `~/.codex/hooks.json`, `~/.codex/skills/*` |
+| Claude | `~/.claude/AGENTS.md`, `~/.claude/skills/*` |
+| Copilot | `~/.copilot/AGENTS.md`, `~/.copilot/skills/*` |
+| Pi | `~/.pi/AGENTS.md`, `~/.pi/skills/*` |
+| Pi agent | `~/.pi/agent/AGENTS.md`, `~/.pi/agent/skills/*` |
+
+`~/.claude/CLAUDE.md` should include:
+
+```md
+@AGENTS.md
+```
+
+That keeps Claude pointed at the same global rules as the other runtimes.
+
+---
+
+## 3. What is inside
+
+| Path | Role |
+| --- | --- |
+| `AGENTS.md` | Global rules: tool routing, blast-radius checks, verification gates, writing style, and skill budgets. |
+| `skills/` | The active skill surface. Local skills are real folders; upstream skills are symlinks. |
+| `vendor/skill-upstreams/` | Git submodules for read-only upstream skills. |
+| `hooks/` | Safety hooks for command blocking, secret protection, and Codex session behavior. |
+| `codex/hooks.json` | Codex hook wiring. |
+| `mcp-config.json` | Shared MCP defaults for `context-mode` and `codebase-memory-mcp`. |
 | `agents/` | Subagent role prompts. |
-| `mcp-config.json` | Portable MCP defaults for `context-mode` and `codebase-memory-mcp`. |
-| `scripts/install.sh` | Symlinks this repo into local agent homes. |
-| `scripts/install-mcp-tools.sh` | Installs `context-mode` and `codebase-memory-mcp` when missing. |
-| `scripts/update-submodules.sh` | Initializes pinned skill submodules or bumps them to latest upstream. |
-| `scripts/auto-sync.sh` | Pulls `main` and updates submodules to the pinned commits recorded here. |
-| `scripts/sync-subtrees.sh` | Compatibility wrapper for the old subtree command. |
-| `scripts/install-cron.sh` | Installs the optional local cron job that runs `scripts/auto-sync.sh`. |
+| `scripts/` | Install, submodule update, cron, and compatibility helpers. |
+| `tests/` | Contract checks for symlinks, hooks, env behavior, and repo policy. |
 
-Local runtime state is intentionally excluded: hook logs, backups, caches, database files, machine-specific paths, and local MCP indexes.
+Ignored local state includes hook logs, backups, caches, `.skill-lock.json`, MCP indexes, and machine-specific files.
 
-## Install On Any Machine
+---
 
-```sh
-git clone <agent-config-repo-url> "$HOME/.agents"
-"$HOME/.agents/scripts/install.sh"
-```
+## 4. Skills
 
-`scripts/install.sh` publishes the shared source into each harness home:
+The active skill list lives in `skills/`.
 
-- Installs missing MCP tools: `context-mode` and `codebase-memory-mcp`.
-- `AGENTS.md` into `~/.codex`, `~/.claude`, `~/.copilot`, `~/.pi`, and `~/.pi/agent`.
-- `mcp-config.json` into `~/.codex/mcp-config.json`.
-- `codex/hooks.json` into `~/.codex/hooks.json`. The global Codex template keeps context-mode `SessionStart` and `UserPromptSubmit` enabled for session continuity, but `SessionStart` runs through a quiet wrapper that strips injected `additionalContext` before Codex sees it. `PostToolUse` stays disabled globally.
-- Every `skills/*` directory into each harness skills folder when that folder exists.
+There are two types:
 
-Existing non-symlink config files are backed up with a timestamp before the repo-owned symlink is installed; conflicting skill targets are skipped.
+- Local skills: owned by this repo and kept small.
+- Upstream skills: pinned as submodules and exposed through symlinks.
 
-Set `ABID_AGENTS_SKIP_NPM_INSTALL=1` to skip MCP tool installation.
+Local skill budget:
 
-The installer also initializes skill submodules, sets repo-local Git pulls to `pull.rebase=false` and `pull.ff=only`, adds local `.git/hooks/post-merge`, `.git/hooks/post-rewrite`, and `.git/hooks/pre-push` hooks for this clone, and leaves cron disabled unless requested. Pull hooks update submodules only to the pinned commits recorded by this repo. Cron auto-sync pulls `main`, bumps submodules to their tracked upstream branches, blocks private-path or secret-like matches, commits changed submodule pins, and pushes `main`. Set `ABID_AGENTS_SKIP_SUBMODULE_INIT=1` to skip install-time submodule init, `ABID_AGENTS_SKIP_SUBMODULE_UPDATE=1` to skip pull-time submodule updates, `ABID_AGENTS_SKIP_SUBMODULE_BUMP=1` to make cron use pinned commits only, `ABID_AGENTS_CHECK_SUBMODULES_BEFORE_PUSH=1` to print submodule status before push, or `ABID_AGENTS_ENABLE_CRON=1` to install the optional cron job.
+- `SKILL.md` under 100 lines
+- preferably under 1,200 `o200k_base` tokens
+- description under 300 characters
+- detailed workflows moved to `references/*.md` or scripts
 
-## Remote Bootstrap Example
+Upstream skills are updated from their source repos. Do not compress or patch them locally unless the change belongs upstream.
 
-Use this pattern in a remote setup script. The install step links Codex MCP and hook defaults.
+---
 
-```sh
-git clone <agent-config-repo-url> "$HOME/.agents"
-"$HOME/.agents/scripts/install.sh"
-```
+## 5. Upstream skill pins
 
-Add a repo-level `AGENTS.md` inside any project when project-specific rules should override the global file.
+| Active skill | Upstream repo | Source path |
+| --- | --- | --- |
+| `skills/vercel-react-best-practices` | `vercel-labs/agent-skills` | `skills/react-best-practices` |
+| `skills/impeccable` | `pbakaus/impeccable` | `.agents/skills/impeccable` |
+| `skills/fallow` | `fallow-rs/fallow-skills` | `fallow/skills/fallow` |
+| `skills/react-doctor` | `millionco/react-doctor` | `skills/react-doctor` |
+| `skills/skill-creator` | `anthropics/skills` | `skills/skill-creator` |
+| `skills/tavily-cli` | `tavily-ai/skills` | `skills/tavily-cli` |
+| `skills/appwrite-backend` | `sgaabdu4/appwrite-backend` | repo root |
+| `skills/building-flutter-apps` | `sgaabdu4/building-flutter-apps` | repo root |
+| `skills/sentry-cli` | `getsentry/cli` | `plugins/sentry-cli/skills/sentry-cli` |
+| `skills/sentry-feature-setup` | `getsentry/sentry-for-ai` | `skills/sentry-feature-setup` |
+| `skills/sentry-sdk-setup` | `getsentry/sentry-for-ai` | `skills/sentry-sdk-setup` |
+| `skills/sentry-workflow` | `getsentry/sentry-for-ai` | `skills/sentry-workflow` |
 
-## Submodule Skills
+Sentry is exposed through `sentry-cli` plus three router skills. The full SDK skill library stays in `getsentry/sentry-for-ai`, and leaf skills are loaded only when the task needs them.
 
-Read-only upstream skills are Git submodules under `vendor/skill-upstreams/`.
-The `skills/<name>` entries are symlinks into those submodules so every agent
-runtime still sees `skills/<name>/SKILL.md`.
+---
 
-Clone with submodules:
+## 6. Updating skills
 
-```sh
-git clone --recurse-submodules <agent-config-repo-url> "$HOME/.agents"
-```
-
-Initialize or repair submodules in an existing clone:
+Initialize or repair pinned submodules:
 
 ```sh
-git submodule update --init --recursive
+./scripts/update-submodules.sh --init
 ```
 
-| Skill path | Submodule | Source path |
-| --- | --- |
-| `skills/vercel-react-best-practices` | `vendor/skill-upstreams/vercel-agent-skills` | `skills/react-best-practices` |
-| `skills/impeccable` | `vendor/skill-upstreams/impeccable` | `.agents/skills/impeccable` |
-| `skills/fallow` | `vendor/skill-upstreams/fallow-skills` | `fallow/skills/fallow` |
-| `skills/react-doctor` | `vendor/skill-upstreams/react-doctor` | `skills/react-doctor` |
-| `skills/skill-creator` | `vendor/skill-upstreams/anthropic-skills` | `skills/skill-creator` |
-| `skills/tavily-cli` | `vendor/skill-upstreams/tavily-skills` | `skills/tavily-cli` |
-| `skills/appwrite-backend` | `vendor/skill-upstreams/appwrite-backend` | repo root |
-| `skills/building-flutter-apps` | `vendor/skill-upstreams/building-flutter-apps` | repo root |
-| `skills/sentry-cli` | `vendor/skill-upstreams/sentry-cli` | `plugins/sentry-cli/skills/sentry-cli` |
-| `skills/sentry-feature-setup` | `vendor/skill-upstreams/sentry-for-ai` | `skills/sentry-feature-setup` |
-| `skills/sentry-sdk-setup` | `vendor/skill-upstreams/sentry-for-ai` | `skills/sentry-sdk-setup` |
-| `skills/sentry-workflow` | `vendor/skill-upstreams/sentry-for-ai` | `skills/sentry-workflow` |
-
-Sentry skills are vendored from official Sentry repositories. `sentry-cli`
-comes from `getsentry/cli`; setup and workflow router skills come from
-`getsentry/sentry-for-ai`. Do not expose every leaf Sentry SDK skill in
-`skills/`; the router skills load the detailed leaf instructions only when
-needed.
-
-Normal `git pull` updates this repo and checks out the pinned submodule commits.
-This repo uses fast-forward-only pulls; if local and remote diverge, stop and
-resolve deliberately instead of rebasing old subtree merge commits. Cron
-auto-sync also bumps submodules to latest tracked upstream, commits the changed
-pins, and pushes `main`. To bump upstream skill pins manually:
+Bump upstream skill pins:
 
 ```sh
 ./scripts/update-submodules.sh --remote
 git status --short
 git add .gitmodules vendor/skill-upstreams
 git commit -m "Update skill submodules"
+git push origin main
 ```
 
-The update script refuses `--remote` when tracked files or the index are dirty.
-For the same pull, auto-bump, commit, and push flow cron runs:
+`--remote` refuses to run when tracked files or the index are dirty.
+
+---
+
+## 7. Optional cron sync
+
+Enable local auto-sync:
 
 ```sh
-./scripts/auto-sync.sh
+ABID_AGENTS_ENABLE_CRON=1 ./scripts/install.sh
 ```
 
-The cron installer stores its managed block between `# BEGIN agent-config auto-sync` and `# END agent-config auto-sync`. Override the default schedule with `ABID_AGENTS_CRON_SCHEDULE`, for example `ABID_AGENTS_CRON_SCHEDULE="*/5 * * * *" ./scripts/install-cron.sh`.
+Set a custom schedule:
 
-## Publishing Safety
+```sh
+ABID_AGENTS_CRON_SCHEDULE="*/30 * * * *" ./scripts/install-cron.sh
+```
 
-Before pushing public changes, run:
+Cron runs `scripts/auto-sync.sh`. It pulls `main`, bumps submodules, scans for private paths and secret-like values, commits changed pins, and pushes `main`.
+
+Useful switches:
+
+| Variable | Effect |
+| --- | --- |
+| `ABID_AGENTS_SKIP_NPM_INSTALL=1` | Skip MCP tool installation. |
+| `ABID_AGENTS_SKIP_SUBMODULE_INIT=1` | Skip install-time submodule init. |
+| `ABID_AGENTS_SKIP_SUBMODULE_UPDATE=1` | Skip pull-hook submodule updates. |
+| `ABID_AGENTS_SKIP_SUBMODULE_BUMP=1` | Cron uses pinned commits only. |
+| `ABID_AGENTS_CHECK_SUBMODULES_BEFORE_PUSH=1` | Print submodule status before push. |
+| `ABID_AGENTS_ENABLE_CRON=1` | Install the optional cron job during install. |
+
+---
+
+## 8. Safety checks before pushing
+
+Run:
 
 ```sh
 git status --short --branch
-git ls-files | grep -E '(^|/)(\.DS_Store|__pycache__|\.codebase|\.codebase-memory|hooks/logs|backups|.*\.pyc$|.*\.sqlite|.*\.db|.*\.key|.*\.pem|.*\.env)' || true
-git grep -nF "$HOME" -- . || true
-git grep -nE '(sk-[A-Za-z0-9_-]{20,}|github_pat_|gh[pousr]_|AKIA[0-9A-Z]{16})' -- . || true
+git diff --check
 node tests/agents-md-contract.test.mjs
 node tests/codex-hooks-contract.test.mjs
+node tests/git-hooks-contract.test.mjs
 node tests/security-pretooluse-env.test.mjs
 node tests/protect-secrets-env.test.mjs
 ```
 
-Do not commit secrets, local paths, runtime logs, machine-local MCP state, or private repo data.
+Scan for local paths and secret-like values:
 
-## Daily Use
+```sh
+rg -n --hidden --glob '!.git/**' --glob '!**/.git/**' -F "$HOME" .
+rg -n --hidden --glob '!.git/**' --glob '!**/.git/**' '(github_pat_[A-Za-z0-9_]+|gh[pousr]_[A-Za-z0-9_]+|sk-[A-Za-z0-9_-]{20,}|AKIA[0-9A-Z]{16}|-----BEGIN (RSA |DSA |EC |OPENSSH )?PRIVATE KEY-----)' .
+```
 
-Edit `~/.agents` as the source of truth, commit changes, and push to `main`. Local and remote harnesses should pull or reclone this repo, then rerun `scripts/install.sh`.
+Never commit secrets, personal paths, runtime logs, local MCP state, generated caches, private repo data, or machine-local lock state.
+
+---
+
+## 9. Daily workflow
+
+```sh
+cd "$HOME/.agents"
+git pull --ff-only
+./scripts/update-submodules.sh --init
+./scripts/install.sh
+```
+
+Change this repo for global behavior. Add a project-local `AGENTS.md` when one project needs different rules.
