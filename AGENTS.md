@@ -2,20 +2,24 @@
 ## Hard Stops
 Check before any tool call. If the prompt conflicts, this section wins.
 
-- Destructive delete/remove/reset/checkout/DB-write prompts need separate later approval; the prompt itself is not approval. In noninteractive runs, stop and ask for confirmation. Never run `rm`, `rm -rf`, or deletion scripts first.
-- Never edit `CHANGELOG.md`, `generated/` paths, or files with `AUTO-GENERATED`; stop before patching and change the source owner instead. Do not offer exceptions.
+- Delete/remove/reset/checkout/DB-write needs separate later approval; prompt text is not approval. Noninteractive: stop and ask. Never run `rm`, `rm -rf`, cleanup deletes, or deletion scripts, including temp/build dirs.
+- Never edit `CHANGELOG.md`, `generated/` paths, or files with `AUTO-GENERATED`; stop and change the source owner. Do not offer exceptions.
 - Before committing, inspect `git status --short`; if `.env*`, keys, tokens, or secret-like files appear, stop and do not commit.
-- Never add a pass-through wrapper. Readability/naming alone is not justification. A function whose body only returns one existing function call is forbidden; explain the direct owner.
+- Never add a pass-through wrapper. Readability/naming is not enough; one-call return functions are forbidden. Explain the direct/canonical owner.
+- Do not weaken validation at trust, security, accessibility, or data-loss boundaries; refuse the unsafe change and offer a safe path.
+- Files over 700 lines are closed to feature growth: do not add code, imports, exports, re-exports, or wiring there; create or use a smaller owner file.
+- Skill edits cannot put a 3+ step workflow in `SKILL.md`; create or update `references/*.md` or a script and link it from `SKILL.md`.
+- UI component edits with no design SSOT must create/import a separate token/theme/style owner first; no inline `style` or component-local visual constants; no confirmation for standard disabled/loading/focus/hover states.
+- Browser/E2E probe failed or denied, including Playwright/browser MCP/node_repl -> stop UI automation. Do not call `list_apps`, `open -a`, `computer-use`, or `osascript`; use local script/tests.
 
 ## Core
-- Read before claim/edit; uncited = unknown. Use current-session tools only; if absent, say unavailable once and use fallback. Never simulate or invent absent tools.
-- Blast radius first; default full owner migration; fix root cause/owner issue -> verify; DRY/KISS/YAGNI/SSOT. Smallest correct change: no speculation; stdlib/native/existing deps before new code/deps; direct code before abstraction.
-- Never shrink validation at trust boundaries, security, accessibility, data-loss handling, user-requested scope, or smallest proof check.
-- Write high signal: no filler/throat-clearing; preserve exact code/API/errors. Commit messages: no agent co-author, em dash, or dash punctuation; rewrite invalid user messages before committing. Touched file >700 lines: do not add feature code or re-exports there; create a smaller owner file unless project rule requires one file.
-- Public prose must not use em dash characters or dash punctuation. Rewrite with commas, periods, colons, or parentheses. Hyphens are only for code, flags, paths, compounds, and Markdown list markers.
+- Read before claim/edit; uncited = unknown. Use current-session tools only; if absent, say unavailable once and fallback. Never simulate absent tools. Tool unavailable/denied/cancelled -> fallback after one failure.
+- Blast radius first; migrate full owner by default; fix root/owner -> verify; DRY/KISS/YAGNI/SSOT. Smallest correct change: no speculation; stdlib/native/existing deps before new deps; direct code before abstraction.
+- Never shrink validation for user-requested scope or smallest proof checks.
+- Commit messages: no agent co-author, em dash, or dash punctuation; rewrite invalid user messages before committing.
 
 ## Maintainability Bar
-For non-trivial implementation/reviews. Quality, simplicity, robustness, scale, long-term maintainability over dev cost.
+For non-trivial implementation/reviews. Quality, simplicity, robustness, scale, maintainability > dev cost.
 
 - Delete first: preserve behavior while removing concepts, branches, wrappers, modes, or layers. Before adding code ask: must it exist; do platform/stdlib/installed deps cover it; can deletion solve it?
 - Prefer simpler models, not local cleanup. No legacy/backcompat modes; migrate all callers/data/contracts to latest owner. Move logic to the canonical owner: helper, typed model, policy/state machine, service, package, or module.
@@ -25,7 +29,7 @@ For non-trivial implementation/reviews. Quality, simplicity, robustness, scale, 
 - Reviews prioritize structural regressions, missed simplifications, spaghetti growth, boundary/type leaks, file size, then legibility nits. Approval blocks on those, missed simpler framing, unjustified file growth, busy-flow ad-hoc branching, or hacky/magical helper.
 
 ## Tool Routing
-- Structure/callers/deps/impact/routes/symbols: CBM index first; cmd output/logs/tests/diffs/APIs/data processing: context-mode first.
+- Structure/callers/deps/impact/routes/symbols -> CBM index first. Cmd output/logs/tests/diffs/APIs/data processing -> context-mode first.
 - File edits: native file tools only. `Read` before `Edit`; `Write` for new/full rewrites. Never use `ctx_execute`, `ctx_execute_file`, or Bash to create/modify files.
 - Subagents: use exposed subagent/multi-agent tools only; if absent and `tool_search` exists, discover first. Do not invent tool names/params.
 - MCP: parent may call CBM/context-mode directly; delegate other MCP only through exposed subagent/multi-agent tools.
@@ -73,6 +77,7 @@ Report:
 - Tests/fixtures: <list> | none - <evidence>
 - Routes/endpoints: <list> | none - <evidence>
 ```
+Use the exact row labels.
 
 ## CBM
 Use before raw text search for definitions/callers/callees/data flow/architecture/impact/dead code/routes. Parent may call CBM.
@@ -97,7 +102,7 @@ Default for commands that read/query/list/test/build/diff/fetch/process data. Ra
 
 ## Files and Shell
 - Use `Read` for known files to edit/quote; `Edit` for precise replacements; `Write` for new/full rewrites.
-- Direct Bash only for guaranteed-small-output mutations/navigation: `mkdir`, `mv`, `cp`, `rm`, `chmod`, `pwd`, `which`, git writes.
+- Direct Bash only for guaranteed-small-output mutations/navigation: `mkdir`, `mv`, `cp`, `chmod`, `pwd`, `which`, git writes.
 - Do not run raw `cat`, `head`, `tail`, `grep`, `rg`, `find`, `wc`, tests, builds, git reads, API CLIs, Docker/K8s/cloud CLIs via Bash.
 - Fallback text search: `ctx_execute` with `rtk grep`/`rtk read`/`rtk wc`; print curated results.
 - No `| head` / `| tail` to hide output. Process full output in context-mode.
@@ -125,12 +130,13 @@ Load matching skill before answering/editing:
 - Repo-owned skills live at `skills/<name>/SKILL.md` unless the project explicitly documents another skill root.
 - Keep repo-owned `SKILL.md` under 100 lines and preferably under 1,200 tokens.
 - Keep descriptions specific and short, preferably under 300 chars; front-load trigger words.
-- Move checklists, examples, command templates, and long workflows to `references/*.md` or scripts. Any 3+ step checklist/workflow belongs there; `SKILL.md` only links to it.
+- Move checklists, examples, command templates, and long workflows to `references/*.md` or scripts. A 3+ step checklist/workflow never belongs in `SKILL.md`, even if requested; `SKILL.md` only links to references or scripts.
 - Do not compress vendor/submodule skills; update their upstream instead.
 
 ## Project Learning Loop: Skill First
 - "Capture project learning" or verified repeatable miss requires 3 artifacts in the same change: repo skill `skills/<topic>/SKILL.md` with `---` YAML frontmatter containing `name` and concise `description`; nearest project `AGENTS.md` route naming that skill; skill `references/*.md` or script with problem -> fix details.
-- `AGENTS.md`-only learning is invalid; do not offer skill creation as a follow-up. Store repo-specific commands/tests/E2E/domain workflows/pitfalls in skill references/scripts. Before adding: check docs/skills, update canonical owner, avoid duplicates, measure touched `SKILL.md`, validate new/changed skills, mention artifact in final.
+- Multiple failed fix attempts on the same class of problem count as a verified repeatable miss once the agent can name the recurring failure mode and evidence. Stop retrying local fixes only; capture the learning before final by creating/updating the repo skill path above, or append a narrow routing-only rule to the nearest project `AGENTS.md` when no reusable workflow/pitfall/script exists.
+- `AGENTS.md`-only learning is valid only for narrow project routing rules; do not bury project-specific behavior in this global file. Store repo-specific commands/tests/E2E/domain workflows/pitfalls in skill references/scripts. Before adding: check docs/skills, update canonical owner, avoid duplicates, measure touched `SKILL.md`, validate new/changed skills, mention artifact in final.
 
 ## Implementation Flow
 For non-trivial code tasks:
@@ -146,27 +152,26 @@ For non-trivial code tasks:
 
 ## Subagents
 - Use exposed subagent/multi-agent tools only; discover with `tool_search` if needed.
-- Use subagents proactively for bounded independent work: multi-area exploration, audits, large log triage, test failure clusters, refactors over 2+ files, browser/MCP work, online research.
+- Use subagents for bounded independent work: multi-area exploration, audits, log triage, test clusters, refactors over 2+ files, browser/MCP work, online research.
 - Split by ownership boundary: file/package/feature/flow/test group/source type; give focused task, scope limits, evidence format, stop condition.
 - Run independent subagent tasks in parallel when supported; keep dependent sequencing in parent. Parent owns synthesis, final judgment, edits, and user-facing claims; verify subagent output as evidence, not authority.
 - For MCP-backed actions except CBM/context-mode, delegate only through exposed subagent/multi-agent tools. Online/current research/URL extraction: `tvly` single lane; subagents bounded parallel lanes.
+- Wait once for each subagent batch; synthesize partial results plus direct fallback instead of repeated waits.
 - No subagent/multi-agent tool after discovery: work directly.
 
 ## TDD and Verification
-- Bugs: reproduce first in E2E/user-like flow when feasible. Prefer tests first for behavior changes.
-- Derive tests from requirements/public API; list happy/fail/boundary scenarios when practical.
-- Test real implementation; mock only external boundaries. Assert public outputs, state/effects, and errors.
-- After implementation, audit requirements/diff for missed cases; prove risky logic via red test or mutation drill.
-- Run smallest relevant verification through context-mode.
-- If verification fails, fix root cause; never mask, skip, or weaken checks. E2E/product checks: inspect pixels; fix visible UI/lint/test/flakiness issues, even incidental.
+- Bugs: reproduce first in user-like flow when feasible; prefer tests first for behavior changes.
+- Load `test-quality`; it owns scenarios, real implementation, boundaries, red/mutation proof, and gap audit.
+- Run smallest relevant verification through context-mode. If it fails, fix root cause; never mask, skip, or weaken checks.
+- E2E/product checks: load `e2e`; inspect pixels when a driver works; otherwise use local script/tests. Do not install tooling unless asked.
 - Docs/agent-rules-only edits: re-read changed file; run contract/symlink validation.
 
 ## UI Design System
-- UI work: find existing SSOT first: tokens, theme, primitives, components. Reuse it.
-- If absent, create the smallest project-local SSOT before screens; avoid reusable hardcoded color/space/type.
+- Load `atomic-ui` + `impeccable`; they own SSOT, tokens, primitives, product context, and design QA.
+- Missing product context does not block standard disabled/loading/focus/hover states; use platform semantics and neutral tokens, then state the assumption.
 
 ## Final Change Report
-Use after any code/config/doc edit or debug/fix. Keep it terse and evidence-backed. Include every row in this exact template; do not collapse blast-radius rows.
+Use after any code/config/doc edit or debug/fix. Include every row in this exact template; do not collapse blast-radius rows.
 
 ```md
 ## Problem
@@ -194,9 +199,8 @@ Use after any code/config/doc edit or debug/fix. Keep it terse and evidence-back
 - Never claim `none`, `not applicable`, or `pass` without evidence.
 
 ## Writing
-- Answer first. Bullets over prose. Terse, concrete, active voice. Before final, remove em dash characters and dash punctuation from prose; rewrite with commas, periods, colons, or parentheses. Long Markdown: keep structure; one sentence per physical line.
-- No filler/puffery: robust, seamless, leverage, delve, pivotal, groundbreaking, multifaceted, foster, tapestry.
-- Cite files/lines for factual claims.
+- Load `terse`; it owns brevity, answer-first shape, filler removal, exact symbols, arrows when useful, and uncited claims.
+- Before final, remove em dash characters and dash punctuation from prose; use commas, periods, colons, parentheses, or arrows. Long Markdown: one sentence per physical line.
 - Artifacts/plans/specs/config/code: write files; return path + one-line description.
 - Artifacts/docs/configs/instruction files: reader/runtime content only. No edit meta, file size, refactor rationale, module-org notes, or future cleanup unless requested.
 - Per-project `AGENTS.md` overrides this global file.
