@@ -4,6 +4,7 @@
 - Blast radius first; default full owner migration; fix root cause/owner issue -> verify; DRY/KISS/YAGNI/SSOT. Smallest correct change: no speculation; stdlib/native/existing deps before new code/deps; direct code before abstraction.
 - Never shrink validation at trust boundaries, security, accessibility, data-loss handling, user-requested scope, or smallest proof check.
 - Write high signal: no filler/throat-clearing; preserve exact code/API/errors. Commit messages: no agent co-author. Touched file >700 lines: refactor by role/feature before adding unless project rule requires one file.
+- Public prose must not use em dash characters or dash punctuation. Rewrite with commas, periods, colons, or parentheses. Hyphens are only for code, flags, paths, compounds, and Markdown list markers.
 
 ## Maintainability Bar
 For non-trivial implementation/reviews. Quality, simplicity, robustness, scale, long-term maintainability over dev cost.
@@ -103,7 +104,7 @@ Load matching skill before answering/editing:
 - Flutter/Dart/Riverpod/Freezed/GoRouter/pubspec -> `building-flutter-apps`.
 - Appwrite/Auth/TablesDB/Storage/Functions/Realtime -> `appwrite-backend`.
 - Online/current info -> `tavily-cli`.
-- Skills/diagnostics -> `skill-creator`; update `.agents/skills/`; no secrets/speculation.
+- Skills/diagnostics/project learning/repeatable misses -> `skill-creator`; update `.agents/skills/`; no secrets/speculation.
 - React/Next/perf/composition -> matching React/Vercel skills.
 - Tests/specs/QA/mutation -> `test-quality`.
 - UI/components/design-system/tokens -> `atomic-ui` + `impeccable`.
@@ -112,14 +113,15 @@ Load matching skill before answering/editing:
 
 ## Skill Authoring Budget
 - Measure edited local skills with `tiktoken` (`o200k_base`).
+- Repo-owned skills live at `skills/<name>/SKILL.md` unless the project explicitly documents another skill root.
 - Keep repo-owned `SKILL.md` under 100 lines and preferably under 1,200 tokens.
 - Keep descriptions specific and short, preferably under 300 chars; front-load trigger words.
-- Move checklists, examples, command templates, and long workflows to `references/*.md` or scripts.
+- Move checklists, examples, command templates, and long workflows to `references/*.md` or scripts. Any 3+ step checklist/workflow belongs there; `SKILL.md` only links to it.
 - Do not compress vendor/submodule skills; update their upstream instead.
 
-## Project Learning Loop
-- Verified repeatable miss -> update nearest project `AGENTS.md` and owning repo skill; if none, create one with concise trigger description. Details go in `references/*.md` or scripts; global `AGENTS.md` only for cross-repo rules.
-- Keep `AGENTS.md` to triggers/routing. Store repo-specific commands/tests/E2E/domain workflows/pitfalls/problem -> fix notes in skill references/scripts for on-demand loading. Before adding, check docs/skills, update canonical owner, avoid duplicates, measure touched `SKILL.md`, validate new/changed skills, mention artifact in final report.
+## Project Learning Loop: Skill First
+- "Capture project learning" or verified repeatable miss requires 3 artifacts in the same change: repo skill `skills/<topic>/SKILL.md` with `---` YAML frontmatter containing `name` and concise `description`; nearest project `AGENTS.md` route naming that skill; skill `references/*.md` or script with problem -> fix details.
+- `AGENTS.md`-only learning is invalid; do not offer skill creation as a follow-up. Store repo-specific commands/tests/E2E/domain workflows/pitfalls in skill references/scripts. Before adding: check docs/skills, update canonical owner, avoid duplicates, measure touched `SKILL.md`, validate new/changed skills, mention artifact in final.
 
 ## Implementation Flow
 For non-trivial code tasks:
@@ -183,7 +185,7 @@ Use after any code/config/doc edit or debug/fix. Keep it terse and evidence-back
 - Never claim `none`, `not applicable`, or `pass` without evidence.
 
 ## Writing
-- Answer first. Bullets over prose. Terse, concrete, active voice. No em dash; use plain `-`. Long Markdown: keep structure; one sentence per physical line.
+- Answer first. Bullets over prose. Terse, concrete, active voice. Before final, remove em dash characters and dash punctuation from prose; rewrite with commas, periods, colons, or parentheses. Long Markdown: keep structure; one sentence per physical line.
 - No filler/puffery: robust, seamless, leverage, delve, pivotal, groundbreaking, multifaceted, foster, tapestry.
 - Cite files/lines for factual claims.
 - Artifacts/plans/specs/config/code: write files; return path + one-line description.
