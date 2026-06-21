@@ -46,7 +46,7 @@ Target artifact: <explanation | decision summary | implementation plan | visual 
 - <blocker/unknown | none>
 
 ## Evidence / Artifacts
-- <path:line, user quote, command result, path/url/status, or none>
+- <path:line, user quote, command result, domain doc note, path/url/status, or none>
 ```
 
 ## Rules
@@ -63,4 +63,4 @@ Target artifact: <explanation | decision summary | implementation plan | visual 
 - If state says `unanswered` and the latest user message is not an answer,
   re-ask `Last Question` exactly.
 - Keep under 100 lines. Summarize old detail into decisions.
-- Delete only after verified final `plan.md` absorbs needed state.
+- Cleanup only after verified final `plan.md` absorbs needed state and approval exists.

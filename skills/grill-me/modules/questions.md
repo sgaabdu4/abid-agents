@@ -93,6 +93,7 @@ User-facing prompt: <exact visible prompt>
 Suggested default: <clear choice + why>
 Internal details:
 - Definitions: <term = meaning | n/a>
+- Domain docs: <CONTEXT/ADR/glossary impact or conflict | n/a>
 - Options: <A/B/C + tradeoffs>
 - Evidence: <code/docs/user quote | unknown>
 - Why: <dependency unlocked>
@@ -113,5 +114,7 @@ Internal details:
   `Use <choice>` and one clear reason.
 - Define new/product/domain/tech terms in internal `Definitions`; expose only
   unavoidable definitions in `Details (optional)`.
+- If domain docs matter, load `modules/domain-docs.md`; capture canonical terms,
+  avoided synonyms, and ADR candidates internally, not in the visible prompt.
 - Avoid vague words; name exact screen, entity, state, runtime, data source, or
   constraint.

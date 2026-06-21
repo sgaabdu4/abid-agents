@@ -3,8 +3,8 @@ name: grill-me
 description: >-
   Interview one clear Q at a time before planning or building ideas, greenfield
   apps, brownfield features, simple changes, codebase maps, specs, stress tests,
-  UI flows, mockups, prototypes, or final plans. Routes depth, persists state,
-  resumes after compaction.
+  UI flows, mockups, prototypes, or final plans. Uses code/domain docs as
+  evidence, routes depth, persists state, resumes after compaction.
 ---
 
 # Grill Me
@@ -34,10 +34,12 @@ description: >-
 5. Load `modules/orchestration.md` only after a grill-me session starts, when
    resuming a draft, managing files/handoffs, closing a stage, or writing the
    final plan.
-6. Load `modules/questions.md` only before asking an interview question.
-7. Load only the active stage module after the stage is selected.
-8. Load `modules/stage-handoff.md` only when writing a handoff.
-9. Load `modules/final-plan.md` only when synthesizing `plan.md`.
+6. Load `modules/domain-docs.md` only for existing-code/doc-backed sessions,
+   fuzzy domain terms, ADR conflicts/candidates, or doc-update synthesis.
+7. Load `modules/questions.md` only before asking an interview question.
+8. Load only the active stage module after the stage is selected.
+9. Load `modules/stage-handoff.md` only when writing a handoff.
+10. Load `modules/final-plan.md` only when synthesizing `plan.md`.
 
 ## Mode shortcuts
 
@@ -70,6 +72,7 @@ Core:
 - Durable session state and resume protocol -> `modules/session-state.md`
 - Question format and internal Q record -> `modules/questions.md`
 - Drafts, files, stage flow, loop, caps -> `modules/orchestration.md`
+- Domain glossary, ADR, and docs-aware grilling -> `modules/domain-docs.md`
 - Temp handoff contract -> `modules/stage-handoff.md`
 - Final synthesis -> `modules/final-plan.md`
 
@@ -89,8 +92,8 @@ Stages:
 - Skipped/n/a stages do not create handoff files.
 - Update `session_state.md` before asking each Q and after recording each answer.
 - `plan_draft.md` is an answer ledger, not a plan.
-- Final plan lives in `docs/planning/<slug>/plan.md`; do not write
-  `99-final-plan.md`.
-- Final plan must absorb required handoff/draft content before temp cleanup.
+- Final plan lives in `docs/planning/<slug>/plan.md`; no `99-final-plan.md`.
+- Final plan must absorb required handoff/draft content before approved cleanup.
+- Domain docs are lazy: read docs, capture terms/ADRs, write on request/synthesis.
 - Schema/data/auth/security/deploy/stateful changes need human review,
   rollback/migration notes, and telemetry/audit expectations.

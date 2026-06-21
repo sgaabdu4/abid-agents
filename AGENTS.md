@@ -119,6 +119,7 @@ Load matching skill before answering/editing:
 - Appwrite/Auth/TablesDB/Storage/Functions/Realtime -> `appwrite-backend`.
 - Online/current info -> `tavily-cli`.
 - Skills/diagnostics/project learning/repeatable misses -> `skill-creator`; update `.agents/skills/`; no secrets/speculation.
+- Ambiguous planning/features -> `grill-me`; committed shipping validation/push/PR -> `no-mistakes`.
 - React/Next/perf/composition -> matching React/Vercel skills.
 - Tests/specs/QA/mutation -> `test-quality`.
 - UI/components/design-system/tokens -> `atomic-ui` + `impeccable`.
@@ -131,7 +132,7 @@ Load matching skill before answering/editing:
 - Keep repo-owned `SKILL.md` under 100 lines and preferably under 1,200 tokens.
 - Keep descriptions specific and short, preferably under 300 chars; front-load trigger words.
 - Move checklists, examples, command templates, and long workflows to `references/*.md` or scripts. A 3+ step checklist/workflow never belongs in `SKILL.md`, even if requested; `SKILL.md` only links to references or scripts.
-- Do not compress vendor/submodule skills; update their upstream instead.
+- Do not compress vendor/submodule/tool-installed skills; update their upstream or CLI owner instead.
 
 ## Project Learning Loop: Skill First
 - "Capture project learning" or verified repeatable miss requires 3 artifacts together: repo skill `skills/<topic>/SKILL.md` with `---` YAML frontmatter containing `name` and concise `description`; nearest project `AGENTS.md` route naming that skill; skill `references/*.md` or script with problem -> fix details.
@@ -148,7 +149,8 @@ For non-trivial code tasks:
 6. Ripple: Gate 2 blast-radius search/trace.
 7. TDD where practical: failing test -> minimal code -> green -> refactor.
 8. Verify with smallest relevant lint/typecheck/test via context-mode; state skipped checks.
-9. Review changed code/docs, touched-file lengths, and uncited claims.
+9. For committed shipping work, use `/no-mistakes` or `git push no-mistakes`; direct `origin` push only on explicit request or when the gate is unavailable.
+10. Review changed code/docs, touched-file lengths, and uncited claims.
 
 ## Subagents
 - Use exposed subagent/multi-agent tools only; discover with `tool_search` if needed.

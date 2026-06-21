@@ -9,6 +9,7 @@ Read fully:
 - Orchestrator draft answer ledger: `docs/planning/<slug>/plan_draft.md`.
 - Existing temp stage handoffs only if they were created at stage close/artifact/final synthesis.
 - Artifact files/paths that were created during visual-design/prototype stages.
+- Relevant `CONTEXT.md`, `CONTEXT-MAP.md`, ADRs, and captured domain doc notes.
 
 Do not expect a Stage Map in `plan_draft.md`; the draft is an answer ledger.
 Do not create/read handoff files for skipped or n/a stages.
@@ -21,6 +22,8 @@ Need in the final artifact only when relevant to the user's goal:
 - Requirement -> slice/task -> verification traceability when implementation is planned.
 - High-risk controls when risk exists.
 - Risks only when they affect decisions.
+- Domain language changes and ADR candidates when they affect naming,
+  contracts, docs, tests, or future work.
 - Parked unknowns/blockers.
 
 ## Synthesis flow
@@ -33,9 +36,12 @@ Need in the final artifact only when relevant to the user's goal:
 5. Detect conflicts between draft, handoffs, artifacts, and user answers.
 6. If conflict/blocker exists, ask one Q; do not finalize.
 7. Write `docs/planning/<slug>/plan.md` as the canonical artifact, sized to the inferred need.
-8. Re-read `plan.md`; verify it contains the needed decisions, artifact refs, acceptance checks, verification/evals, risks, unknowns, and traceability only where relevant.
-9. Delete temp planning state only after verification: `session_state.md`, `plan_draft.md`, temp stage handoffs, empty `stages/` dir.
-10. Preserve non-temp artifacts: visual design concepts, prototypes, mock data, fixtures, screenshots, diagrams, code, and user-created docs.
+8. If requested or needed, update confirmed `CONTEXT.md` glossary terms or ADRs
+   using `modules/domain-docs.md`.
+9. Re-read `plan.md`; verify it contains the needed decisions, artifact refs, acceptance checks, verification/evals, domain docs, risks, unknowns, and traceability only where relevant.
+10. List temp planning state for cleanup after verification:
+   `session_state.md`, `plan_draft.md`, temp stage handoffs, empty `stages/`.
+11. Preserve non-temp artifacts: visual design concepts, prototypes, mock data, fixtures, screenshots, diagrams, code, and user-created docs.
 
 ## Final plan requirements
 
@@ -45,6 +51,7 @@ Need in the final artifact only when relevant to the user's goal:
 - Decisions with short rationale.
 - Q&A history only when needed to understand decisions.
 - Artifact paths + current status.
+- Domain language and ADR updates when relevant.
 - Acceptance checks.
 - Verification/evals.
 - Traceability table only when implementation is planned.
@@ -63,6 +70,7 @@ Do not write `99-final-plan.md`; final synthesis lives in `plan.md`.
 ## Code/Request Evidence
 ## Stage Map and Source Status
 ## Decisions
+## Domain Language and ADRs
 ## Product Plan
 ## UI Flow
 ## Visual Design
@@ -89,6 +97,8 @@ Omit irrelevant stage sections unless they explain an important decision. Do not
 
 - Final plan is canonical. No required info may live only in a temp handoff/draft.
 - Do not write "see handoff"; copy the useful content into `plan.md`.
+- Use `modules/domain-docs.md` before writing glossary or ADR updates.
+- Do not put implementation decisions in `CONTEXT.md`.
 - Do not finish while a relevant handoff/artifact is `draft` or `blocked`.
 - Do not finish until each active stage has acceptance checks + verification/eval where relevant, or an explicitly user-parked blocker/unknown.
 - Trace requirements -> slices/tasks -> acceptance criteria -> verification/evals.
@@ -96,5 +106,6 @@ Omit irrelevant stage sections unless they explain an important decision. Do not
 - Keep evidence labels: code/docs/user quote/unknown.
 - Do not invent certainty.
 - Include file paths + localhost/device refs for artifacts.
-- Delete only skill-generated temp planning files after the final plan is verified. If content is not copied or ownership is unclear, keep it and list why under `## Cleanup`.
+- Do not clean up temp planning files without separate approval. If content is
+  not copied or ownership is unclear, keep it and list why under `## Cleanup`.
 - Final reply: `plan.md` path + cleanup status.

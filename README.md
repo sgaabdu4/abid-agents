@@ -11,30 +11,45 @@ This repo is designed to be cloned to `~/.agents`. From there it links one set o
 New machine:
 
 ```sh
-git clone --recurse-submodules https://github.com/sgaabdu4/abid-agents.git "$HOME/.agents"
-"$HOME/.agents/scripts/install.sh"
+curl -fsSL https://raw.githubusercontent.com/sgaabdu4/abid-agents/main/scripts/setup.sh | bash
 ```
 
 Existing clone:
 
 ```sh
 cd "$HOME/.agents"
-git pull --ff-only
-./scripts/update-submodules.sh --init
-./scripts/install.sh
+./scripts/setup.sh
 ```
 
-The installer is conservative:
+The setup script detects whether `~/.agents` already exists. It clones or updates the repo, initializes pinned submodules, installs MCP tools, links agent configs and skills, installs local Git hooks, installs or updates [`no-mistakes`](https://github.com/kunchenguid/no-mistakes), and initializes the `.agents` repo for `git push no-mistakes`.
 
-- backs up existing non-symlink config files before replacing them
-- skips conflicting skill folders instead of overwriting them
+When run in a terminal, setup asks whether to install `no-mistakes`, enable cron, and initialize extra repos. In non-interactive runs, defaults are safe: `no-mistakes` on, cron off, extra repos only from env vars.
+
+The setup is conservative:
+
+- prepends a deduped managed block to existing agent `AGENTS.md` files instead of replacing local content
+- preserves existing non-managed config files and conflicting skill folders instead of overwriting them
 - initializes pinned submodules
 - installs local Git hooks for this repo
 - leaves cron disabled unless you explicitly enable it
+- initializes extra `no-mistakes` repos only when `ABID_AGENTS_NO_MISTAKES_REPOS=/repo/a:/repo/b` is set
+
+Useful setup switches:
+
+| Variable | Effect |
+| --- | --- |
+| `ABID_AGENTS_ENABLE_CRON=1` | Install the optional auto-sync cron during setup. |
+| `ABID_AGENTS_SETUP_NO_MISTAKES=0` | Answer no to the setup-time `no-mistakes` question. |
+| `ABID_AGENTS_SKIP_NPM_INSTALL=1` | Skip MCP tool installation. |
+| `ABID_AGENTS_SKIP_NO_MISTAKES=1` | Skip installing and initializing `no-mistakes`. |
+| `ABID_AGENTS_SKIP_NO_MISTAKES_INIT=1` | Install `no-mistakes` but skip repo initialization. |
+| `ABID_AGENTS_NO_MISTAKES_REPOS=/repo/a:/repo/b` | Initialize extra repos for `git push no-mistakes`. |
 
 ---
 
 ## 2. What gets linked
+
+Existing agent instruction files are preserved. Setup refreshes only the marked `abid-agents` block and leaves local rules below it.
 
 | Agent/runtime | Linked config |
 | --- | --- |
@@ -80,6 +95,9 @@ There are two types:
 
 - Local skills: owned by this repo and kept small.
 - Upstream skills: pinned as submodules and exposed through symlinks.
+- Tool-installed skills: written by their CLI owner, such as `no-mistakes`.
+
+Workflow defaults: use `grill-me` to clarify ambiguous work before building, then use [`no-mistakes`](https://github.com/kunchenguid/no-mistakes) through `/no-mistakes` or `git push no-mistakes` to validate committed shipping work after implementation.
 
 Local skill budget:
 
@@ -88,7 +106,7 @@ Local skill budget:
 - description under 300 characters
 - detailed workflows moved to `references/*.md` or scripts
 
-Upstream skills are updated from their source repos. Do not compress or patch them locally unless the change belongs upstream.
+Upstream and tool-installed skills are updated from their source repos or CLI owners. Do not compress or patch them locally unless the change belongs upstream.
 
 ---
 
@@ -149,7 +167,7 @@ Set a custom schedule:
 ABID_AGENTS_CRON_SCHEDULE="*/30 * * * *" ./scripts/install-cron.sh
 ```
 
-Cron runs `scripts/auto-sync.sh`. It pulls `main`, bumps submodules, scans for private paths and secret-like values, commits changed pins, and pushes `main`.
+Cron runs `scripts/auto-sync.sh`. It updates `no-mistakes`, pulls `main`, bumps submodules, scans for private paths and secret-like values, commits changed pins, and pushes `main`.
 
 Useful switches:
 
@@ -159,12 +177,17 @@ Useful switches:
 | `ABID_AGENTS_SKIP_SUBMODULE_INIT=1` | Skip install-time submodule init. |
 | `ABID_AGENTS_SKIP_SUBMODULE_UPDATE=1` | Skip pull-hook submodule updates. |
 | `ABID_AGENTS_SKIP_SUBMODULE_BUMP=1` | Cron uses pinned commits only. |
+| `ABID_AGENTS_SKIP_NO_MISTAKES_UPDATE=1` | Skip cron-time `no-mistakes update`. |
+| `ABID_AGENTS_NO_MISTAKES_BIN=/path/to/no-mistakes` | Override the CLI path used by cron. |
 | `ABID_AGENTS_CHECK_SUBMODULES_BEFORE_PUSH=1` | Print submodule status before push. |
 | `ABID_AGENTS_ENABLE_CRON=1` | Install the optional cron job during install. |
 
 ---
 
-## 8. Safety checks before pushing
+## 8. Shipping and safety checks
+
+Default shipping path: use [`no-mistakes`](https://github.com/kunchenguid/no-mistakes) through `/no-mistakes` or `git push no-mistakes` after a repo has been initialized with `no-mistakes init`.
+Use direct `git push origin ...` only when explicitly requested or when the gate is unavailable.
 
 Run:
 
@@ -193,9 +216,7 @@ Never commit secrets, personal paths, runtime logs, local MCP state, generated c
 
 ```sh
 cd "$HOME/.agents"
-git pull --ff-only
-./scripts/update-submodules.sh --init
-./scripts/install.sh
+./scripts/setup.sh
 ```
 
 Change this repo for global behavior. Add a project-local `AGENTS.md` when one project needs different rules.

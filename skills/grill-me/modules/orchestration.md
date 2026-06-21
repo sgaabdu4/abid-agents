@@ -12,7 +12,8 @@ closing a stage, or writing the final plan.
 - If existing code matters or user asks to modify/review existing code, ground
   the session in the actual request + repo.
 - Existing code path: use CBM first (`list_projects` -> status/index ->
-  architecture -> search/trace), then read relevant code/docs before asking.
+  architecture -> search/trace), load `modules/domain-docs.md` when domain docs
+  may matter, then read relevant code/docs before asking.
 - For understanding/codebase-understanding requests, map current owners,
   behavior, routes, data, constraints, and unknowns before proposing a build
   path. Ask only what evidence cannot answer.
@@ -48,61 +49,23 @@ Stage skipping:
 - Use `run` only for unresolved decisions, requested artifacts, risky UX/API
   choices, or changed surfaces.
 
-Classify:
-- Request profile: greenfield, brownfield-feature, simple-feature,
-  understanding, codebase-understanding, or mixed.
-- Work type: product, feature, redesign, refactor, API/schema, infra, launch.
-- Code reality: greenfield or existing.
-- UI need: user-facing UI or backend-only.
-- Runtime: web, Flutter, native, desktop, CLI, API.
-- Visual design mode: 2-4 style directions, styled key screens, existing design
-  system, skip, n/a.
-- Prototype tech stack: target frontend/runtime, existing app stack, static
-  HTML/CSS, Flutter/native, skip, n/a.
-- Prototype mode: mock-data clickable/local flow, existing prototype, skip, n/a.
-- Mock-data scope: happy, empty, loading, error, permission, offline/failure.
-- Tech split: prototype/frontend tech stack before prototype; backend/infra
-  stack after prototype approval.
-- Certainty: fixed vs undecided.
-- Delivery plan: vertical slices, task waves, acceptance criteria,
-  verification/evals.
-- Desired artifact: product plan, impl plan, visual design directions, styled
-  prototype, implementation plan, all.
+Classify only what changes routing: profile, work type, repo reality, UI need,
+runtime, visual/prototype need, backend/API/data risk, certainty, desired
+artifact, acceptance checks, verification/evals, and domain-doc impact.
 
 ## Files
 
-- Ensure `docs/planning/<slug>/`; infer slug from request when safe. Ask only if
-  ambiguous/conflicting.
-- Durable session state: `docs/planning/<slug>/session_state.md`.
-- Orchestrator draft: `docs/planning/<slug>/plan_draft.md`.
-- Temp stage handoffs: create lazily only when a stage closes, an artifact is
-  written, or final plan synthesis needs it; never for simple Q&A turns; never
-  for `skip`/`n/a`.
-  - Intake: `docs/planning/<slug>/stages/00-intake.md`.
-  - Product: `docs/planning/<slug>/stages/01-product.md`.
-  - UI flow: `docs/planning/<slug>/stages/02-ui-flow.md`.
-  - Visual design: `docs/planning/<slug>/stages/03-visual-design.md`.
-  - Prototype tech stack: `docs/planning/<slug>/stages/04-prototype-tech.md`.
-  - Prototype: `docs/planning/<slug>/stages/05-prototype.md`.
-  - Backend/infra tech: `docs/planning/<slug>/stages/06-backend-tech.md`.
-  - Vertical slices/evals: `docs/planning/<slug>/stages/07-vertical-slices.md`.
-- Final plan: `docs/planning/<slug>/plan.md` - canonical, self-contained.
-- Do not create `docs/planning/<slug>/stages/99-final-plan.md`; final synthesis
-  lives in `plan.md`.
-- Legacy compatibility: if old draft/handoff paths exist, read them, copy needed
-  content into `plan.md` or current temp paths, then delete temp duplicates when
-  safe.
-- Web visual design concepts: `docs/planning/visual-design/<slug>/`.
-- Web prototypes: `docs/planning/prototypes/<slug>/`.
-- Flutter visual design concepts: prefer `lib/visual_design/<slug>/` or
-  `lib/main_visual_design.dart`.
-- Flutter prototypes: prefer `lib/prototypes/<slug>/` or
-  `lib/main_prototype.dart`.
-- Mock data: keep near prototype (`mock-data.*`, `fixtures.*`, or
-  `mock_data.dart`).
-- File edits via native file tools only; shell/context-mode only run/verify.
-- During interview, update only `session_state.md` plus `plan_draft.md`. Do not
-  update stage handoffs per question.
+- Ensure `docs/planning/<slug>/`; infer slug when safe, ask only if ambiguous.
+- Interview writes only `session_state.md` plus `plan_draft.md`, except when the
+  user explicitly asks for docs/status.
+- `stage-handoff.md` owns temp stage paths; create them lazily only at stage
+  close, artifact creation, user request, or final synthesis.
+- Final plan is `docs/planning/<slug>/plan.md`; never write `99-final-plan.md`.
+- Visual/prototype modules own artifact paths and mock-data placement.
+- Domain docs module owns proposed `CONTEXT.md` terms and ADR candidates.
+- If old draft/handoff paths exist, read and absorb needed content into current
+  state or `plan.md`; list temp duplicates for later approved cleanup.
+- File edits use native file tools; shell/context-mode only run or verify.
 
 ## Handoff model
 
@@ -176,27 +139,10 @@ known enough to choose the next stage.
 - Do not paste the refined doc to the user unless they ask; just continue the
   interview.
 
-Draft minimum:
-
-```md
-# <Title> Draft
-
-## Current
-- Stage: <stage>
-- Next: <plain next Q>
-
-## Answers
-| # | Question | Answer |
-|---|---|---|
-| <N> | <plain question> | <user answer> |
-
-## Decisions
-- <confirmed decision>
-```
-
 Draft rules:
 - `plan_draft.md` is an answer ledger, not a plan. Target <= 60 lines / 4 KB.
-- Record only: current stage, next Q, user answers, confirmed decisions.
+- Record only: current stage, next Q, user answers, confirmed decisions, and
+  confirmed domain-doc notes when active.
 - `session_state.md` owns route profile, stage map, exact last/next question,
   blockers, artifact refs, and compaction recovery.
 - Do not store recommendations, rejected options, definitions, evidence,
@@ -209,32 +155,14 @@ Draft rules:
 
 ## Stage flow
 
-Run only stages mapped `run` or `brief`. Treat stages as interview phases, not
-doc-writing phases.
+Run only stages mapped `run` or `brief`. Load the matching module, ask Qs,
+update only the ledger/state, then refine at stage end. Artifact modules may
+write artifacts only when their gates allow it. Final plan loads
+`modules/final-plan.md`, synthesizes into `plan.md`, and creates handoffs only
+when needed for artifact/risk traceability.
 
-1. Intake - ask Qs; update only answer ledger; refine at stage end.
-2. Product plan - load `modules/product.md`; ask Qs; update only answer ledger;
-   refine at stage end.
-3. UI flow - load `modules/ui-flow.md`; ask Qs; update only answer ledger;
-   refine at stage end.
-4. Visual design - load `modules/visual-design.md`; choose 2-4 style directions
-   and write styled key-screen/flow concepts when needed; compact artifact note;
-   refine at stage end.
-5. Prototype tech stack - load `modules/prototype-tech.md`; ask Qs; update only
-   answer ledger; refine at stage end.
-6. Mock-data prototype - load `modules/prototype.md`; write artifact when
-   approved; compact artifact note; refine at stage end.
-7. Backend/infra tech stack - load `modules/backend-tech.md`; ask Qs; update
-   only answer ledger; refine at stage end.
-8. Vertical slices/evals - load `modules/vertical-slices.md`; ask Qs; update
-   only answer ledger; refine at stage end.
-9. Final plan - load `modules/final-plan.md` only when user wants the plan or
-   interview is done. Synthesize answers into `plan.md`; create handoffs only if
-   needed for artifacts/risk traceability.
-
-Do not create `00-intake.md`-`07-vertical-slices.md` just because a stage is
-active; create/refine the relevant handoff only at stage end or
-artifact/final synthesis.
+Do not create `00-intake.md` through `07-vertical-slices.md` just because a
+stage is active.
 
 ## Loop
 
@@ -251,11 +179,13 @@ Each turn:
    generating the next Q.
 6. If existing code matters, ground with code/docs before Q1; for
    codebase-understanding, answer evidence-backed facts first.
-7. If intake incomplete, ask the highest-impact unanswered intake Q.
-8. Else load only the relevant stage module and `modules/questions.md`.
-9. Before the visible reply, persist the exact Q in `session_state.md`.
-10. Visible interview reply = question only.
-11. When a stage is clear, refine/handoff if needed, then continue or finalize.
+7. If fuzzy terms, glossary/ADR conflicts, or doc updates matter, load
+   `modules/domain-docs.md`.
+8. If intake incomplete, ask the highest-impact unanswered intake Q.
+9. Else load only the relevant stage module and `modules/questions.md`.
+10. Before the visible reply, persist the exact Q in `session_state.md`.
+11. Visible interview reply = question only.
+12. When a stage is clear, refine/handoff if needed, then continue or finalize.
 
 ## Global rules
 
@@ -276,14 +206,10 @@ Each turn:
 - If user answers `all/both/all important`, accept it when feasible; do not
   re-ask the same ranking. Next Q must ask a concrete behavior, boundary, or
   risk control.
-- Visual design is an impeccable-backed selection gate: run/load impeccable
-  setup, create or refresh PRODUCT.md via teach when missing, offer DESIGN.md
-  via document when missing, show 2-4 meaningfully different styled directions,
-  let the user pick/merge/customize/accept default, then build the full-flow
-  prototype in that chosen style.
-- Full-flow UI prototypes are token-first and atomic by default: minimal
-  semantic tokens, atoms, molecules, organisms/templates, pages; reuse
-  components across states and keep the taxonomy proportional to the prototype.
+- Visual design module owns impeccable setup, PRODUCT/DESIGN context,
+  2-4 directions, user choice, tokens/components, and prototype handoff.
+- Full-flow UI prototypes are token-first and atomic by default; keep the
+  taxonomy proportional and reuse components across states.
 - No full-flow UI prototype before visual direction is chosen and prototype tech
   stack is decided, unless the user explicitly says to skip visual design.
 - No backend/infra tech stack before product + UI flow + visual design alignment
@@ -298,6 +224,8 @@ Each turn:
 - Do not write `99-final-plan.md`; write `plan.md` only.
 - Schema/data/auth/security/deploy/stateful changes require human review gate,
   rollback/migration notes, and telemetry/audit expectations.
+- Existing glossary/ADR conflicts must be surfaced with evidence before final
+  synthesis or downstream task plans.
 - Resolve parent decisions before child decisions.
 - Replace fuzzy terms with canonical terms.
 - Surface contradictions with evidence.
@@ -307,4 +235,4 @@ Each turn:
   after options, risks, and validation are clear; it must not drift into visual
   design, prototype, or build planning unless the user expands scope.
 - Finish only after final plan write, self-contained verification, and cleanup
-  of temp draft/handoffs that were safely absorbed.
+  status for temp draft/handoffs that were safely absorbed.

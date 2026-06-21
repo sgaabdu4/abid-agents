@@ -5,6 +5,8 @@ import path from 'node:path';
 
 const repo = path.join(process.env.HOME, '.agents');
 const installScript = fs.readFileSync(path.join(repo, 'scripts', 'install.sh'), 'utf8');
+const setupScript = fs.readFileSync(path.join(repo, 'scripts', 'setup.sh'), 'utf8');
+const setupNewUserScript = fs.readFileSync(path.join(repo, 'scripts', 'setup-new-user.sh'), 'utf8');
 const autoSyncScript = fs.readFileSync(path.join(repo, 'scripts', 'auto-sync.sh'), 'utf8');
 const cronScript = fs.readFileSync(path.join(repo, 'scripts', 'install-cron.sh'), 'utf8');
 const subtreeSyncScript = fs.readFileSync(path.join(repo, 'scripts', 'sync-subtrees.sh'), 'utf8');
@@ -19,6 +21,18 @@ assert.ok(installScript.includes('config --local pull.ff only'), 'installer must
 assert.ok(installScript.includes('ABID_AGENTS_SKIP_SUBMODULE_INIT'), 'installer must support skipping submodule init');
 assert.ok(installScript.includes('ABID_AGENTS_SKIP_SUBMODULE_UPDATE'), 'pull hooks must support skipping submodule updates');
 assert.ok(installScript.includes('ABID_AGENTS_CHECK_SUBMODULES_BEFORE_PUSH'), 'pre-push submodule status must be opt-in');
+assert.ok(installScript.includes('install_managed_block'), 'installer must preserve agent files with a managed block');
+assert.ok(installScript.includes('BEGIN managed by abid-agents'), 'managed block must be marker-deduped');
+assert.ok(installScript.includes('Preserving existing file'), 'installer must preserve existing non-managed config files');
+assert.ok(!installScript.includes('rm "$target"'), 'installer must not remove existing linked targets');
+assert.ok(setupScript.includes('git clone --recurse-submodules'), 'new-user setup must clone with submodules');
+assert.ok(setupScript.includes('scripts/install.sh'), 'new-user setup must run the main installer');
+assert.ok(setupScript.includes('no-mistakes'), 'new-user setup must install or initialize no-mistakes');
+assert.ok(setupScript.includes('ask_yes_no'), 'setup must ask questions when interactive');
+assert.ok(setupScript.includes('ABID_AGENTS_SETUP_NO_MISTAKES'), 'setup must allow non-interactive no-mistakes choice');
+assert.ok(setupScript.includes('ABID_AGENTS_ENABLE_CRON'), 'setup must allow cron choice');
+assert.ok(setupScript.includes('ABID_AGENTS_NO_MISTAKES_REPOS'), 'new-user setup must support extra no-mistakes repo init');
+assert.ok(setupNewUserScript.includes('exec "$SCRIPT_DIR/setup.sh" "$@"'), 'legacy setup-new-user script must delegate to canonical setup');
 assert.ok(installScript.includes('"${1:-}" != "rebase"'), 'post-rewrite hook must only react to rebase rewrites');
 assert.ok(
   installScript.includes('Blocked push: reachable git history contains private path or secret-like references.'),
@@ -29,6 +43,10 @@ assert.ok(autoSyncScript.includes('git rev-parse --git-path agent-config-auto-sy
 assert.ok(autoSyncScript.includes('git pull --ff-only origin main'), 'auto-sync must pull main with ff-only');
 assert.ok(autoSyncScript.includes('scripts/update-submodules.sh" --remote'), 'auto-sync must bump submodules to tracked upstreams');
 assert.ok(autoSyncScript.includes('ABID_AGENTS_SKIP_SUBMODULE_BUMP'), 'auto-sync must allow disabling upstream submodule bumps');
+assert.ok(autoSyncScript.includes('ABID_AGENTS_SKIP_NO_MISTAKES_UPDATE'), 'auto-sync must allow disabling no-mistakes updates');
+assert.ok(autoSyncScript.includes('ABID_AGENTS_NO_MISTAKES_BIN'), 'auto-sync must allow overriding the no-mistakes binary path');
+assert.ok(autoSyncScript.includes('NO_MISTAKES_NO_UPDATE_CHECK=1'), 'auto-sync must avoid nested no-mistakes update checks');
+assert.ok(autoSyncScript.includes('update --yes'), 'auto-sync must update no-mistakes non-interactively');
 assert.ok(autoSyncScript.includes('git commit -m "Auto-update skill submodules"'), 'auto-sync must commit changed submodule pins');
 assert.ok(autoSyncScript.includes('git push --recurse-submodules=check origin main'), 'auto-sync must push bumped submodule pins safely');
 assert.ok(
@@ -74,7 +92,7 @@ if (fs.existsSync(postRewriteHook)) {
   assert.ok(text.includes('ABID_AGENTS_SKIP_SUBMODULE_UPDATE'), 'installed post-rewrite hook must support skipping submodule updates');
 }
 
-for (const relativePath of ['scripts/auto-sync.sh', 'scripts/install-cron.sh', 'scripts/update-submodules.sh']) {
+for (const relativePath of ['scripts/auto-sync.sh', 'scripts/install-cron.sh', 'scripts/update-submodules.sh', 'scripts/setup.sh', 'scripts/setup-new-user.sh']) {
   const stat = fs.statSync(path.join(repo, relativePath));
   assert.ok((stat.mode & 0o111) !== 0, `${relativePath} must be executable`);
 }

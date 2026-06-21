@@ -437,6 +437,103 @@
         "Build-plan, visual, prototype, and vertical slice stages are n/a.",
         "Any Q is only for scope or unresolved evidence."
       ]
+    },
+    {
+      "id": 37,
+      "prompt": "Grill me on adding pitches to this existing course app. Use the repo docs if they exist, and do not build yet.",
+      "expected_output": "Routes as brownfield/domain-doc-backed planning, reads existing CONTEXT.md before Q1, uses glossary vocabulary, and asks one relationship or lifecycle question.",
+      "files": [
+        {
+          "path": "CONTEXT.md",
+          "content": "# Course Admin\n\n## Language\n\n**Standalone Video**:\nA video with no lesson association.\n_Avoid_: orphan video, loose video\n\n**Pitch**:\nPackaging metadata for a potential standalone video.\n_Avoid_: promo, campaign\n"
+        },
+        {
+          "path": "src/videos.ts",
+          "content": "export type Video = { id: string; lessonId: string | null; pitchId?: string | null; status: 'idle' | 'scheduled' | 'shipped' };\n"
+        }
+      ],
+      "expectations": [
+        "Existing CONTEXT.md or repo docs are inspected before Q1.",
+        "The question uses or challenges glossary vocabulary such as Standalone Video or Pitch.",
+        "The first Q asks one concrete domain relationship, lifecycle/status, empty-state, or deletion/archive decision.",
+        "The response does not start build, prototype, or implementation work."
+      ]
+    },
+    {
+      "id": 38,
+      "prompt": "Full grill me for an existing billing migration. There might not be any domain docs yet. Ask what matters, but do not ask me to create docs up front.",
+      "expected_output": "Routes existing-code build-plan, proceeds silently if domain docs are missing, and asks one migration decision question grounded in evidence or unknowns.",
+      "files": [
+        {
+          "path": "src/billing.ts",
+          "content": "export type BillingProvider = 'stripe' | 'adyen';\nexport type SubscriptionState = 'trial' | 'active' | 'past_due' | 'cancelled';\n"
+        }
+      ],
+      "expectations": [
+        "Missing CONTEXT.md or ADR docs are not treated as a blocker.",
+        "The visible response does not ask the user to create docs before grilling.",
+        "The first Q is about migration behavior, provider ownership, state mapping, rollback, telemetry, or risk.",
+        "Backend/data/stateful risk controls remain in scope."
+      ]
+    },
+    {
+      "id": 39,
+      "prompt": "Stress test my plan to hard-delete Pitches when users delete them. The repo has ADRs. Grill me before we finalize.",
+      "expected_output": "Routes review/stress-test, reads relevant ADR context, surfaces any delete/archive conflict, and asks one blocking decision question.",
+      "files": [
+        {
+          "path": "CONTEXT.md",
+          "content": "# Course Admin\n\n## Language\n\n**Pitch**:\nPackaging metadata for a potential standalone video.\n_Avoid_: campaign\n"
+        },
+        {
+          "path": "docs/adr/0001-restrict-destructive-content-actions.md",
+          "content": "# Restrict destructive content actions\n\nWe keep content deletion restrictive. Records with dependent content should be archived or detached before deletion, not cascaded automatically.\n"
+        }
+      ],
+      "expectations": [
+        "The existing ADR is considered before asking the next question.",
+        "The output surfaces the conflict between hard-delete and restrictive deletion/archive policy.",
+        "The visible response asks one blocking decision question.",
+        "The response does not silently override the ADR."
+      ]
+    },
+    {
+      "id": 40,
+      "prompt": "Continue the grill-me session. We just decided that Pitch is the canonical term and promo should be avoided. Save the final plan and any useful docs.",
+      "expected_output": "Runs final synthesis, captures the confirmed glossary term, writes docs only as synthesis output, and keeps CONTEXT.md as glossary-only.",
+      "files": [
+        {
+          "path": "docs/planning/pitches/session_state.md",
+          "content": "# Pitches Session State\nUpdated: synthetic\nMode: build-plan\nProfile: brownfield-feature\nRepo: existing\nTarget artifact: implementation plan\n\n## Position\n- Active stage: final\n- Stage status: accepted\n- Last question id: 4\n- Last answer: recorded\n- Next action: write-final-plan\n\n## Decisions\n- Use Pitch as the canonical term.\n- Avoid promo.\n\n## Evidence / Artifacts\n- user quote: Pitch is canonical, promo should be avoided.\n"
+        },
+        {
+          "path": "docs/planning/pitches/plan_draft.md",
+          "content": "# Pitches Draft\n\n## Answers\n| # | Question | Answer |\n|---|---|---|\n| 4 | Which term should name the packaging concept? | Pitch. Avoid promo. |\n\n## Decisions\n- Pitch is the canonical project term.\n- Promo is an avoided synonym.\n"
+        }
+      ],
+      "expectations": [
+        "Final synthesis uses session_state.md and plan_draft.md.",
+        "The output includes or writes a glossary-style CONTEXT.md update for Pitch.",
+        "CONTEXT.md content stays glossary-only and avoids implementation decisions.",
+        "The final plan remains canonical and self-contained."
+      ]
+    },
+    {
+      "id": 41,
+      "prompt": "Grill me on whether this auth refactor deserves an ADR. We have two real options and it will affect rollback.",
+      "expected_output": "Routes build-plan/review with domain-doc awareness, treats ADR as a candidate only if strict criteria are met, and asks one tradeoff question.",
+      "files": [
+        {
+          "path": "src/auth.ts",
+          "content": "export type SessionMode = 'cookie' | 'token';\n"
+        }
+      ],
+      "expectations": [
+        "The response treats ADR creation as conditional, not automatic.",
+        "The ADR criteria include hard to reverse, surprising without context, and real tradeoff.",
+        "The first Q asks about the auth tradeoff, rollback, compatibility, or future-reader surprise.",
+        "Security/auth review and verification remain in scope."
+      ]
     }
   ]
 }

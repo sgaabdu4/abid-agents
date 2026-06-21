@@ -29,6 +29,34 @@ if ! mkdir "$LOCK_DIR" 2>/dev/null; then
 fi
 trap 'rmdir "$LOCK_DIR"' EXIT
 
+update_no_mistakes() {
+  local binary
+
+  if [[ "${ABID_AGENTS_SKIP_NO_MISTAKES_UPDATE:-}" == "1" ]]; then
+    return 0
+  fi
+
+  binary="${ABID_AGENTS_NO_MISTAKES_BIN:-}"
+  if [[ -z "$binary" ]]; then
+    if command -v no-mistakes >/dev/null 2>&1; then
+      binary="$(command -v no-mistakes)"
+    elif [[ -x "$HOME/.no-mistakes/bin/no-mistakes" ]]; then
+      binary="$HOME/.no-mistakes/bin/no-mistakes"
+    elif [[ -x "$HOME/.local/bin/no-mistakes" ]]; then
+      binary="$HOME/.local/bin/no-mistakes"
+    else
+      echo "Skipping no-mistakes update: no-mistakes not found."
+      return 0
+    fi
+  fi
+
+  if ! NO_MISTAKES_TELEMETRY="${NO_MISTAKES_TELEMETRY:-0}" \
+    NO_MISTAKES_NO_UPDATE_CHECK=1 \
+    "$binary" update --yes; then
+    echo "no-mistakes update failed; continuing auto-sync." >&2
+  fi
+}
+
 if [[ "$(git branch --show-current)" != "main" ]]; then
   echo "Refusing auto-sync: current branch is not main." >&2
   exit 1
@@ -38,6 +66,8 @@ if ! git diff --quiet || ! git diff --cached --quiet; then
   echo "Refusing auto-sync: tracked working tree or index has local changes." >&2
   exit 1
 fi
+
+update_no_mistakes
 
 git fetch origin main
 

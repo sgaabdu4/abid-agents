@@ -9,6 +9,7 @@ const schemaPath = path.join(skillRoot, "evals", "eval-output-schema.json");
 const runRoot = process.env.GRILL_ME_EVAL_ROOT || "/tmp/grill-me-eval-run";
 const model = process.env.GRILL_ME_EVAL_MODEL || "gpt-5.4-mini";
 const concurrency = Number(process.env.GRILL_ME_EVAL_CONCURRENCY || "3");
+const runId = process.env.GRILL_ME_EVAL_RUN_ID || `${Date.now()}-${process.pid}`;
 const idsArg = process.argv.slice(2);
 const ids = idsArg.length ? new Set(idsArg.map(Number)) : null;
 const selected = ids ? evals.filter((item) => ids.has(item.id)) : evals;
@@ -24,10 +25,13 @@ if (!fs.existsSync(skillCopy)) {
   process.exit(1);
 }
 
-fs.mkdirSync(path.join(runRoot, "results"), { recursive: true });
+const resultDir = path.join(runRoot, "results", runId);
+fs.mkdirSync(resultDir, { recursive: true });
 
 function copyDir(src, dest) {
-  fs.rmSync(dest, { recursive: true, force: true });
+  if (fs.existsSync(dest)) {
+    throw new Error(`Destination already exists: ${dest}`);
+  }
   fs.mkdirSync(path.dirname(dest), { recursive: true });
   fs.cpSync(src, dest, { recursive: true });
 }
@@ -76,11 +80,13 @@ ${item.expectations.map((expectation, index) => `${index + 1}. ${expectation}`).
 
 function runEval(item) {
   return new Promise((resolve) => {
-    const evalDir = path.join(runRoot, "runs", `eval-${String(item.id).padStart(2, "0")}`);
+    const evalDir = path.join(runRoot, "runs", runId, `eval-${String(item.id).padStart(2, "0")}`);
     const targetDir = path.join(evalDir, "target");
-    const resultPath = path.join(runRoot, "results", `eval-${String(item.id).padStart(2, "0")}.json`);
-    const logPath = path.join(runRoot, "results", `eval-${String(item.id).padStart(2, "0")}.log`);
-    fs.rmSync(evalDir, { recursive: true, force: true });
+    const resultPath = path.join(resultDir, `eval-${String(item.id).padStart(2, "0")}.json`);
+    const logPath = path.join(resultDir, `eval-${String(item.id).padStart(2, "0")}.log`);
+    if (fs.existsSync(evalDir)) {
+      throw new Error(`Eval directory already exists: ${evalDir}`);
+    }
     fs.mkdirSync(targetDir, { recursive: true });
     copyDir(skillCopy, path.join(targetDir, "skill-under-test"));
     fs.writeFileSync(path.join(targetDir, "README.md"), "Synthetic eval target repo. App code exists only if this eval prompt provides it.\n");
@@ -134,6 +140,7 @@ results.sort((a, b) => a.id - b.id);
 const passed = results.filter((result) => result.parsed?.overall_pass === true).length;
 const summary = {
   model,
+  runId,
   total: results.length,
   passed,
   failed: results.length - passed,
@@ -146,6 +153,6 @@ const summary = {
     notes: result.parsed?.notes || ""
   }))
 };
-fs.writeFileSync(path.join(runRoot, "results", "summary.json"), JSON.stringify(summary, null, 2));
+fs.writeFileSync(path.join(resultDir, "summary.json"), JSON.stringify(summary, null, 2));
 console.log(JSON.stringify(summary, null, 2));
 if (summary.failed) process.exit(2);

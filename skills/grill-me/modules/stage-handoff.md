@@ -56,7 +56,9 @@ Do not create this while interviewing unless the user asks for docs/status. Use 
 - <what next module can assume or must ask>
 ```
 
-Expanded detail allowed at gate close: inputs, definitions, options considered, dependencies, traceability, high-risk controls, gate criteria.
+Expanded detail allowed at gate close: inputs, definitions, domain doc notes,
+ADR candidates, options considered, dependencies, traceability, high-risk
+controls, gate criteria.
 
 ## Gate status rules
 
@@ -74,9 +76,12 @@ Expanded detail allowed at gate close: inputs, definitions, options considered, 
 - No hidden assumptions. Put unknowns in `Open questions`.
 - Before moving stages, confirm the stage is fully clarified, then refine the stage summary and set gate status.
 - Ask as many one-by-one clarification Qs as needed before the gate passes; do not optimize for fewer questions.
-- Clarification blockers: contradiction, vague term, missing required decision, unsafe risk/control gap, unclear acceptance/eval, or artifact cannot be produced.
+- Clarification blockers: contradiction, vague term/domain conflict, missing
+  required decision, unsafe risk/control gap, unclear acceptance/eval, or
+  artifact cannot be produced.
 - If no blocker, do not ask extra refinement Qs; write the compact summary and continue.
 - `run`/`brief` stages need acceptance criteria + verification/eval, or an explicitly user-parked blocker/unknown.
 - High-risk schema/data/auth/security/deploy/stateful work needs controls before final plan.
 - Final plan must copy needed content into `plan.md`; no required info may live only here.
-- After verified final plan, delete temp handoffs unless ownership/content-copy safety is unclear.
+- After verified final plan, list temp handoffs for cleanup; do not clean them
+  up without separate approval.

@@ -40,6 +40,10 @@
     "should_trigger": true
   },
   {
+    "query": "Grill me with the existing CONTEXT.md and ADRs before we finalize this billing migration plan.",
+    "should_trigger": true
+  },
+  {
     "query": "Run pnpm test and fix whatever fails.",
     "should_trigger": false
   },
@@ -85,6 +89,10 @@
   },
   {
     "query": "Explain what this one function does: parseReminderPayload(). No interview, just explain the code.",
+    "should_trigger": false
+  },
+  {
+    "query": "Update CONTEXT.md with exactly these glossary terms. Do not ask questions or run a planning interview.",
     "should_trigger": false
   }
 ]

@@ -16,25 +16,72 @@ if git -C "$ROOT" rev-parse --git-dir >/dev/null 2>&1 &&
   "$ROOT/scripts/update-submodules.sh" --init
 fi
 
-link_file() {
+backup_path() {
+  local target="$1"
+  printf '%s.backup.%s' "$target" "$(date +%Y%m%d%H%M%S)"
+}
+
+preserve_or_link_file() {
   local source="$1"
   local target="$2"
   mkdir -p "$(dirname "$target")"
   if [[ -L "$target" ]]; then
-    rm "$target"
+    if [[ "$(readlink "$target")" == "$source" ]]; then
+      return 0
+    fi
+    echo "Preserving existing symlink: $target"
+    return 0
   elif [[ -e "$target" ]]; then
-    mv "$target" "$target.backup.$(date +%Y%m%d%H%M%S)"
+    echo "Preserving existing file: $target"
+    return 0
   fi
   ln -s "$source" "$target"
 }
 
-link_file "$ROOT/AGENTS.md" "$HOME/.codex/AGENTS.md"
-link_file "$ROOT/mcp-config.json" "$HOME/.codex/mcp-config.json"
-link_file "$ROOT/codex/hooks.json" "$HOME/.codex/hooks.json"
-link_file "$ROOT/AGENTS.md" "$HOME/.claude/AGENTS.md"
-link_file "$ROOT/AGENTS.md" "$HOME/.copilot/AGENTS.md"
-link_file "$ROOT/AGENTS.md" "$HOME/.pi/AGENTS.md"
-link_file "$ROOT/AGENTS.md" "$HOME/.pi/agent/AGENTS.md"
+install_managed_block() {
+  local source="$1"
+  local target="$2"
+  local name="$3"
+  local begin="<!-- BEGIN managed by abid-agents: $name -->"
+  local end="<!-- END managed by abid-agents: $name -->"
+  local tmp
+
+  mkdir -p "$(dirname "$target")"
+
+  if [[ -L "$target" ]]; then
+    if [[ "$(readlink "$target")" == "$source" ]]; then
+      mv "$target" "$(backup_path "$target")"
+    else
+      echo "Preserving existing symlink: $target"
+      return 0
+    fi
+  fi
+
+  tmp="$(mktemp)"
+
+  {
+    printf '%s\n' "$begin"
+    cat "$source"
+    printf '%s\n\n' "$end"
+    if [[ -f "$target" ]]; then
+      awk -v begin="$begin" -v end="$end" '
+        $0 == begin { skip = 1; next }
+        $0 == end { skip = 0; next }
+        !skip { print }
+      ' "$target"
+    fi
+  } >"$tmp"
+
+  mv "$tmp" "$target"
+}
+
+install_managed_block "$ROOT/AGENTS.md" "$HOME/.codex/AGENTS.md" "AGENTS.md"
+preserve_or_link_file "$ROOT/mcp-config.json" "$HOME/.codex/mcp-config.json"
+preserve_or_link_file "$ROOT/codex/hooks.json" "$HOME/.codex/hooks.json"
+install_managed_block "$ROOT/AGENTS.md" "$HOME/.claude/AGENTS.md" "AGENTS.md"
+install_managed_block "$ROOT/AGENTS.md" "$HOME/.copilot/AGENTS.md" "AGENTS.md"
+install_managed_block "$ROOT/AGENTS.md" "$HOME/.pi/AGENTS.md" "AGENTS.md"
+install_managed_block "$ROOT/AGENTS.md" "$HOME/.pi/agent/AGENTS.md" "AGENTS.md"
 
 for skill in "$ROOT"/skills/*; do
   [[ -d "$skill" ]] || continue
@@ -46,8 +93,13 @@ for skill in "$ROOT"/skills/*; do
     mkdir -p "$dir"
     target="$dir/$name"
     if [[ -L "$target" ]]; then
-      rm "$target"
+      if [[ "$(readlink "$target")" == "$skill" ]]; then
+        continue
+      fi
+      echo "Preserving existing skill symlink: $target"
+      continue
     elif [[ -e "$target" ]]; then
+      echo "Preserving existing skill folder: $target"
       continue
     fi
     ln -s "$skill" "$target"

@@ -20,6 +20,8 @@ unneeded UI/design/prototype work.
 - UI-needed vs UI-not-needed routing.
 - Visual design/prototype gates.
 - Backend/API/schema/auth/stateful risk controls.
+- Existing `CONTEXT.md`/ADR use, missing-doc silence, glossary capture, and
+  docs-aware final synthesis.
 - Compaction, missing state, unanswered Q, and answer-recording recovery.
 - Final synthesis for build-plan and understand-only sessions.
 - Trigger near-misses where other skills should win.
