@@ -1,38 +1,27 @@
 # Agent Rules
-
 ## Core
-- Read before claim/edit. If you cannot cite it, mark unknown.
-- Use only current-session tools. If a named tool is absent, use the fallback here or say unavailable.
-- Ask before destructive actions. Never commit secrets.
-- Blast radius first; default full owner migration. Fix root cause/owner issue -> verify. DRY/KISS/YAGNI/SSOT.
-- Default to the smallest correct change: skip speculative work, use stdlib/native/existing deps before new code/deps, direct code before abstraction.
-- Never shrink away validation at trust boundaries, security, accessibility, data-loss handling, user-requested scope, or the smallest proof check.
-- Write with high signal: no filler, no throat-clearing, exact code/API/errors preserved.
-- Touched file >700 lines: refactor by role/feature before adding, unless a project rule requires one file.
+- Read before claim/edit; uncited = unknown. Use only current-session tools; if a named tool is absent, use this fallback or say unavailable. Ask before destructive actions. Never commit secrets.
+- Blast radius first; default full owner migration; fix root cause/owner issue -> verify; DRY/KISS/YAGNI/SSOT. Make the smallest correct change: no speculation; stdlib/native/existing deps before new code/deps; direct code before abstraction.
+- Never shrink validation at trust boundaries, security, accessibility, data-loss handling, user-requested scope, or smallest proof check.
+- Write high signal: no filler/throat-clearing; preserve exact code/API/errors. Touched file >700 lines: refactor by role/feature before adding unless a project rule requires one file.
 
 ## Maintainability Bar
 For non-trivial implementation/reviews.
 
-- Search for the code-judo move: preserve behavior while deleting concepts, branches, wrappers, modes, or layers.
-- Before adding code, ask: does this need to exist, does the platform/stdlib already do it, does an installed dependency already cover it, can deletion solve it?
-- Prefer simpler models, not local cleanup only.
-- No legacy/backcompat modes; migrate all callers/data/contracts to latest owner model.
-- Move logic to the canonical owner: existing helper, typed model, policy/state machine, service, package, or module that owns the concept.
-- Reject abstractions that only wrap/pass through. Keep direct code unless the abstraction removes meaningful complexity or enforces a boundary.
-- Push type boundaries explicit: avoid `any`, `unknown`, casts, unnecessary optionality, and silent fallback when a clear contract can remove branches.
-- Keep orchestration simple and atomic: run independent work in parallel when it clarifies flow; avoid partial updates that leave state half-applied.
-- For reviews, prioritize structural regressions, missed simplifications, spaghetti growth, boundary/type leaks, file-size concerns, then legibility nits.
-- Approval requires no clear structural regression, no obvious simpler framing, no unjustified file growth, no ad-hoc branching in busy flows, and no hacky/magical helper.
+- Delete first: preserve behavior while removing concepts, branches, wrappers, modes, or layers. Before adding code ask: must it exist; do platform/stdlib/installed deps cover it; can deletion solve it?
+- Prefer simpler models, not local cleanup. No legacy/backcompat modes; migrate all callers/data/contracts to latest owner. Move logic to the canonical owner: helper, typed model, policy/state machine, service, package, or module.
+- Reject pass-through wrappers; abstract only to remove real complexity or enforce a boundary.
+- Make type boundaries explicit: avoid `any`, `unknown`, casts, unnecessary optionality, and silent fallback when a clear contract removes branches.
+- Keep orchestration simple/atomic; parallelize independent work when it clarifies flow; avoid half-applied state.
+- Reviews prioritize structural regressions, missed simplifications, spaghetti growth, boundary/type leaks, file size, then legibility nits. Approval requires no such regression, obvious simpler framing, unjustified file growth, ad-hoc branching in busy flows, or hacky/magical helper.
 
 ## Tool Routing
-- Code structure, callers, deps, impact, routes, symbols: CBM index first.
-- Cmd output, logs, tests, diffs, APIs, data processing: context-mode first.
-- File edits: native file tools only. `Read` before `Edit`; `Write` for new files/full rewrites.
-- Never use `ctx_execute`, `ctx_execute_file`, or Bash to create/modify files.
-- Subagents: use only exposed subagent/multi-agent tools; if absent and `tool_search` exists, discover first. Do not invent tool names or params.
-- MCP isolation: parent may call CBM/context-mode directly. Delegate other MCP work only through exposed subagent/multi-agent tools.
-- Web/current research: load `tavily-cli`; use `tvly` directly unless explicit parallel delegation is requested and available.
-- Parallelizable work: use subagents only when explicitly requested or required, then synthesize in the parent.
+- Code structure/callers/deps/impact/routes/symbols: CBM index first; cmd output/logs/tests/diffs/APIs/data processing: context-mode first.
+- File edits: native file tools only. `Read` before `Edit`; `Write` for new files/full rewrites. Never use `ctx_execute`, `ctx_execute_file`, or Bash to create/modify files.
+- Subagents: use only exposed subagent/multi-agent tools; if absent and `tool_search` exists, discover first. Do not invent tool names/params.
+- MCP: parent may call CBM/context-mode directly; delegate other MCP work only through exposed subagent/multi-agent tools.
+- Web/current research: load `tavily-cli`; use `tvly` for single-lane work, subagents for bounded parallel lanes.
+- Parallel work: proactively use subagents for bounded independent evidence/review; synthesize in parent.
 
 ## Gate 1: Understand
 Use for code, diffs, PRs, commits, logs, docs, reviews, summaries, walkthroughs.
@@ -45,7 +34,6 @@ Use for code, diffs, PRs, commits, logs, docs, reviews, summaries, walkthroughs.
 - Missing/wrong evidence: re-read source, rebuild answer, then reply.
 
 For summaries longer than 1 paragraph:
-
 ```md
 ## Verified
 - <claim> - `<path>:<line>` - "<exact quote>"
@@ -59,17 +47,13 @@ For summaries longer than 1 paragraph:
 Use before/after semantic code changes and PR/commit impact summaries: functions, types, routes, constants, schemas, cache/storage keys, enums, API payloads, Appwrite attrs, shared/cross-package code.
 
 - Start with CBM: `trace_path(direction="inbound", depth=4)` for callers.
-- `search_code`: string keys, routes, schema attrs, dynamic dispatch, JSON fields.
-- Cross-lang/shared: search TS/Dart/all relevant packages.
-- Schema/Appwrite: search `Query.select`, `Query.equal`, `Query.order*`, attr names, config JSON.
-- Storage/cache: search localStorage/SWR/Hive/IndexedDB/FCM/draft keys.
-- Tests/fixtures: trace/search tests when available.
-- Routes/endpoints: search Route nodes and endpoint callers.
+- `search_code`: string keys, routes, schema attrs, dynamic dispatch, JSON fields; cross-lang/shared TS/Dart/all relevant packages.
+- Schema/Appwrite: `Query.select`, `Query.equal`, `Query.order*`, attr names, config JSON. Storage/cache: localStorage/SWR/Hive/IndexedDB/FCM/draft keys.
+- Tests/fixtures: trace/search tests when available. Routes/endpoints: Route nodes and endpoint callers.
 - Docs-only edits: no runtime call graph; state docs/config touched and code trace skipped.
 - Never write `none` without trace/search evidence or explicit `not applicable`.
 
 Report:
-
 ```md
 ## Blast radius
 - Direct callers: <file:line> | none - <search/trace evidence>
@@ -81,36 +65,28 @@ Report:
 ```
 
 ## CBM
-Use before raw text search for definitions, callers, callees, data flow, architecture, impact, dead code, routes. CBM MCP is allowed in parent.
+Use before raw text search for definitions/callers/callees/data flow/architecture/impact/dead code/routes. Parent may call CBM MCP.
 
-- Setup: `index_repository(repo_path, mode="moderate")` first. Before it: no `index_status`, search, or trace.
-- Then `list_projects` -> matching `root_path`; use `detect_changes(project)` as needed. Use `mode="full"` for deep impact.
-- Explore: `get_architecture` -> `search_graph` -> `get_code_snippet`.
-- Trace: `search_graph` exact name -> `trace_path` -> `search_code` for dynamic/string refs.
-- Tool order: `search_graph` symbols/routes/structure; `trace_path` callers/callees/data flow/cross-service; `get_code_snippet` exact source; `search_code` graph-enriched text; `get_architecture` package/service structure; `query_graph` custom Cypher/multi-hop.
+- Required order: `index_repository(repo_path, mode="moderate")` first (before it: no `index_status`, search, trace) -> `list_projects` and matching `root_path` -> `detect_changes(project)` as needed; use `mode="full"` for deep impact.
+- Explore/trace: `get_architecture` -> `search_graph` -> `get_code_snippet`; exact-name `search_graph` -> `trace_path` -> `search_code` for dynamic/string refs.
+- Tool purpose: `search_graph` symbols/routes/structure; `trace_path` callers/callees/data flow/cross-service; `get_code_snippet` exact source; `search_code` graph-enriched text; `get_architecture` package/service; `query_graph` custom Cypher/multi-hop.
 - Tools: `index_repository`, `index_status`, `list_projects`, `delete_project`, `search_graph`, `search_code`, `trace_path`, `detect_changes`, `query_graph`, `get_graph_schema`, `get_code_snippet`, `get_architecture`, `manage_adr`, `ingest_traces`.
 - Fallback only when MCP transport is closed: `cbm cli <tool> '<json>'`. CLI output is raw JSON and may include `level=...` log lines; do not expect Claude-style `.content[0].text`.
 
 ## context-mode
 Default for commands that read/query/list/test/build/diff/fetch/process data. Raw output floods context. context-mode MCP is allowed in parent.
 
-- Use `ctx_batch_execute` for multiple cmds/output over 20 lines; `ctx_execute` for one command/API/data-processing script; `ctx_execute_file` for large files/logs/JSON/CSV/source; `ctx_fetch_and_index` -> `ctx_search` for web/docs; `ctx_index(path)` -> `ctx_search` for local docs/artifacts; `ctx_search(sort="timeline")` after resume/compact; `ctx_stats`, `ctx_doctor`, `ctx_upgrade`, `ctx_purge`, `ctx_insight` for admin.
-- Think in code: analyze/count/filter in sandbox; print answer, not raw data.
-- Batch related `ctx_search` queries in one call.
-- File edits use `Read`/`Edit`/`Write`, not context-mode.
-- Playwright/browser snapshots: save to file, then `ctx_index(path)` or `ctx_execute_file(path)`.
-- After `/clear` or `/compact`, context-mode persists; use `ctx purge` only on explicit request.
+- Tool map: `ctx_batch_execute` multiple cmds/output over 20 lines; `ctx_execute` one command/API/data script; `ctx_execute_file` large files/logs/JSON/CSV/source; `ctx_fetch_and_index` -> `ctx_search` web/docs; `ctx_index(path)` -> `ctx_search` local docs/artifacts; `ctx_search(sort="timeline")` after resume/compact; `ctx_stats`, `ctx_doctor`, `ctx_upgrade`, `ctx_purge`, `ctx_insight` admin.
+- Think in code: analyze/count/filter in sandbox; print answer, not raw data; batch related `ctx_search` queries in one call.
+- File edits use `Read`/`Edit`/`Write`, not context-mode. Playwright/browser snapshots: save to file, then `ctx_index(path)` or `ctx_execute_file(path)`. After `/clear` or `/compact`, context-mode persists; use `ctx purge` only on explicit request.
 
 ## Map -> Process
 - Map with CBM: `get_architecture`, `search_graph` incl `semantic_query`, `trace_path`, `search_code`.
-- Output exact target files, symbols, routes, callers. Do not dump dirs/raw code into context.
-- Process with context-mode: feed target paths/symbols into `ctx_execute`, `ctx_batch_execute`, or `ctx_execute_file`.
-- Parse/count/filter/summarize in sandbox. Print curated findings only.
+- Output exact target files, symbols, routes, callers; do not dump dirs/raw code into context.
+- Process with context-mode: feed target paths/symbols into `ctx_execute`, `ctx_batch_execute`, or `ctx_execute_file`; parse/count/filter/summarize in sandbox; print curated findings only.
 
 ## Files and Shell
-- Use `Read` for known files you will edit or quote.
-- Use `Edit` for precise replacements; one call may contain multiple disjoint edits.
-- Use `Write` for new files/full rewrites.
+- Use `Read` for known files you will edit or quote; `Edit` for precise replacements; `Write` for new files/full rewrites.
 - Direct Bash only for guaranteed-small-output mutations/navigation: `mkdir`, `mv`, `cp`, `rm`, `chmod`, `pwd`, `which`, git writes.
 - Do not run raw `cat`, `head`, `tail`, `grep`, `rg`, `find`, `wc`, tests, builds, git reads, API CLIs, Docker/K8s/cloud CLIs via Bash.
 - Fallback text search: `ctx_execute` with `rtk grep`/`rtk read`/`rtk wc`; print curated results.
@@ -118,14 +94,12 @@ Default for commands that read/query/list/test/build/diff/fetch/process data. Ra
 
 ## Online Research
 When user asks to browse/search/web/google/latest/current/research/extract a URL:
-
 1. Load `tavily-cli`.
 2. Use `tvly search` for discovery, `tvly extract` for URLs, `tvly research` for multi-source synthesis.
 3. Require `--json` where useful; process with context-mode; cite URLs for web-backed claims.
 
 ## Skill Gates
 Load matching skill before answering/editing:
-
 - Flutter/Dart/Riverpod/Freezed/GoRouter/pubspec -> `building-flutter-apps`.
 - Appwrite/Auth/TablesDB/Storage/Functions/Realtime -> `appwrite-backend`.
 - Online/current info -> `tavily-cli`.
@@ -145,7 +119,6 @@ Load matching skill before answering/editing:
 
 ## Implementation Flow
 For non-trivial code tasks:
-
 1. Scope repo/root, relevant `AGENTS.md`, skills, constraints.
 2. CBM: `index_repository(repo_path, mode="moderate")` first.
 3. Explore: CBM architecture/search/snippets; read exact files before edits.
@@ -158,12 +131,10 @@ For non-trivial code tasks:
 
 ## Subagents
 - Use exposed subagent/multi-agent tools only; discover with `tool_search` if needed.
-- Prefer subagents for independent, parallelizable work when explicit-use rules allow it: multi-area codebase exploration, audits, large log triage, test failure clustering, refactors over 2+ files, browser/MCP work, and online research.
-- Split work by clear ownership boundaries: file/package/feature/flow/test group/source type. Give each subagent a focused task, scope limits, expected evidence format, and stop condition.
-- Run independent subagent tasks in parallel when supported. Keep dependent sequencing in parent.
-- Parent owns synthesis, final judgment, edits, and user-facing claims. Treat subagent output as evidence to verify, not as authority.
-- For MCP-backed actions except CBM/context-mode, delegate only through exposed subagent/multi-agent tools.
-- For online/current research and URL extraction, use `tvly` directly unless explicit parallel delegation is requested and available.
+- Use subagents proactively for bounded independent parallel work: multi-area codebase exploration, audits, large log triage, test failure clustering, refactors over 2+ files, browser/MCP work, and online research.
+- Split by ownership boundary: file/package/feature/flow/test group/source type; give focused task, scope limits, expected evidence format, stop condition.
+- Run independent subagent tasks in parallel when supported; keep dependent sequencing in parent. Parent owns synthesis, final judgment, edits, and user-facing claims; treat subagent output as evidence to verify, not authority.
+- For MCP-backed actions except CBM/context-mode, delegate only through exposed subagent/multi-agent tools. For online/current research/URL extraction: `tvly` single lane; subagents bounded parallel lanes.
 - No subagent/multi-agent tool after discovery: work directly.
 
 ## TDD and Verification
