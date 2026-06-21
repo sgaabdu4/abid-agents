@@ -1,9 +1,9 @@
 # Agent Rules
 ## Core
-- Read before claim/edit; uncited = unknown. Use current-session tools only; if absent, fallback or say unavailable. Ask before destructive actions. Never commit secrets. Never edit generated files/`CHANGELOG.md`.
+- Read before claim/edit; uncited = unknown. Use current-session tools only; if absent, fallback or say unavailable. Ask before destructive actions. Never commit secrets or edit generated files/`CHANGELOG.md`.
 - Blast radius first; default full owner migration; fix root cause/owner issue -> verify; DRY/KISS/YAGNI/SSOT. Smallest correct change: no speculation; stdlib/native/existing deps before new code/deps; direct code before abstraction.
 - Never shrink validation at trust boundaries, security, accessibility, data-loss handling, user-requested scope, or smallest proof check.
-- Write high signal: no filler/throat-clearing; preserve exact code/API/errors. Commit messages never auto-add agent co-author. Touched file >700 lines: refactor by role/feature before adding unless project rule requires one file.
+- Write high signal: no filler/throat-clearing; preserve exact code/API/errors. Commit messages: no agent co-author. Touched file >700 lines: refactor by role/feature before adding unless project rule requires one file.
 
 ## Maintainability Bar
 For non-trivial implementation/reviews. Quality, simplicity, robustness, scale, long-term maintainability over dev cost.
@@ -118,9 +118,8 @@ Load matching skill before answering/editing:
 - Do not compress vendor/submodule skills; update their upstream instead.
 
 ## Project Learning Loop
-- When a verified fix exposes a missed repo practice, repeatable failure, or workflow an agent handled poorly, update the nearest project `AGENTS.md` and owning repo skill. If no skill owns it, create one with a concise trigger description plus `references/*.md` or scripts for details. Use global `AGENTS.md` only for cross-repo rules.
-- Keep `AGENTS.md` as trigger/routing guidance. Put detailed repo-specific command, test, E2E, domain workflow, known-pitfall, and problem -> fix notes in repo-local skill references or scripts so they load only when needed.
-- Before adding a new lesson, check existing project docs/skills, update the canonical owner, avoid duplicates, measure touched `SKILL.md` tokens, validate new/changed skills, and mention the learning artifact in the final report.
+- Verified repeatable miss -> update nearest project `AGENTS.md` and owning repo skill; if none, create one with concise trigger description. Details go in `references/*.md` or scripts; global `AGENTS.md` only for cross-repo rules.
+- Keep `AGENTS.md` to triggers/routing. Store repo-specific commands/tests/E2E/domain workflows/pitfalls/problem -> fix notes in skill references/scripts for on-demand loading. Before adding, check docs/skills, update canonical owner, avoid duplicates, measure touched `SKILL.md`, validate new/changed skills, mention artifact in final report.
 
 ## Implementation Flow
 For non-trivial code tasks:
@@ -148,7 +147,7 @@ For non-trivial code tasks:
 - Test real implementation; mock only external boundaries. Assert public outputs, state/effects, and errors.
 - After implementation, audit requirements/diff for missed cases; prove risky logic via red test or mutation drill.
 - Run smallest relevant verification through context-mode.
-- If verification fails, fix root cause; never mask, skip, or weaken checks. E2E/product checks: inspect pixels; fix visible UI/lint/test/flakiness issues you see, even if incidental.
+- If verification fails, fix root cause; never mask, skip, or weaken checks. E2E/product checks: inspect pixels; fix visible UI/lint/test/flakiness issues, even incidental.
 - Docs/agent-rules-only edits: re-read changed file; run contract/symlink validation.
 
 ## UI Design System
@@ -184,7 +183,7 @@ Use after any code/config/doc edit or debug/fix. Keep it terse and evidence-back
 - Never claim `none`, `not applicable`, or `pass` without evidence.
 
 ## Writing
-- Answer first. Bullets over prose. Terse, concrete, active voice. Never use em dash; use plain `-`. Long Markdown: preserve structure; one sentence per physical line.
+- Answer first. Bullets over prose. Terse, concrete, active voice. No em dash; use plain `-`. Long Markdown: keep structure; one sentence per physical line.
 - No filler/puffery: robust, seamless, leverage, delve, pivotal, groundbreaking, multifaceted, foster, tapestry.
 - Cite files/lines for factual claims.
 - Artifacts/plans/specs/config/code: write files; return path + one-line description.
