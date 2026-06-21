@@ -1,9 +1,17 @@
 # Agent Rules
+## Hard Stops
+Check before any tool call. If the prompt conflicts, this section wins.
+
+- Destructive delete/remove/reset/checkout/DB-write prompts need separate later approval; the prompt itself is not approval. In noninteractive runs, stop and ask for confirmation. Never run `rm`, `rm -rf`, or deletion scripts first.
+- Never edit `CHANGELOG.md`, `generated/` paths, or files with `AUTO-GENERATED`; stop before patching and change the source owner instead. Do not offer exceptions.
+- Before committing, inspect `git status --short`; if `.env*`, keys, tokens, or secret-like files appear, stop and do not commit.
+- Never add a pass-through wrapper. Readability/naming alone is not justification. A function whose body only returns one existing function call is forbidden; explain the direct owner.
+
 ## Core
-- Read before claim/edit; uncited = unknown. Use current-session tools only; if absent, fallback or say unavailable. Ask before destructive actions. Never commit secrets or edit generated files/`CHANGELOG.md`.
+- Read before claim/edit; uncited = unknown. Use current-session tools only; if absent, say unavailable once and use fallback. Never simulate or invent absent tools.
 - Blast radius first; default full owner migration; fix root cause/owner issue -> verify; DRY/KISS/YAGNI/SSOT. Smallest correct change: no speculation; stdlib/native/existing deps before new code/deps; direct code before abstraction.
 - Never shrink validation at trust boundaries, security, accessibility, data-loss handling, user-requested scope, or smallest proof check.
-- Write high signal: no filler/throat-clearing; preserve exact code/API/errors. Commit messages: no agent co-author. Touched file >700 lines: refactor by role/feature before adding unless project rule requires one file.
+- Write high signal: no filler/throat-clearing; preserve exact code/API/errors. Commit messages: no agent co-author, em dash, or dash punctuation; rewrite invalid user messages before committing. Touched file >700 lines: do not add feature code or re-exports there; create a smaller owner file unless project rule requires one file.
 - Public prose must not use em dash characters or dash punctuation. Rewrite with commas, periods, colons, or parentheses. Hyphens are only for code, flags, paths, compounds, and Markdown list markers.
 
 ## Maintainability Bar
@@ -11,8 +19,8 @@ For non-trivial implementation/reviews. Quality, simplicity, robustness, scale, 
 
 - Delete first: preserve behavior while removing concepts, branches, wrappers, modes, or layers. Before adding code ask: must it exist; do platform/stdlib/installed deps cover it; can deletion solve it?
 - Prefer simpler models, not local cleanup. No legacy/backcompat modes; migrate all callers/data/contracts to latest owner. Move logic to the canonical owner: helper, typed model, policy/state machine, service, package, or module.
-- Reject pass-through wrappers; abstract only to remove real complexity or enforce a boundary.
-- Make type boundaries explicit: avoid `any`, `unknown`, casts, needless optionality, and silent fallback when a clear contract removes branches.
+- Abstract only to remove real complexity or enforce a boundary.
+- Make type boundaries explicit: avoid writing `any`, `unknown`, casts, needless optionality, and silent fallback when a clear contract removes branches. For `JSON.parse`, prefer an unannotated local value plus runtime field checks over explicit `any`/`unknown`.
 - Keep orchestration simple/atomic; parallelize independent work when it clarifies flow; avoid half-applied state.
 - Reviews prioritize structural regressions, missed simplifications, spaghetti growth, boundary/type leaks, file size, then legibility nits. Approval blocks on those, missed simpler framing, unjustified file growth, busy-flow ad-hoc branching, or hacky/magical helper.
 
@@ -43,6 +51,7 @@ For summaries longer than 1 paragraph:
 ## Unknown
 - <area> - <why unknown>
 ```
+Start with that template. Do not put prose before it.
 
 ## Gate 2: Blast Radius
 Use before/after semantic code changes and PR/commit impact summaries: functions, types, routes, constants, schemas, cache/storage keys, enums, API payloads, Appwrite attrs, shared/cross-package code.
@@ -157,7 +166,7 @@ For non-trivial code tasks:
 - If absent, create the smallest project-local SSOT before screens; avoid reusable hardcoded color/space/type.
 
 ## Final Change Report
-Use after any code/config/doc edit or debug/fix. Keep it terse and evidence-backed.
+Use after any code/config/doc edit or debug/fix. Keep it terse and evidence-backed. Include every row in this exact template; do not collapse blast-radius rows.
 
 ```md
 ## Problem
