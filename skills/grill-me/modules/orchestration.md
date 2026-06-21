@@ -13,6 +13,9 @@ closing a stage, or writing the final plan.
   the session in the actual request + repo.
 - Existing code path: use CBM first (`list_projects` -> status/index ->
   architecture -> search/trace), then read relevant code/docs before asking.
+- For understanding/codebase-understanding requests, map current owners,
+  behavior, routes, data, constraints, and unknowns before proposing a build
+  path. Ask only what evidence cannot answer.
 - Do not ask what code can answer. Inspect only for existing-code tasks.
 - Q1 must resolve the highest-impact unknown that request context cannot answer.
 - No evidence = `unknown`.
@@ -46,6 +49,8 @@ Stage skipping:
   choices, or changed surfaces.
 
 Classify:
+- Request profile: greenfield, brownfield-feature, simple-feature,
+  understanding, codebase-understanding, or mixed.
 - Work type: product, feature, redesign, refactor, API/schema, infra, launch.
 - Code reality: greenfield or existing.
 - UI need: user-facing UI or backend-only.
@@ -68,6 +73,7 @@ Classify:
 
 - Ensure `docs/planning/<slug>/`; infer slug from request when safe. Ask only if
   ambiguous/conflicting.
+- Durable session state: `docs/planning/<slug>/session_state.md`.
 - Orchestrator draft: `docs/planning/<slug>/plan_draft.md`.
 - Temp stage handoffs: create lazily only when a stage closes, an artifact is
   written, or final plan synthesis needs it; never for simple Q&A turns; never
@@ -95,7 +101,7 @@ Classify:
 - Mock data: keep near prototype (`mock-data.*`, `fixtures.*`, or
   `mock_data.dart`).
 - File edits via native file tools only; shell/context-mode only run/verify.
-- During interview, update only `plan_draft.md` as a tiny answer log. Do not
+- During interview, update only `session_state.md` plus `plan_draft.md`. Do not
   update stage handoffs per question.
 
 ## Handoff model
@@ -133,33 +139,18 @@ Classify:
 
 ## Stage clarity gates
 
-Internal only. Ask Qs until each active stage gate passes or the user explicitly
-parks an unknown.
-
-- Intake: goal, target users, runtime/platform, requested artifact, and hard
-  constraints are clear enough to start.
-- Product: user/job, MVP, non-goals, success/fail checks, constraints, and
-  high-risk edge cases are clear.
-- UI flow: entry points, main path, empty/loading/error/success states,
-  permissions, and recovery paths are clear.
-- Visual design: style direction, target key screens/flow moments, theme/color
-  strategy, typography/density, accessibility constraints, and review method are
-  clear.
-- Prototype tech stack: runtime, mock boundary, mock data shape, preview method,
-  and fidelity gaps are clear.
-- Prototype: covered states, mock data, minimal token/component system, artifact
-  path, preview status, and approval/blockers are clear.
-- Backend/infra: data ownership, auth/roles, APIs/events/notifications, storage,
-  deploy/env, rollback, and observability are clear.
-- Vertical slices/evals: slice order, dependencies, acceptance checks,
-  verification, parallel-safe waves, and risk controls are clear.
+Internal only. Use the active stage module's clarity gate. Ask until the gate
+passes or the user explicitly parks the unknown. Intake is clear enough when
+goal, repo reality, target area, requested artifact, and hard constraints are
+known enough to choose the next stage.
 
 ## Artifact depth
 
 - Do not ask the user to choose `lite`, `build-plan`, or `full` upfront when the
   request already implies depth.
 - If the user explicitly says `lite`, `align`, `build-plan`, `full`, or
-  `review`, use that as the starting cap.
+  `review`, use that as the starting cap. If the user says understand, explain,
+  map, learn the codebase, or figure out what is going on, use `understand`.
 - Infer artifact depth from the conversation and what the user asks for.
 - During interview, gather decisions first; the output shape emerges from
   answers.
@@ -206,6 +197,8 @@ Draft minimum:
 Draft rules:
 - `plan_draft.md` is an answer ledger, not a plan. Target <= 60 lines / 4 KB.
 - Record only: current stage, next Q, user answers, confirmed decisions.
+- `session_state.md` owns route profile, stage map, exact last/next question,
+  blockers, artifact refs, and compaction recovery.
 - Do not store recommendations, rejected options, definitions, evidence,
   scenarios, acceptance criteria, verification, risks, or stage maps during
   interview.
@@ -246,26 +239,23 @@ artifact/final synthesis.
 ## Loop
 
 Each turn:
-1. If first turn + greenfield/new app/empty repo: ask Q1 immediately; no repo
-   research, no CBM, no indexing.
-2. If continuing, read `plan_draft.md` only. Do not read/write stage handoffs
-   unless closing a stage, using artifacts, or finalizing.
-3. If existing code matters, perform codebase grounding before Q1.
-4. If intake incomplete, ask the most relevant unanswered intake Q; never a
-   boilerplate Q when request context points elsewhere.
-5. Else load only the relevant stage module; do not load
-   `modules/stage-handoff.md` unless writing a handoff.
-6. Ask next stage Q using `modules/questions.md`.
-7. Visible reply during interview = question only. Do not paste
-   draft/status/handoff unless user asks.
-8. After user answers, append/update one row in `plan_draft.md` and one short
-   decision if confirmed.
-9. If the stage is not fully clear, ask the next clarification Q immediately. No
-   question-count limit.
-10. If the stage is fully clear, refine the stage summary/handoff now. If
-    refinement exposes a blocker, ask one clarification Q and repeat.
-11. Ask next Q immediately after the minimal write/refinement.
-12. Keep all metadata out of the draft until final plan/handoff synthesis.
+1. Greenfield first turn: ask Q1 immediately; no repo research/indexing. If no
+   safe slug exists, make slug/title Q1.
+2. Continuing or post-compaction: read `session_state.md`, then
+   `plan_draft.md`, then only the active stage module.
+3. If state is missing but draft exists, rebuild minimal state from the draft and
+   mark uncertain fields `unknown`.
+4. If state has an unanswered Q and the latest user message is not an answer,
+   re-ask that Q exactly.
+5. If the latest user message answers the last Q, update draft + state before
+   generating the next Q.
+6. If existing code matters, ground with code/docs before Q1; for
+   codebase-understanding, answer evidence-backed facts first.
+7. If intake incomplete, ask the highest-impact unanswered intake Q.
+8. Else load only the relevant stage module and `modules/questions.md`.
+9. Before the visible reply, persist the exact Q in `session_state.md`.
+10. Visible interview reply = question only.
+11. When a stage is clear, refine/handoff if needed, then continue or finalize.
 
 ## Global rules
 
@@ -276,8 +266,9 @@ Each turn:
   architecture scan unless user asks.
 - During interview, visible reply is only the next question; no draft/status
   summary unless user asks.
-- During interview, docs are answer-ledger only. No stage handoffs, stage maps,
-  risks, evidence, or acceptance criteria in `plan_draft.md`.
+- During interview, docs are `session_state.md` plus answer-ledger only. No
+  stage handoffs per Q. Stage map belongs in `session_state.md`; not
+  `plan_draft.md`.
 - Intake before skipping stages unless code proves n/a; after intake, skip any
   non-needed stage with evidence.
 - `skip`/`n/a` stages create no stage file; final plan carries their evidence if

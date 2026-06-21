@@ -45,31 +45,10 @@ Clarity gate:
 
 ## Q pattern
 
-Ask one parent decision at a time. Show a clear user-facing terminal card. Keep acceptance criteria, verification, evidence, and scenario details for stage close or final synthesis.
-
-```text
-Q<N>: Which <plain outcome/choice> matters here?
-
-Meaning:
-<explain the decision in one sentence, using the user's domain>
-
-Why it matters:
-This sets what must work before real users try it.
-
-Suggested default:
-<A/B/C> — <one clear reason>
-
-Options:
-A) <plain option tied to an observable outcome>
-
-B) <plain option tied to an observable outcome>
-
-C) <plain option, "all", or "Not sure — use the default">
-
-Reply: A/B/C, "all", "use default", "not sure", "skip for now", or your own answer.
-```
-
-Internal notes for stage close/final synthesis: definitions, options/tradeoffs, acceptance criteria, verification/eval, evidence, why, scenario.
+Use `modules/questions.md`. Ask one parent product decision at a time. Options
+must be observable outcomes. Allow `all` only when scope still stays coherent.
+Keep definitions, tradeoffs, acceptance checks, verification, evidence, why, and
+scenarios for `session_state.md`, stage close, or final synthesis.
 
 ## Rules
 

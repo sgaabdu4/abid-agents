@@ -41,31 +41,9 @@ Clarity gate:
 
 ## Q pattern
 
-Show a clear user-facing terminal card. Keep stack/runtime/mock-boundary details for stage close or final synthesis.
-
-```text
-Q<N>: What should we use to build the clickable prototype?
-
-Meaning:
-<explain whether this is real app tech or a throwaway mock>
-
-Why it matters:
-This decides how the prototype runs and where mock data lives.
-
-Suggested default:
-<A/B/C> — <one clear reason>
-
-Options:
-A) <target app stack> — closest to the real app.
-
-B) <lighter mock stack> — fastest to build and review.
-
-C) <existing prototype or "Not sure — use the default">.
-
-Reply: A/B/C, "use default", "not sure", "skip for now", or your own answer.
-```
-
-Internal notes for stage close/final synthesis: prototype stack definition, component-system convention, mock boundary, options/tradeoffs, evidence, why, scenario.
+Use `modules/questions.md`. Ask one runtime, mock boundary, component-system, or
+preview decision at a time. Keep stack definitions, tradeoffs, evidence, why,
+and fidelity gaps for `session_state.md`, stage close, or final synthesis.
 
 ## Rules
 

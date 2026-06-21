@@ -35,31 +35,9 @@ Clarity gate:
 
 ## Q pattern
 
-Show a clear user-facing terminal card. Keep route/state evidence and edge cases for stage close or final synthesis.
-
-```text
-Q<N>: After <action>, where should <user> go next?
-
-Meaning:
-<explain what the user will see or do next>
-
-Why it matters:
-This fixes the screen flow before layout work.
-
-Suggested default:
-<A/B/C> — <one clear reason>
-
-Options:
-A) <plain destination/state>
-
-B) <plain destination/state>
-
-C) <plain destination/state or "Not sure — use the default">
-
-Reply: A/B/C, "use default", "not sure", "skip for now", or your own answer.
-```
-
-Internal notes for stage close/final synthesis: screen/state definitions, options/tradeoffs, evidence, why, scenario.
+Use `modules/questions.md`. Ask one route, state, permission, or recovery
+decision at a time. Keep route/state evidence, tradeoffs, why, and edge cases
+for `session_state.md`, stage close, or final synthesis.
 
 ## Rules
 

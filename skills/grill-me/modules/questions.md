@@ -33,6 +33,7 @@ Reply: A/B/C, "use default", "not sure", "skip for now", or your own answer.
 - Clarity beats terseness. Normal prompt target: 12-24 lines; max 220 words.
 - Use one `text` code fence containing the plain question block; no prose
   outside it during interview.
+- Before replying, persist the exact block in `session_state.md`.
 - Do not use box drawing, table borders, vertical bars, horizontal rules, or
   decorative lines.
 - Use blank lines between sections and between options.
@@ -103,6 +104,7 @@ Internal details:
 ## Internal rules
 
 - Never batch Qs.
+- Do not rely on chat memory for the last or next Q; use `session_state.md`.
 - Always list 2-3 directly selectable options in the visible prompt and
   internal record.
 - If only one option works, visible option C is `Not sure - use the default`

@@ -44,31 +44,10 @@ Clarity gate:
 
 ## Q pattern
 
-Show a clear user-facing terminal card. Keep definitions, evidence, failure/security notes, and tradeoffs for stage close or final synthesis.
-
-```text
-Q<N>: How should <capability> work behind the scenes?
-
-Meaning:
-<explain what the app will remember/send/check>
-
-Why it matters:
-This decides the data/API/auth plan before task slicing.
-
-Suggested default:
-<A/B/C> — <one clear reason>
-
-Options:
-A) <plain backend option>
-
-B) <plain backend option>
-
-C) <plain backend option or "Not sure — use the default">
-
-Reply: A/B/C, "use default", "not sure", "skip for now", or your own answer.
-```
-
-Internal notes for stage close/final synthesis: capability/tech definitions, options/tradeoffs, evidence, why, failure/scale/security scenario.
+Use `modules/questions.md`. Ask one backend capability decision at a time:
+data/API/auth/storage/deploy/test boundary. Keep definitions, tradeoffs,
+evidence, why, and failure/scale/security scenarios for `session_state.md`,
+stage close, or final synthesis.
 
 ## Rules
 

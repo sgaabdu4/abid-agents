@@ -23,7 +23,7 @@ Out of scope:
 
 - Start after visual design alignment + prototype tech stack gate accepted/brief, or after the user explicitly says to skip visual design.
 - The prototype must use the chosen visual direction through semantic tokens, type direction, density, component feel, and motion tone.
-- UI prototypes are token-first and atomic by default: tokens → atoms → molecules → organisms/templates → pages.
+- UI prototypes are token-first and atomic by default: tokens -> atoms -> molecules -> organisms/templates -> pages.
 - Reuse primitives/composites across states; no one-off UI clones unless explicitly marked disposable.
 - Keep atomic design lean: create only tokens/components used by the current flow and required states; do not write a full design-system doc unless requested or needed.
 - Web/static prototypes use CSS custom properties + reusable classes/components; Flutter prototypes use theme/token constants or `ThemeExtension` + reusable widgets.
@@ -31,8 +31,8 @@ Out of scope:
 - Cover primary journey + empty/loading/error/permission/offline or failure states.
 - Use local fixtures/mock services only.
 - Do not connect real backend, auth, storage, realtime, payments, analytics, or external APIs.
-- Web/unknown → `docs/planning/prototypes/<slug>/`; use visual-design preview safety rules; show `Prototype preview:` only after verified.
-- Flutter → `lib/prototypes/<slug>/` or `lib/main_prototype.dart`; use mock repos/providers/data; no live SDK init; verify/free port first.
+- Web/unknown -> `docs/planning/prototypes/<slug>/`; use visual-design preview safety rules; show `Prototype preview:` only after verified.
+- Flutter -> `lib/prototypes/<slug>/` or `lib/main_prototype.dart`; use mock repos/providers/data; no live SDK init; verify/free port first.
 - Mock data must be obvious/editable. Persist fixture path + covered states in handoff.
 - Implementation/backend work starts only after user approves prototype flow.
 
@@ -61,33 +61,10 @@ Clarity gate:
 
 ## Q pattern
 
-Show the prototype preview/status first, then ask one clear flow/state question. Keep artifact, stack, mock-data, evidence, and scenario details for artifact creation, stage close, or final synthesis.
-
-```text
-Prototype preview: <verified URL/device/path>
-
-Q<N>: How should the prototype handle <flow/state>?
-
-Meaning:
-<explain what the user sees when this happens>
-
-Why it matters:
-This fixes the behavior before backend planning.
-
-Suggested default:
-<A/B/C> — <one clear reason>
-
-Options:
-A) <plain behavior>
-
-B) <plain behavior>
-
-C) <plain behavior or "Not sure — use the default">
-
-Reply: A/B/C, "use default", "not sure", "skip for now", or your own answer.
-```
-
-Internal notes for stage close/final synthesis: definitions, options/tradeoffs, prototype path, stack, mock data, token/component map, evidence, why, scenario.
+Use `modules/questions.md`. Show verified preview/status first when available,
+then ask one flow/state behavior decision. Keep artifact, stack, mock data,
+token/component map, evidence, why, and scenarios for `session_state.md`,
+artifact notes, stage close, or final synthesis.
 
 ## Notes
 

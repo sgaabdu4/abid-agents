@@ -4,9 +4,9 @@ Load this before building a stage map or when the requested depth is unclear.
 
 ## Goal
 
-Infer the smallest useful depth from the user's words, supplied context, and
-code evidence. Do not show a mode menu. Ask one clarification only if the
-requested depth is genuinely ambiguous or contradictory.
+Infer the smallest useful depth/profile from the user's words, supplied context,
+and code evidence. Do not show a mode menu. Ask one clarification only if depth
+is genuinely ambiguous or contradictory.
 
 Modes are generic depth caps, not domain-specific workflows.
 
@@ -19,6 +19,9 @@ Modes are generic depth caps, not domain-specific workflows.
   docs/pages/code first when they matter. Ask only decision-critical Qs.
   Cap: no visual design, no prototype tech, no prototype, and no design/code
   artifact build unless the user explicitly asks.
+- `understand`: shared understanding only. Use for codebase/current behavior,
+  domain idea, tradeoff, implementation-area, or "what would it take" requests.
+  Cap: explanation/map/findings/options; no plan/build unless user expands.
 - `build-plan`: implementation sequencing + verification. Use when the user
   wants to build/ship/implement but does not ask for visual exploration or a
   prototype. Run product/backend/UI briefs only where unclear or touched; run
@@ -37,6 +40,8 @@ Modes are generic depth caps, not domain-specific workflows.
 - Domain words like migration, auth, billing, onboarding, redesign, refactor, or
   data cleanup do not create modes. They shape the stage map inside the inferred
   mode.
+- Request profiles are route hints: `greenfield`, `brownfield-feature`,
+  `simple-feature`, `understanding`, `codebase-understanding`, `mixed`.
 - Mode cap overrides the greenfield/full default. Example: greenfield + "just
   align on approach" = `align`, not `full`.
 - Existing/supplied docs/pages/code used for alignment are part of intake and
@@ -65,6 +70,8 @@ Modes are generic depth caps, not domain-specific workflows.
   constraints, options, risks, validation, and final plan. UI/backend/slices are
   brief only when the decision touches them. Visual design, prototype tech, and
   prototype are `n/a` unless explicitly requested.
+- `understand`: run intake/current-state grounding only. Other stages are brief
+  only when needed to explain the area; build/design/prototype stages are `n/a`.
 - `build-plan`: product brief if unclear; UI/backend only when touched; visual
   design/prototype `n/a` unless requested or needed to reduce a risky UX
   unknown; vertical slices/evals run.
@@ -78,6 +85,8 @@ Modes are generic depth caps, not domain-specific workflows.
   skip/brief already-decided product, UI, visual design, prototype, and backend
   sections with evidence; run vertical slices/evals if implementation is
   requested.
+- Simple feature: pin goal, owner, boundary, acceptance check, and verification.
+  UI/backend run only if changed; visual/prototype are `n/a` unless needed.
 - Existing UI feature: product brief if problem/success criteria are unclear;
   UI flow only if navigation/state changes; visual design only if surface/style
   changes or user needs style choice; prototype tech/prototype only if requested

@@ -54,31 +54,10 @@ Clarity gate:
 
 ## Q pattern
 
-Show a clear user-facing terminal card. Keep slice/task-wave definitions, evidence, and review/failure scenario for stage close or final synthesis.
-
-```text
-Q<N>: What should we build first?
-
-Meaning:
-<explain the small working piece the user can test first>
-
-Why it matters:
-This sets the first reviewable build slice.
-
-Suggested default:
-<A/B/C> — <one clear reason>
-
-Options:
-A) <small end-to-end slice with user value>
-
-B) <small end-to-end slice with user value>
-
-C) <small end-to-end slice or "Not sure — use the default">
-
-Reply: A/B/C, "use default", "not sure", "skip for now", or your own answer.
-```
-
-Internal notes for stage close/final synthesis: vertical slice/task wave definitions, options/tradeoffs, evidence, why, user/failure/review scenario.
+Use `modules/questions.md`. Ask one slice, dependency, wave, acceptance, or
+verification decision at a time. Keep slice/task definitions, tradeoffs,
+evidence, why, and review/failure scenarios for `session_state.md`, stage close,
+or final synthesis.
 
 ## Rules
 

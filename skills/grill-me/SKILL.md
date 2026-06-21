@@ -1,9 +1,10 @@
 ---
 name: grill-me
 description: >-
-  Interview one clear Q at a time to plan important work: products, features,
-  architecture, migrations, specs, or stress tests. Infers align/lite,
-  build-plan, full, or review depth. Evidence-only; unknown stays unknown.
+  Interview one clear Q at a time before planning or building ideas, greenfield
+  apps, brownfield features, simple changes, codebase maps, specs, stress tests,
+  UI flows, mockups, prototypes, or final plans. Routes depth, persists state,
+  resumes after compaction.
 ---
 
 # Grill Me
@@ -13,6 +14,8 @@ description: >-
 - Interview one clear, plain-language Q at a time.
 - Evidence-only. No evidence = `unknown`.
 - Persist state in the target repo only when a grill-me session actually starts.
+- `session_state.md` is the source of truth after compaction/resume; chat memory
+  is not.
 - User can answer with A/B/C, `use default`, `not sure`, `skip for now`, or a
   custom answer.
 - During interview, visible reply = next question only.
@@ -21,23 +24,27 @@ description: >-
 
 ## Start
 
-1. Infer mode and candidate active stage from this file first.
+1. Infer request profile, mode, and candidate active stage from this file first.
 2. If mode/stage is clear, do not load `modules/modes.md`; use the matching
    shortcut below.
 3. Load `modules/modes.md` only when depth is unclear, the stage map is
    disputed, or a formal Stage Map must be written.
-4. Load `modules/orchestration.md` only after a grill-me session starts, when
+4. Load `modules/session-state.md` after a grill-me session starts, before every
+   continuing turn, after compaction/resume, and before final synthesis.
+5. Load `modules/orchestration.md` only after a grill-me session starts, when
    resuming a draft, managing files/handoffs, closing a stage, or writing the
    final plan.
-5. Load `modules/questions.md` only before asking an interview question.
-6. Load only the active stage module after the stage is selected.
-7. Load `modules/stage-handoff.md` only when writing a handoff.
-8. Load `modules/final-plan.md` only when synthesizing `plan.md`.
+6. Load `modules/questions.md` only before asking an interview question.
+7. Load only the active stage module after the stage is selected.
+8. Load `modules/stage-handoff.md` only when writing a handoff.
+9. Load `modules/final-plan.md` only when synthesizing `plan.md`.
 
 ## Mode shortcuts
 
 - `align` / `lite`: decision alignment + plan only. No visual design,
   prototype tech, prototype, or design/code artifact unless requested.
+- `understand`: shared understanding only. Explain/map unless user asks to
+  plan/build.
 - `build-plan`: implementation sequencing + verification. Run vertical
   slices/evals; skip design/prototype unless requested or needed for a risky UX
   unknown.
@@ -60,6 +67,7 @@ description: >-
 
 Core:
 - Mode inference and stage-map defaults -> `modules/modes.md`
+- Durable session state and resume protocol -> `modules/session-state.md`
 - Question format and internal Q record -> `modules/questions.md`
 - Drafts, files, stage flow, loop, caps -> `modules/orchestration.md`
 - Temp handoff contract -> `modules/stage-handoff.md`
@@ -79,6 +87,7 @@ Stages:
 - Load the relevant module before working that stage.
 - Run only stages mapped `run` or `brief`.
 - Skipped/n/a stages do not create handoff files.
+- Update `session_state.md` before asking each Q and after recording each answer.
 - `plan_draft.md` is an answer ledger, not a plan.
 - Final plan lives in `docs/planning/<slug>/plan.md`; do not write
   `99-final-plan.md`.

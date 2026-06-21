@@ -1,0 +1,90 @@
+[
+  {
+    "query": "Full grill me for a greenfield app that helps gym staff assign daily work. I only have the idea and need you to ask questions before anything gets built.",
+    "should_trigger": true
+  },
+  {
+    "query": "I have a rough idea for our existing admin portal: managers should bulk approve timesheets. I don't know if it needs UI, backend, or mockups. Grill me and figure out the right path.",
+    "should_trigger": true
+  },
+  {
+    "query": "Before touching code, help me understand how reminder delivery works in this repo and ask me only the questions the code cannot answer.",
+    "should_trigger": true
+  },
+  {
+    "query": "Plan a tiny feature: add an Archived filter to the bookings table. It should be simple, but ask the important questions first.",
+    "should_trigger": true
+  },
+  {
+    "query": "Stress test this plan.md and ask me the single most important unresolved question before we commit to it.",
+    "should_trigger": true
+  },
+  {
+    "query": "I want a clickable mock for a new onboarding flow. Include visual direction, prototype tech, fake data, and a final implementation plan.",
+    "should_trigger": true
+  },
+  {
+    "query": "I need to decide build-vs-buy for search. Ask me questions until the tradeoffs and risks are clear, then summarize the decision.",
+    "should_trigger": true
+  },
+  {
+    "query": "We need to migrate billing providers. It touches auth, webhooks, schema, admin screens, and rollout risk. Grill me before planning.",
+    "should_trigger": true
+  },
+  {
+    "query": "Continue the grill-me session after compaction. session_state.md says the last question is unanswered.",
+    "should_trigger": true
+  },
+  {
+    "query": "Help me understand the codebase area that owns push notifications. I may implement later, but right now I want a map and the next question.",
+    "should_trigger": true
+  },
+  {
+    "query": "Run pnpm test and fix whatever fails.",
+    "should_trigger": false
+  },
+  {
+    "query": "Generate a hero image for a venue website.",
+    "should_trigger": false
+  },
+  {
+    "query": "Summarize this PDF invoice and extract the totals into a CSV.",
+    "should_trigger": false
+  },
+  {
+    "query": "Please commit and push my current changes.",
+    "should_trigger": false
+  },
+  {
+    "query": "Add Sentry SDK setup to this Next.js app.",
+    "should_trigger": false
+  },
+  {
+    "query": "Review this PR for security vulnerabilities only.",
+    "should_trigger": false
+  },
+  {
+    "query": "Make this React component faster by reducing re-renders.",
+    "should_trigger": false
+  },
+  {
+    "query": "Look up current Appwrite pricing and tell me which plan I need.",
+    "should_trigger": false
+  },
+  {
+    "query": "Create a spreadsheet with monthly sales and a chart.",
+    "should_trigger": false
+  },
+  {
+    "query": "Run the existing app in Chrome and click through checkout.",
+    "should_trigger": false
+  },
+  {
+    "query": "I already gave you exact requirements. Implement the archived filter now without asking planning questions.",
+    "should_trigger": false
+  },
+  {
+    "query": "Explain what this one function does: parseReminderPayload(). No interview, just explain the code.",
+    "should_trigger": false
+  }
+]

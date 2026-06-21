@@ -38,7 +38,7 @@ Do not create this while interviewing unless the user asks for docs/status. Use 
 - Owner module: <module path>
 
 ## Decisions
-- <decision> — <short reason/user answer>
+- <decision> - <short reason/user answer>
 
 ## Open questions
 - <question/blocker | none>

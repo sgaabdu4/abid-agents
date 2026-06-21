@@ -1,0 +1,442 @@
+{
+  "skill_name": "grill-me",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Full grill me for a greenfield app idea: I want to build a lightweight staff task tool from scratch, but I only have the rough concept. Start the interview.",
+      "expected_output": "Starts question-first without repo research, classifies greenfield/full or suitable cap, creates durable session state when a slug is safe, and asks exactly one high-impact Q.",
+      "files": [],
+      "expectations": [
+        "No repo/codebase indexing or architecture scan is performed before Q1.",
+        "The visible reply contains exactly one question block.",
+        "session_state.md records profile, mode, stage map, and exact next question.",
+        "The first Q asks the highest-impact product or constraint unknown, not a generic mode menu."
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "Greenfield but lite: I want a plan for a tiny marketplace app, but do not do visual design, mockups, prototype, or implementation yet. Ask me what matters.",
+      "expected_output": "Routes greenfield plus explicit align/lite cap, asks one planning question, and marks visual/prototype stages n/a.",
+      "files": [],
+      "expectations": [
+        "The mode is align/lite despite greenfield wording.",
+        "Visual design, prototype tech, and prototype are n/a or skipped in session state.",
+        "The first Q asks a decision-critical product/constraint question.",
+        "No design artifact, mock, or implementation work is started."
+      ]
+    },
+    {
+      "id": 3,
+      "prompt": "In this existing app, I have an idea to add recurring reminders to staff tasks. I want to implement it, but first grill me enough that we understand the right approach.",
+      "expected_output": "Treats this as a brownfield feature, inspects relevant code/docs before asking what code can answer, skips visual/prototype unless evidence shows they matter, and asks one implementation-shaping Q.",
+      "files": [],
+      "expectations": [
+        "The run identifies a brownfield-feature profile.",
+        "Existing code/docs are grounded before asking Q1 when available.",
+        "Visual design and prototype stages are not run by default.",
+        "The first Q targets a real implementation boundary, behavior, data, or risk unknown."
+      ]
+    },
+    {
+      "id": 4,
+      "prompt": "Brownfield UI feature: add bulk approve for timesheets in the manager portal. I suspect the table and detail drawer both change. Grill me before we build.",
+      "expected_output": "Runs or briefs UI flow because navigation/state is likely touched, keeps visual design/prototype conditional, and asks one UI behavior or state question.",
+      "files": [],
+      "expectations": [
+        "The profile is brownfield-feature.",
+        "UI flow is run or briefed with evidence from the prompt/code.",
+        "Visual design is skipped unless surface/style direction is unresolved.",
+        "The first Q asks about flow/state/permission/recovery rather than color or styling."
+      ]
+    },
+    {
+      "id": 5,
+      "prompt": "I need a small feature: add an Archived filter to the admin bookings table. It should be simple, but ask whatever you need before we build.",
+      "expected_output": "Routes as simple-feature, asks only for goal/boundary/acceptance/verification details, and does not expand into visual design or prototype stages.",
+      "files": [],
+      "expectations": [
+        "The stage map keeps visual design, prototype tech, and prototype as n/a or skipped.",
+        "The first Q targets the highest-impact missing boundary or acceptance check.",
+        "The session does not ask for broad product discovery.",
+        "session_state.md records simple-feature profile."
+      ]
+    },
+    {
+      "id": 6,
+      "prompt": "Tiny backend-only change: add a staffRole field to exported CSV rows. Ask me only what you need and then make a plan.",
+      "expected_output": "Keeps UI and prototype n/a, runs backend/vertical slice planning only if needed, and asks one schema/output contract question.",
+      "files": [],
+      "expectations": [
+        "UI flow, visual design, prototype tech, and prototype are n/a or skipped.",
+        "The first Q is about export contract, data source, permissions, or verification.",
+        "No visual/mock/prototype work is suggested.",
+        "The plan path includes acceptance and verification for the CSV output."
+      ]
+    },
+    {
+      "id": 7,
+      "prompt": "I do not want to build yet. Help me understand how auth/session renewal works in this codebase and what could break if we changed it.",
+      "expected_output": "Routes as understand/codebase-understanding, maps evidence-backed current behavior, marks unknowns explicitly, and asks only unresolved intent or evidence-gap questions.",
+      "files": [],
+      "expectations": [
+        "The mode is understand, not build-plan/full.",
+        "The response uses code/doc evidence for current behavior where available.",
+        "No implementation plan, UI flow, visual design, or prototype is started.",
+        "Unknowns are marked unknown instead of guessed."
+      ]
+    },
+    {
+      "id": 8,
+      "prompt": "Can you help me understand this codebase enough to know where push notifications are owned? I might change it later, but not yet.",
+      "expected_output": "Treats this as codebase-understanding, maps owners/callers/config from evidence, and asks one follow-up only if the target scope is ambiguous.",
+      "files": [],
+      "expectations": [
+        "The profile is codebase-understanding.",
+        "Code/docs are inspected before asking broad questions.",
+        "The output does not start build planning or task slicing.",
+        "Any follow-up Q is about scope or unresolved evidence, not product strategy."
+      ]
+    },
+    {
+      "id": 9,
+      "prompt": "I have an idea for our web portal: let managers bulk approve timesheets. Maybe it needs UI flow, maybe not. I do not want a mock unless it is actually needed. Grill me and make the right call.",
+      "expected_output": "Classifies as mixed/brownfield-feature, asks enough to decide UI/backend scope, and keeps visual design/prototype out unless the answers reveal a risky UX unknown.",
+      "files": [],
+      "expectations": [
+        "The first questions decide touched surfaces and risk, not visual style.",
+        "UI flow is run or briefed only if navigation/state changes are likely.",
+        "Mock/prototype work is skipped unless a risky UX unknown is established.",
+        "The explicit no-mock preference is preserved in session_state.md."
+      ]
+    },
+    {
+      "id": 10,
+      "prompt": "This is probably mostly design: users are confused during onboarding, and I want to explore a better first-run experience before implementation.",
+      "expected_output": "Runs product/UI flow and visual design as needed, but still asks one decision at a time and does not jump straight to code.",
+      "files": [],
+      "expectations": [
+        "The stage map includes UI flow and visual design as run or brief.",
+        "Prototype is not started until visual direction and prototype tech gates are satisfied.",
+        "The first Q targets onboarding behavior, success, or user state before style details.",
+        "session_state.md stores the exact Q before reply."
+      ]
+    },
+    {
+      "id": 11,
+      "prompt": "I want a clickable mock for a new mobile habit app. Full grill me, including look and feel, but make sure the prototype uses fake data only.",
+      "expected_output": "Runs full staged pipeline, uses visual direction before prototype, separates prototype mock data from backend, and asks one Q.",
+      "files": [],
+      "expectations": [
+        "The mode is full or equivalent full staged flow.",
+        "Visual direction gate precedes full-flow prototype.",
+        "Prototype tech/mock-data boundary precedes prototype build.",
+        "No real backend/auth/storage integration is planned before prototype approval."
+      ]
+    },
+    {
+      "id": 12,
+      "prompt": "I want to migrate billing providers in our app. It may touch auth, webhooks, database rows, and admin screens. Grill me before planning.",
+      "expected_output": "Treats this as a high-risk brownfield migration, grounds code/docs, runs backend and possibly UI stages, and requires human review/rollback/telemetry controls.",
+      "files": [],
+      "expectations": [
+        "The profile is brownfield-feature or mixed migration.",
+        "Schema/data/auth/deploy/stateful risk controls are required.",
+        "Human review, rollback/migration notes, and telemetry/audit expectations are captured.",
+        "Visual design/prototype are not run unless the admin UI flow risk requires them."
+      ]
+    },
+    {
+      "id": 13,
+      "prompt": "We need to redesign the dashboard, but use the existing design system. Do not invent a new brand direction unless the code proves we need it.",
+      "expected_output": "Routes to brownfield UI/design work, reuses existing design system evidence, and asks one dashboard flow/density/state question before any new style direction.",
+      "files": [],
+      "expectations": [
+        "Existing design system/tokens/components are inspected before visual direction work.",
+        "The first Q does not ask for brand style if existing design should be reused.",
+        "UI flow/state coverage is considered before visual polish.",
+        "Prototype is conditional, not automatic."
+      ]
+    },
+    {
+      "id": 14,
+      "prompt": "I just want to compare two approaches for data cleanup. No code, no plan doc unless needed. Ask me questions until we know which approach is better.",
+      "expected_output": "Routes to align, asks decision-critical Qs, avoids build/prototype stages, and can finish with a compact decision summary.",
+      "files": [],
+      "expectations": [
+        "The mode is align/lite.",
+        "Visual design, prototype, and implementation stages are n/a.",
+        "Questions focus on constraints, risk, reversibility, verification, and success criteria.",
+        "Final artifact defaults to decision summary unless user expands scope."
+      ]
+    },
+    {
+      "id": 15,
+      "prompt": "Stress test this spec: docs/planning/reminders/plan.md. Find gaps and ask me the most important question first.",
+      "expected_output": "Routes to review, reads the supplied spec first, produces evidence-backed gap context internally, and asks one focused Q.",
+      "files": [
+        {
+          "path": "docs/planning/reminders/plan.md",
+          "content": "# Reminder Plan\n\n## Goal\nSend a reminder before each booked session.\n\n## Current assumptions\n- Reminders are sent by a background worker.\n- Users can have multiple active bookings.\n- The app stores booking start time and client timezone.\n\n## Draft behavior\n- Send one reminder 24 hours before the session.\n- Do not send reminders for cancelled bookings.\n- Mark each reminder as sent after the push provider accepts it.\n\n## Open notes\n- The retry strategy is undecided.\n- The product owner has not chosen the failure mode that matters most.\n"
+        }
+      ],
+      "expectations": [
+        "The mode is review.",
+        "The supplied doc is read before asking questions.",
+        "The visible reply asks exactly one highest-impact gap/risk Q.",
+        "No unrelated stage artifacts are created."
+      ]
+    },
+    {
+      "id": 16,
+      "prompt": "Continue a grill-me session after compaction. session_state.md says Last answer: unanswered and Last Question is: Q4: Which failure should the first slice handle? Options A) expired token B) missing permission C) offline retry. I just said: where were we?",
+      "expected_output": "Reads session state as source of truth and re-asks the exact unanswered Q instead of summarizing or moving forward.",
+      "files": [],
+      "expectations": [
+        "The exact Q4 question is re-asked.",
+        "The run does not invent a new Q or finalize a plan.",
+        "The run treats chat memory as insufficient without session_state.md.",
+        "The run does not mark the unanswered Q as recorded."
+      ]
+    },
+    {
+      "id": 17,
+      "prompt": "Continue after compaction. The last question was Q6: Should deleted clients remain visible in historical reports? I answer: B, only in reports, not active search.",
+      "expected_output": "Records the answer, updates decision/session state, then computes the next concrete Q instead of repeating Q6.",
+      "files": [],
+      "expectations": [
+        "The answer is recorded in plan_draft.md.",
+        "session_state.md sets last answer recorded or equivalent.",
+        "A confirmed decision captures deleted clients visible only in reports.",
+        "The next visible reply is one new concrete Q, not Q6 repeated."
+      ]
+    },
+    {
+      "id": 18,
+      "prompt": "Resume a session where session_state.md is missing but docs/planning/refactor/plan_draft.md exists with Stage: backend-tech and Next: Which table owns archival state? Continue.",
+      "expected_output": "Rebuilds minimal session state from the draft, marks uncertain fields unknown, and asks the recorded next Q.",
+      "files": [],
+      "expectations": [
+        "A minimal session_state.md is recreated before asking.",
+        "Unknown fields are marked unknown rather than guessed.",
+        "The next Q uses the draft's recorded Next field.",
+        "No stage handoff is created just to recover state."
+      ]
+    },
+    {
+      "id": 19,
+      "prompt": "The user answered 'all important' to a ranking question about launch checks. Continue the grill-me session.",
+      "expected_output": "Accepts all feasible checks, records them, and asks a concrete next behavior/boundary/risk question instead of forcing a primary ranking.",
+      "files": [],
+      "expectations": [
+        "The answer 'all important' is accepted when feasible.",
+        "The next Q does not re-ask for a single primary ranking.",
+        "The next Q targets a concrete behavior, boundary, or risk control.",
+        "session_state.md records the decision."
+      ]
+    },
+    {
+      "id": 20,
+      "prompt": "User says 'skip for now' to the analytics question in backend-tech. Continue without losing the unknown.",
+      "expected_output": "Parks the unknown, records it as a blocker/unknown when relevant, and continues only if risk permits.",
+      "files": [],
+      "expectations": [
+        "The skipped analytics decision is recorded as parked or unknown.",
+        "The run does not silently assume analytics behavior.",
+        "If analytics is high risk, the next Q addresses the blocker or human review.",
+        "If safe to continue, the next Q is one concrete next-stage question."
+      ]
+    },
+    {
+      "id": 21,
+      "prompt": "The user says 'use default' to a visual direction choice. Continue.",
+      "expected_output": "Records the suggested default as accepted, keeps the chosen direction contract for prototype handoff, and moves to the next necessary Q.",
+      "files": [],
+      "expectations": [
+        "The accepted default direction is recorded as a decision.",
+        "Prototype handoff names what to preserve from the chosen direction.",
+        "The run does not regenerate directions unnecessarily.",
+        "The next Q is about the next unresolved prototype/flow/tech decision."
+      ]
+    },
+    {
+      "id": 22,
+      "prompt": "The user says 'not sure' to the first backend storage question. Continue.",
+      "expected_output": "Uses the suggested default if appropriate, records uncertainty/default choice, and asks the next meaningful backend or risk question.",
+      "files": [],
+      "expectations": [
+        "The suggested default is used only if the prompt/skill supplied one.",
+        "User uncertainty is preserved in state or decisions.",
+        "The run does not badger the user with the same question.",
+        "The next Q is concrete and answerable."
+      ]
+    },
+    {
+      "id": 23,
+      "prompt": "We are in final synthesis for a build-plan session. session_state.md has Product and Backend accepted, UI n/a, Visual n/a, Prototype n/a, Vertical slices accepted. Write the plan.",
+      "expected_output": "Reads session state and draft, writes plan.md as canonical artifact, includes only relevant sections, and cleans temp state only after verification.",
+      "files": [],
+      "expectations": [
+        "session_state.md is read before final synthesis.",
+        "plan.md includes decisions, acceptance checks, verification/evals, risks/unknowns where relevant.",
+        "Irrelevant visual/prototype sections are omitted or not boilerplated.",
+        "Temp state is deleted only after plan.md is verified to contain needed content."
+      ]
+    },
+    {
+      "id": 24,
+      "prompt": "We are finalizing an understand-only codebase session. Produce the smallest useful artifact.",
+      "expected_output": "Produces an explanation/map or findings artifact, not a full implementation plan, and preserves unknowns/evidence.",
+      "files": [],
+      "expectations": [
+        "The final artifact is explanation/map/findings, not task waves.",
+        "Evidence anchors and unknowns are included.",
+        "No visual/prototype/build sections are added.",
+        "The output matches the understand cap."
+      ]
+    },
+    {
+      "id": 25,
+      "prompt": "I want to start implementing immediately after two questions. If you need more to avoid mistakes, keep asking. This is for payment refunds.",
+      "expected_output": "Does not stop early because of user impatience; asks enough one-by-one questions for high-risk payment work, including controls.",
+      "files": [],
+      "expectations": [
+        "The run does not cap itself at two questions if risk remains.",
+        "Payment/data/security risks trigger human review, rollback, and telemetry expectations.",
+        "Questions remain one at a time.",
+        "The first Q targets the highest-risk unknown."
+      ]
+    },
+    {
+      "id": 26,
+      "prompt": "I want this feature in our Flutter app: let users schedule workouts offline and sync later. Grill me before build.",
+      "expected_output": "Routes as brownfield/mobile feature, invokes Flutter-specific guidance when editing/planning Flutter code is reached, and asks offline/sync behavior questions before implementation.",
+      "files": [],
+      "expectations": [
+        "Offline/sync state is treated as a core product/backend risk.",
+        "UI flow is run or briefed because user-facing state changes are likely.",
+        "Backend/storage/sync decisions are not guessed.",
+        "Flutter-specific skill/tooling is invoked only when relevant stage/code work requires it."
+      ]
+    },
+    {
+      "id": 27,
+      "prompt": "I want to clean up a messy service file but preserve behavior. Grill me enough to decide scope and verification, then plan slices.",
+      "expected_output": "Routes refactor/build-plan, asks about behavior boundaries and verification before slices, and avoids visual/prototype stages.",
+      "files": [],
+      "expectations": [
+        "The profile is brownfield-feature or simple-feature depending scope.",
+        "Visual design/prototype are n/a.",
+        "Questions cover preserved behavior, blast radius, tests, and rollback.",
+        "Vertical slices avoid parallel work over shared owners."
+      ]
+    },
+    {
+      "id": 28,
+      "prompt": "Our onboarding activation is low. I want to figure out if we need a product change, UI change, or just better lifecycle emails. Grill me.",
+      "expected_output": "Routes mixed discovery, asks a product/current-state question first, and defers UI/design/prototype until the touched surface is known.",
+      "files": [],
+      "expectations": [
+        "The first Q resolves product/current-state or success metric before UI details.",
+        "Stage map keeps UI/design/prototype conditional until evidence/answers require them.",
+        "Questions can cover non-UI lifecycle/email paths.",
+        "The session state records mixed or equivalent profile."
+      ]
+    },
+    {
+      "id": 29,
+      "prompt": "I have a design already in Figma and want an implementation plan only. Do not redo visual direction.",
+      "expected_output": "Treats visual design as already supplied/skipped, asks about implementation boundaries and verification, and does not create new directions.",
+      "files": [],
+      "expectations": [
+        "Visual design is brief/skipped with evidence that design is supplied.",
+        "No new style direction options are generated.",
+        "UI flow/prototype run only if implementation risk requires them.",
+        "The first Q targets handoff fidelity, components, states, or verification."
+      ]
+    },
+    {
+      "id": 30,
+      "prompt": "I want to add a public API endpoint for partners. It touches auth, rate limits, schemas, and docs. Grill me.",
+      "expected_output": "Routes backend/API build-plan, asks about contract/auth/rate-limit/data ownership, and captures high-risk controls.",
+      "files": [],
+      "expectations": [
+        "UI/visual/prototype stages are n/a unless user-facing docs portal is in scope.",
+        "Backend/API stage is run.",
+        "Auth/rate-limit/schema/data risks trigger controls and verification.",
+        "The first Q is about API contract, partner access, auth, data, or failure behavior."
+      ]
+    },
+    {
+      "id": 31,
+      "prompt": "Make a plan for adding admin audit logs, but I only want the backend and observability thinking, no UI.",
+      "expected_output": "Honors no-UI cap, routes backend/observability, and asks audit event ownership or retention question.",
+      "files": [],
+      "expectations": [
+        "UI flow, visual design, and prototype are n/a.",
+        "Backend/infra and vertical slices/evals are run or briefed.",
+        "Questions cover event ownership, retention, permissions, observability, or rollback.",
+        "No admin screen design is proposed."
+      ]
+    },
+    {
+      "id": 32,
+      "prompt": "Help me decide whether to build or buy search. I need to understand tradeoffs and maybe later implement it.",
+      "expected_output": "Routes align/understand, asks constraints/evidence questions, and stops before implementation planning unless user pivots.",
+      "files": [],
+      "expectations": [
+        "The mode is align or understand, not build-plan by default.",
+        "Questions cover scale, data shape, latency, cost, maintenance, and relevance needs.",
+        "No visual/prototype work is started.",
+        "Final artifact can be comparison/options rather than task plan."
+      ]
+    },
+    {
+      "id": 33,
+      "prompt": "There is a bug in reminder delivery. I want you to grill me before touching code, but check what the code already says first.",
+      "expected_output": "Routes brownfield/debug planning, grounds code first, asks one evidence-gap/root-cause question, and avoids design/prototype.",
+      "files": [],
+      "expectations": [
+        "Existing code/log/docs are inspected before Q1.",
+        "The first Q asks about missing evidence, reproduction, expected behavior, or blast radius.",
+        "Visual/prototype stages are n/a.",
+        "The skill does not ask what code can answer."
+      ]
+    },
+    {
+      "id": 34,
+      "prompt": "I want a product spec for a new AI assistant feature, but no UI or prototype yet. Include eval thinking.",
+      "expected_output": "Routes greenfield align/build-plan with eval focus, runs product and vertical eval thinking, and skips UI/prototype unless needed.",
+      "files": [],
+      "expectations": [
+        "Product stage is run.",
+        "Vertical slices/evals are run or briefed because eval thinking is requested.",
+        "UI/visual/prototype are n/a unless the assistant surface is ambiguous.",
+        "Questions cover user job, failure modes, eval criteria, and data boundaries."
+      ]
+    },
+    {
+      "id": 35,
+      "prompt": "I want a new landing page for a venue. Full grill me, including visual direction and prototype.",
+      "expected_output": "Routes full greenfield/brand-like UI work, runs product, UI flow, visual design, prototype tech, prototype, and eval stages in order.",
+      "files": [],
+      "expectations": [
+        "Visual design is run because full visual/prototype is requested.",
+        "Prototype is not built before visual direction and prototype tech gates.",
+        "Questions stay one at a time.",
+        "The final-plan stage is queued for later and must include artifact paths and verification when reached."
+      ]
+    },
+    {
+      "id": 36,
+      "prompt": "I only want a README-level explanation of how data imports work. Do not plan changes.",
+      "expected_output": "Routes understand, inspects code/docs, creates explanation-level output only, and avoids plan/build stages.",
+      "files": [],
+      "expectations": [
+        "The mode is understand.",
+        "The requested artifact is explanation/README-level map.",
+        "Build-plan, visual, prototype, and vertical slice stages are n/a.",
+        "Any Q is only for scope or unresolved evidence."
+      ]
+    }
+  ]
+}

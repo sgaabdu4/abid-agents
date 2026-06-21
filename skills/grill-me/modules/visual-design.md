@@ -44,8 +44,8 @@ Before producing visual directions or styled artifacts:
    - Use them as project anchors.
    - Do not ask questions already answered there.
 6. Identify register (`brand` or `product`) and load the matching impeccable reference:
-   - Brand → `reference/brand.md`.
-   - Product → `reference/product.md`.
+   - Brand -> `reference/brand.md`.
+   - Product -> `reference/product.md`.
 
 ## Required references
 
@@ -80,11 +80,11 @@ Use the relevant impeccable color/theming rules:
 
 Do not compress these gates:
 
-1. **Context gate** — PRODUCT/DESIGN context loaded, created, or explicitly skipped where allowed.
-2. **Direction-input gate** — scene, color strategy, fidelity, breadth, and named references are clear enough.
-3. **Palette gate** — palette/tokens are confirmed when native image generation or high-fidelity exploration is used.
-4. **Direction-choice gate** — one direction is chosen, merged, customized, accepted as default, or explicitly parked.
-5. **Prototype handoff gate** — chosen direction contract is recorded for the prototype.
+1. **Context gate** - PRODUCT/DESIGN context loaded, created, or explicitly skipped where allowed.
+2. **Direction-input gate** - scene, color strategy, fidelity, breadth, and named references are clear enough.
+3. **Palette gate** - palette/tokens are confirmed when native image generation or high-fidelity exploration is used.
+4. **Direction-choice gate** - one direction is chosen, merged, customized, accepted as default, or explicitly parked.
+5. **Prototype handoff gate** - chosen direction contract is recorded for the prototype.
 
 No full-flow UI prototype before gate 4, unless the user explicitly says to skip visual design.
 
@@ -130,11 +130,11 @@ If native image generation does not exist:
 - Before showing any localhost URL, verify port is not serving something else: `lsof -iTCP:4173 -sTCP:LISTEN -n -P`.
 - If `4173` is occupied by unrelated/unknown process, use next free port (`4174+`) or stop only a server you started for this visual-design artifact.
 - Serve only artifact dir, never repo root: `python3 -m http.server <port> --directory docs/planning/visual-design/<slug>`.
-- Web/unknown → static HTML/CSS + direct verified URL to actual HTML: `http://localhost:<port>/<file>.html`; use `/` only when `index.html` is the actual concept.
+- Web/unknown -> static HTML/CSS + direct verified URL to actual HTML: `http://localhost:<port>/<file>.html`; use `/` only when `index.html` is the actual concept.
 - Verify URL before replying by fetching it and confirming path/title/unique marker.
 - Label `Visual design preview:` only after verification; otherwise label `Run preview:` + exact command + expected URL.
-- Flutter → Flutter-native styled concept; verify/free port; run `flutter run -d chrome --web-port <port> -t lib/main_visual_design.dart` or target device.
-- Existing code → reuse real routes, copy constraints, components, and design tokens when they exist; if they conflict with the chosen direction, name the conflict.
+- Flutter -> Flutter-native styled concept; verify/free port; run `flutter run -d chrome --web-port <port> -t lib/main_visual_design.dart` or target device.
+- Existing code -> reuse real routes, copy constraints, components, and design tokens when they exist; if they conflict with the chosen direction, name the conflict.
 
 ## Stage handoff plan
 
@@ -163,35 +163,11 @@ Clarity gate:
 
 ## Q pattern
 
-Show the visual direction preview/status first, then ask one clear style choice question. Keep artifact paths and rationale for artifact creation, stage close, or final synthesis.
-
-```text
-Visual design preview: <verified URL/device/path>
-
-Q<N>: Which visual direction should the product use?
-
-Meaning:
-This decides the look and feel before we build the clickable prototype.
-You can pick one, merge parts, or describe a different direction.
-
-Why it matters:
-The prototype will use this style, so flow feedback happens on a design
-that already feels close to the real product.
-
-Suggested default:
-<A/B/C> — <one clear reason>
-
-Options:
-A) <plain style direction with concrete feel>
-
-B) <plain style direction with concrete feel>
-
-C) <plain style direction with concrete feel or "Not sure — use the default">
-
-Reply: A/B/C, "merge A+B", "use default", "not sure", "skip for now", or your own answer.
-```
-
-Internal notes for stage close/final synthesis: setup status, register, loaded refs, scene, direction options/tradeoffs, color strategy, tokens, type/density/component feel, accessibility, artifact path, why, scenario.
+Use `modules/questions.md`. Show verified preview/status first when available,
+then ask one style choice question. Allow pick, merge, custom, use-default, or
+park. Keep setup status, refs, scene, directions, tokens, type/density,
+accessibility, artifact path, why, and scenario for `session_state.md`, artifact
+notes, stage close, or final synthesis.
 
 ## Rules
 
