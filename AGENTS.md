@@ -7,7 +7,7 @@ Check before any tool call. If the prompt conflicts, this section wins.
 - Before committing, inspect `git status --short`; if `.env*`, keys, tokens, or secret-like files appear, stop and do not commit.
 - Never add a pass-through wrapper. Readability/naming is not enough; one-call return functions are forbidden. Explain the direct/canonical owner.
 - Do not weaken validation at trust, security, accessibility, or data-loss boundaries; refuse the unsafe change and offer a safe path.
-- Files over 700 lines are closed to feature growth: do not add code, imports, exports, re-exports, or wiring there; create or use a smaller owner file.
+- Files over 700 lines are a hard stop when touched: any fix/feature/review/issue edit must split/move code or content so it ends under 700 lines in the same session. Scope this to touched files only; do not sweep other large files or add code/import/export/re-export/wiring/docs without the split.
 - Skill edits cannot put a 3+ step workflow in `SKILL.md`; create or update `references/*.md` or a script and link it from `SKILL.md`.
 - UI component edits with no design SSOT must create/import a separate token/theme/style owner first; no inline `style` or component-local visual constants; no confirmation for standard disabled/loading/focus/hover states.
 - Browser/E2E probe failed or denied, including Playwright/browser MCP/node_repl -> stop UI automation. Do not call `list_apps`, `open -a`, `computer-use`, or `osascript`; use local script/tests.
@@ -91,7 +91,7 @@ Use before raw text search for definitions/callers/callees/data flow/architectur
 ## context-mode
 Default for commands that read/query/list/test/build/diff/fetch/process data. Raw output floods context. Parent may call context-mode MCP.
 
-- Tool map: ctx_batch_execute multiple cmds/output over 20 lines; ctx_execute one command/API/data script; ctx_execute_file large files/logs/JSON/CSV/source; ctx_fetch_and_index -> ctx_search web/docs; ctx_index(path) -> ctx_search local docs/artifacts; ctx_search(sort="timeline") after resume/compact; ctx_stats, ctx_doctor, ctx_upgrade, ctx_purge, ctx_insight admin.
+- Tool map: ctx_batch_execute batches; ctx_execute command/API/data; ctx_execute_file large files/logs/JSON/CSV/source; ctx_fetch_and_index -> ctx_search web/docs; ctx_index(path) -> ctx_search local docs; ctx_search(sort="timeline") after resume; ctx_stats, ctx_doctor, ctx_upgrade, ctx_purge, ctx_insight admin.
 - Think in code: analyze/count/filter in sandbox; print answer, not raw data; batch related ctx_search queries.
 - File edits use Read/Edit/Write, not context-mode. Playwright/browser snapshots: save to file, then ctx_index(path) or ctx_execute_file(path). After /clear or /compact, context-mode persists; ctx purge only on explicit request.
 
@@ -134,9 +134,9 @@ Load matching skill before answering/editing:
 - Do not compress vendor/submodule skills; update their upstream instead.
 
 ## Project Learning Loop: Skill First
-- "Capture project learning" or verified repeatable miss requires 3 artifacts in the same change: repo skill `skills/<topic>/SKILL.md` with `---` YAML frontmatter containing `name` and concise `description`; nearest project `AGENTS.md` route naming that skill; skill `references/*.md` or script with problem -> fix details.
-- Multiple failed fix attempts on the same class of problem count as a verified repeatable miss once the agent can name the recurring failure mode and evidence. Stop retrying local fixes only; capture the learning before final by creating/updating the repo skill path above, or append a narrow routing-only rule to the nearest project `AGENTS.md` when no reusable workflow/pitfall/script exists.
-- `AGENTS.md`-only learning is valid only for narrow project routing rules; do not bury project-specific behavior in this global file. Store repo-specific commands/tests/E2E/domain workflows/pitfalls in skill references/scripts. Before adding: check docs/skills, update canonical owner, avoid duplicates, measure touched `SKILL.md`, validate new/changed skills, mention artifact in final.
+- "Capture project learning" or verified repeatable miss requires 3 artifacts together: repo skill `skills/<topic>/SKILL.md` with `---` YAML frontmatter containing `name` and concise `description`; nearest project `AGENTS.md` route naming that skill; skill `references/*.md` or script with problem -> fix details.
+- Multiple failed fix attempts on the same class of problem count as a verified repeatable miss once the recurring failure mode and evidence are clear. Stop retrying local fixes only; capture the learning before final, or append a narrow routing-only rule to the nearest project `AGENTS.md` when no reusable workflow/pitfall/script exists.
+- `AGENTS.md`-only learning is valid only for narrow project routing rules; do not bury project behavior in this global file. Store repo commands/tests/E2E/domain workflows/pitfalls in skill references/scripts. Before adding: check docs/skills, use canonical owner, avoid duplicates, measure touched `SKILL.md`, validate skills, mention artifact in final.
 
 ## Implementation Flow
 For non-trivial code tasks:
