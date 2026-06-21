@@ -88,9 +88,8 @@ artifact, acceptance checks, verification/evals, and domain-doc impact.
 
 ## Clarification depth
 
-- Full clarification beats speed. There is no question-count limit.
+- Full clarification beats speed.
 - Still ask one Q at a time. Ask as many one-by-one Qs as needed.
-- Fast interview mode means minimal docs, not fewer questions.
 - Do not move to the next stage while important unknowns remain.
 - A stage is clear only when the needed user behavior, boundaries, constraints,
   non-goals, acceptance checks, and risky edge cases are decided or explicitly
@@ -177,21 +176,22 @@ Each turn:
    re-ask that Q exactly.
 5. If the latest user message answers the last Q, update draft + state before
    generating the next Q.
-6. If existing code matters, ground with code/docs before Q1; for
+6. If state says the active stage is accepted/brief/skipped, refine if needed,
+   then advance to the next Stage Map item marked `run` or `brief`.
+7. If existing code matters, ground with code/docs before Q1; for
    codebase-understanding, answer evidence-backed facts first.
-7. If fuzzy terms, glossary/ADR conflicts, or doc updates matter, load
+8. If fuzzy terms, glossary/ADR conflicts, or doc updates matter, load
    `modules/domain-docs.md`.
-8. If intake incomplete, ask the highest-impact unanswered intake Q.
-9. Else load only the relevant stage module and `modules/questions.md`.
-10. Before the visible reply, persist the exact Q in `session_state.md`.
-11. Visible interview reply = question only.
-12. When a stage is clear, refine/handoff if needed, then continue or finalize.
+9. If intake incomplete, ask the highest-impact unanswered intake Q.
+10. Else load only the relevant stage module and `modules/questions.md`.
+11. Before the visible reply, persist the exact Q in `session_state.md`.
+12. Visible interview reply = question only.
+13. When a stage is clear, refine/handoff if needed, then continue or finalize.
 
 ## Global rules
 
 - Never batch Qs.
-- Ask as many one-by-one Qs as needed for full clarification; do not optimize for
-  fewer questions.
+- Ask as many one-by-one Qs as needed; do not optimize for fewer questions.
 - Greenfield means question-first: no repo research, no indexing, no
   architecture scan unless user asks.
 - During interview, visible reply is only the next question; no draft/status
@@ -220,12 +220,11 @@ Each turn:
   criteria + verification/eval strategy + risky edge cases, or an explicit
   user-approved parked unknown.
 - Final plan must be self-contained: summary, decisions, Q&A, artifact refs,
-  acceptance criteria, verification/evals, risks, unknowns, traceability.
+  acceptance checks, verification/evals, risks, unknowns, traceability.
 - Do not write `99-final-plan.md`; write `plan.md` only.
 - Schema/data/auth/security/deploy/stateful changes require human review gate,
   rollback/migration notes, and telemetry/audit expectations.
-- Existing glossary/ADR conflicts must be surfaced with evidence before final
-  synthesis or downstream task plans.
+- Surface glossary/ADR conflicts with evidence before final synthesis or plans.
 - Resolve parent decisions before child decisions.
 - Replace fuzzy terms with canonical terms.
 - Surface contradictions with evidence.

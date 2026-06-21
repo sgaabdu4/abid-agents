@@ -120,6 +120,9 @@ Load matching skill before answering/editing:
 - Online/current info -> `tavily-cli`.
 - Skills/diagnostics/project learning/repeatable misses -> `skill-creator`; update `.agents/skills/`; no secrets/speculation.
 - Ambiguous planning/features -> `grill-me`; committed shipping validation/push/PR -> `no-mistakes`.
+- Hard bugs/failures/flakes/regressions -> `diagnosing-bugs`.
+- Boundaries/interfaces/ownership/wrappers -> `codebase-design`.
+- Resolved context to PRD/spec -> `to-prd`; accepted plan to vertical issues -> `to-issues`.
 - React/Next/perf/composition -> matching React/Vercel skills.
 - Tests/specs/QA/mutation -> `test-quality`.
 - UI/components/design-system/tokens -> `atomic-ui` + `impeccable`.

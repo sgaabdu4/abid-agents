@@ -99,6 +99,30 @@ There are two types:
 
 Workflow defaults: use `grill-me` to clarify ambiguous work before building, then use [`no-mistakes`](https://github.com/kunchenguid/no-mistakes) through `/no-mistakes` or `git push no-mistakes` to validate committed shipping work after implementation.
 
+Planning and engineering helpers:
+
+- `diagnosing-bugs`: isolate hard bugs before patching.
+- `codebase-design`: decide module ownership, public interfaces, and abstraction shape.
+- `to-prd`: turn resolved context into a PRD or implementation brief.
+- `to-issues`: split an accepted plan into vertical-slice issues.
+
+Quick routing:
+
+| Need | Use |
+| --- | --- |
+| Clarify ambiguous work before building | `grill-me` |
+| Diagnose hard bugs, flakes, regressions | `diagnosing-bugs` |
+| Decide module ownership or abstraction shape | `codebase-design` |
+| Turn resolved context into a spec | `to-prd` |
+| Split a plan into agent-ready slices | `to-issues` |
+| Design or repair tests | `test-quality` |
+| UI systems, tokens, or product polish | `atomic-ui` + `impeccable` |
+| User-like UI regression proof | `e2e` |
+| Latency or efficiency work | `performance-rescue` |
+| Security, auth, secrets, or data exposure | `security-review` |
+| Strict maintainability review | `thermo-nuclear-code-quality-review` |
+| Final validation, push, PR, or CI gate | `no-mistakes` |
+
 Local skill budget:
 
 - `SKILL.md` under 100 lines

@@ -149,7 +149,16 @@
       "id": 13,
       "prompt": "We need to redesign the dashboard, but use the existing design system. Do not invent a new brand direction unless the code proves we need it.",
       "expected_output": "Routes to brownfield UI/design work, reuses existing design system evidence, and asks one dashboard flow/density/state question before any new style direction.",
-      "files": [],
+      "files": [
+        {
+          "path": "src/design/tokens.ts",
+          "content": "export const spacing = { xs: 4, sm: 8, md: 12, lg: 16 };\nexport const colors = { surface: '#f8fafc', text: '#0f172a', accent: '#2563eb' };\n"
+        },
+        {
+          "path": "src/components/DashboardCard.tsx",
+          "content": "export function DashboardCard({ title, value }: { title: string; value: string }) {\n  return <section data-density=\"compact\"><h2>{title}</h2><strong>{value}</strong></section>;\n}\n"
+        }
+      ],
       "expectations": [
         "Existing design system/tokens/components are inspected before visual direction work.",
         "The first Q does not ask for brand style if existing design should be reused.",
@@ -279,7 +288,7 @@
         "session_state.md is read before final synthesis.",
         "plan.md includes decisions, acceptance checks, verification/evals, risks/unknowns where relevant.",
         "Irrelevant visual/prototype sections are omitted or not boilerplated.",
-        "Temp state is deleted only after plan.md is verified to contain needed content."
+        "Temp state is listed for cleanup only after plan.md is verified to contain needed content."
       ]
     },
     {
@@ -533,6 +542,48 @@
         "The ADR criteria include hard to reverse, surprising without context, and real tradeoff.",
         "The first Q asks about the auth tradeoff, rollback, compatibility, or future-reader surprise.",
         "Security/auth review and verification remain in scope."
+      ]
+    },
+    {
+      "id": 42,
+      "prompt": "Continue after compaction. The current session state says Product plan is accepted and UI flow is the next run stage. Continue the grill-me session.",
+      "expected_output": "Reads session_state.md and plan_draft.md, advances from accepted Product plan to UI flow, and asks one UI-flow question instead of looping on product.",
+      "files": [
+        {
+          "path": "docs/planning/staff-tasks/session_state.md",
+          "content": "# Staff Tasks Session State\nUpdated: synthetic\nMode: build-plan\nProfile: brownfield-feature\nRepo: existing\nTarget artifact: implementation plan\n\n## Stage Map\n- Intake: brief - request and repo known\n- Product plan: run - accepted\n- UI flow: run - navigation and states unresolved\n- Visual design: n/a - existing design system\n- Prototype tech stack: n/a - no prototype requested\n- Prototype: n/a - no prototype requested\n- Backend/infra tech stack: brief - endpoint ownership may matter\n- Vertical slices/evals: run - implementation planned\n\n## Position\n- Active stage: product\n- Stage status: accepted\n- Last question id: 5\n- Last answer: recorded\n- Next action: refine-stage\n\n## Last Question\nQ5: What is the primary staff task outcome?\n\n## Next Question\nnone\n\n## Decisions\n- Managers assign a daily task to one staff member and need completion status.\n\n## Blockers\n- UI flow state is unresolved.\n\n## Evidence / Artifacts\n- user quote: existing design system, no prototype.\n"
+        },
+        {
+          "path": "docs/planning/staff-tasks/plan_draft.md",
+          "content": "# Staff Tasks Draft\n\n## Current\n- Stage: product\n- Next: none\n\n## Answers\n| # | Question | Answer |\n|---|---|---|\n| 5 | What is the primary staff task outcome? | Manager assigns one daily task and tracks completion. |\n\n## Decisions\n- Primary outcome is assignment plus completion tracking.\n"
+        }
+      ],
+      "expectations": [
+        "session_state.md is read before choosing the next step.",
+        "The response advances beyond Product plan because that stage is accepted.",
+        "The next visible reply is one UI-flow question, not a repeated product question.",
+        "session_state.md is updated toward UI flow or the next run stage before asking."
+      ]
+    },
+    {
+      "id": 43,
+      "prompt": "Resume after compaction. session_state.md says UI flow is accepted, visual/prototype are n/a, backend is the next run stage. Continue.",
+      "expected_output": "Reads session_state.md, skips n/a visual/prototype stages, advances to backend/infra, and asks one backend/API ownership or data question.",
+      "files": [
+        {
+          "path": "docs/planning/audit-logs/session_state.md",
+          "content": "# Audit Logs Session State\nUpdated: synthetic\nMode: build-plan\nProfile: brownfield-feature\nRepo: existing\nTarget artifact: implementation plan\n\n## Stage Map\n- Intake: brief - target known\n- Product plan: accepted - audit events required\n- UI flow: run - accepted\n- Visual design: n/a - no UI design requested\n- Prototype tech stack: n/a - no prototype requested\n- Prototype: n/a - no prototype requested\n- Backend/infra tech stack: run - event ownership unresolved\n- Vertical slices/evals: run - implementation planned\n\n## Position\n- Active stage: ui-flow\n- Stage status: accepted\n- Last question id: 7\n- Last answer: recorded\n- Next action: refine-stage\n\n## Last Question\nQ7: Where should admins view audit events?\n\n## Next Question\nnone\n\n## Decisions\n- Admins view audit events from an existing account detail tab.\n\n## Blockers\n- Backend event ownership unresolved.\n\n## Evidence / Artifacts\n- user quote: no UI design or prototype.\n"
+        },
+        {
+          "path": "docs/planning/audit-logs/plan_draft.md",
+          "content": "# Audit Logs Draft\n\n## Current\n- Stage: ui-flow\n- Next: none\n\n## Answers\n| # | Question | Answer |\n|---|---|---|\n| 7 | Where should admins view audit events? | Existing account detail tab. |\n\n## Decisions\n- Reuse the existing account detail tab.\n"
+        }
+      ],
+      "expectations": [
+        "session_state.md drives the resume path after compaction.",
+        "Visual design, prototype tech, and prototype remain skipped or n/a.",
+        "The response advances to backend/infra instead of staying in UI flow.",
+        "The next visible reply is one backend/API/data ownership question."
       ]
     }
   ]

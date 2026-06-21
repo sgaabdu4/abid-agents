@@ -78,7 +78,7 @@
       "id": "paste_ready_release_note",
       "prompt": "User asks: write a paste-ready release note. Shipped: workspace exports now include archived projects when `includeArchived=true`; fixed CSV escaping for notes with commas; admins can see export status in `/settings/exports`. Keep it product-facing, not internal.",
       "expected_output": "Return a short release note that preserves exact flag and route names, explains the user-visible change, and avoids internal implementation detail.",
-      "required_terms": ["includeArchived=true", "CSV", "/settings/exports", "archived projects"],
+      "required_terms": ["includeArchived=true", "notes with commas", "/settings/exports", "archived projects"],
       "forbidden_terms": ["not just", "not only", "more than just", "not merely", "pivotal", "seamless", "robust", "groundbreaking", "internal"],
       "requires_human_writing": true,
       "max_output_tokens": 140
