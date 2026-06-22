@@ -1,6 +1,7 @@
 # Final plan module
 
-Use when the interview is done or the user asks for an artifact. Do not ask the user to choose plan depth upfront; infer the smallest useful artifact from the conversation, then ask one clarification only if the output shape is still unclear.
+Use when the interview is done or the user asks for an artifact. Infer the
+smallest useful artifact; ask one clarification only if output shape is unclear.
 
 ## Inputs
 
@@ -14,50 +15,37 @@ Read fully:
 Do not expect a Stage Map in `plan_draft.md`; the draft is an answer ledger.
 Do not create/read handoff files for skipped or n/a stages.
 
-Need in the final artifact only when relevant to the user's goal:
-- Decisions and Q&A needed to understand them.
-- Artifacts and paths.
-- Acceptance checks.
-- Verification/evals.
-- Requirement -> slice/task -> verification traceability when implementation is planned.
-- High-risk controls when risk exists.
-- Risks only when they affect decisions.
-- Domain language changes and ADR candidates when they affect naming,
-  contracts, docs, tests, or future work.
-- Parked unknowns/blockers.
+Include only goal-relevant decisions, needed Q&A, paths, acceptance checks,
+verification/evals, implementation traceability, high-risk controls, material
+risks, domain/ADR changes, and parked unknowns.
 
 ## Synthesis flow
 
 1. Read session state + draft answer ledger + existing stage handoffs/artifacts
    if present.
-2. Infer artifact depth from the user's request and gathered answers.
+2. Infer artifact depth from the request and gathered answers.
 3. If output shape is still unclear, ask one Q: decision summary, implementation plan, visual design/prototype, or full spec.
 4. Check active stages are fully clarified or unknowns are explicitly parked by the user.
 5. Detect conflicts between draft, handoffs, artifacts, and user answers.
 6. If conflict/blocker exists, ask one Q; do not finalize.
-7. Write `docs/planning/<slug>/plan.md` as the canonical artifact, sized to the inferred need.
+7. Write `docs/planning/<slug>/plan.md` as the canonical artifact, sized to need.
 8. If requested or needed, update confirmed `CONTEXT.md` glossary terms or ADRs
    using `modules/domain-docs.md`.
 9. Re-read `plan.md`; verify it contains the needed decisions, artifact refs, acceptance checks, verification/evals, domain docs, risks, unknowns, and traceability only where relevant.
 10. List temp planning state for cleanup after verification:
    `session_state.md`, `plan_draft.md`, temp stage handoffs, empty `stages/`.
-11. Preserve non-temp artifacts: visual design concepts, prototypes, mock data, fixtures, screenshots, diagrams, code, and user-created docs.
+11. Preserve non-temp artifacts: designs, prototypes, mock data, fixtures,
+    screenshots, diagrams, code, and user-created docs.
+12. End with a plain handoff: what was produced, cleanup status, and the next
+    likely user choices. For build-plan, include implement now, review/edit
+    plan, or stop with the plan.
 
 ## Final plan requirements
 
-`plan.md` includes only what is useful for the inferred artifact depth:
-- Summary.
-- Final assumptions.
-- Decisions with short rationale.
-- Q&A history only when needed to understand decisions.
-- Artifact paths + current status.
-- Domain language and ADR updates when relevant.
-- Acceptance checks.
-- Verification/evals.
-- Traceability table only when implementation is planned.
-- High-risk controls only when risk exists.
-- Risks + mitigations only when they affect decisions.
-- Parked unknowns + owner/next step.
+`plan.md` includes only what the inferred artifact needs:
+summary, assumptions, decisions, needed Q&A, artifact paths/status, relevant
+domain or ADR updates, acceptance checks, verification/evals, implementation
+traceability, high-risk controls, material risks, parked unknowns, owner/next.
 
 Do not write `99-final-plan.md`; final synthesis lives in `plan.md`.
 
@@ -108,4 +96,6 @@ Omit irrelevant stage sections unless they explain an important decision. Do not
 - Include file paths + localhost/device refs for artifacts.
 - Do not clean up temp planning files without separate approval. If content is
   not copied or ownership is unclear, keep it and list why under `## Cleanup`.
-- Final reply: `plan.md` path + cleanup status.
+- Final reply: `plan.md` path + cleanup status + next-step handoff.
+- Do not end with only a generic docs/config change report after writing
+  `plan.md`; the user should know what can happen next.

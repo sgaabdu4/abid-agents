@@ -585,6 +585,28 @@
         "The response advances to backend/infra instead of staying in UI flow.",
         "The next visible reply is one backend/API/data ownership question."
       ]
+    },
+    {
+      "id": 44,
+      "prompt": "Continue the grill-me session. I answered A to the question asking whether to stop clarifying and write the implementation plan now.",
+      "expected_output": "Writes the final implementation plan and ends with a clear next-step handoff instead of only a generic docs/config report.",
+      "files": [
+        {
+          "path": "docs/planning/task-priority/session_state.md",
+          "content": "# Task Priority Session State\nUpdated: synthetic\nMode: build-plan\nProfile: brownfield-feature\nRepo: existing\nTarget artifact: implementation plan\n\n## Stage Map\n- Intake: run - request clarified\n- Product plan: run - accepted\n- UI flow: brief - accepted\n- Visual design: skip - existing design system\n- Prototype tech stack: n/a - no prototype requested\n- Prototype: n/a - no prototype requested\n- Backend/infra tech stack: brief - accepted\n- Vertical slices/evals: brief - accepted\n\n## Position\n- Active stage: product\n- Stage status: accepted\n- Last question id: 17\n- Last answer: recorded\n- Next action: write-final-plan\n\n## Last Question\nQ17: Should I stop clarifying and write the implementation plan now?\n\n## Next Question\nnone\n\n## Decisions\n- Priority is a boolean flag.\n- Multi-assignee create makes independent duplicate tasks.\n- User approved writing the implementation plan.\n\n## Blockers\n- none\n\n## Evidence / Artifacts\n- user quote: A\n"
+        },
+        {
+          "path": "docs/planning/task-priority/plan_draft.md",
+          "content": "# Task Priority Draft\n\n## Decisions\n- Priority is a boolean flag.\n- Multi-assignee create makes independent duplicate tasks.\n- User approved writing `plan.md`.\n"
+        }
+      ],
+      "expectations": [
+        "The answer records the user's A response as approval to write the implementation plan.",
+        "`docs/planning/task-priority/plan.md` is created as the canonical final artifact.",
+        "The visible final response includes the plan path and cleanup status.",
+        "The visible final response offers clear next-step choices, such as implement now, review or edit the plan, or stop with the plan.",
+        "The response does not end with only a generic docs/config change report."
+      ]
     }
   ]
 }

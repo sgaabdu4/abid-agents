@@ -23,7 +23,8 @@ unneeded UI/design/prototype work.
 - Existing `CONTEXT.md`/ADR use, missing-doc silence, glossary capture, and
   docs-aware final synthesis.
 - Compaction, missing state, unanswered Q, and answer-recording recovery.
-- Final synthesis for build-plan and understand-only sessions.
+- Final synthesis for build-plan and understand-only sessions, including
+  next-step handoff after `plan.md` is written.
 - Trigger near-misses where other skills should win.
 
 ## Local Check
