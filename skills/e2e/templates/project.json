@@ -15,6 +15,12 @@
     "statePath": "",
     "secretsPolicy": "Do not commit credentials, cookies, tokens, or private session dumps."
   },
+  "dataMode": {
+    "mode": "unknown",
+    "allowedValues": ["mock", "seeded-test", "prod-read-only", "prod-approved-write"],
+    "default": "seeded-test",
+    "prodPolicy": "Production data requires explicit approval and is read-only unless exact writes are separately approved."
+  },
   "flows": [
     {
       "id": "login",

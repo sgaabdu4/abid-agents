@@ -14,6 +14,12 @@ It should include:
 
 ## Artifact Checker
 
+Run:
+
+```bash
+node <skill-dir>/scripts/check-e2e-run-artifacts.mjs --run-dir <docs/e2e/RUN_ID>
+```
+
 The checker should fail when:
 
 - a checked flow lacks `events.jsonl`;

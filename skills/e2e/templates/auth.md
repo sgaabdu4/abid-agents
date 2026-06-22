@@ -8,6 +8,7 @@ Do not store secrets here.
 - Test account owner: unknown
 - Roles: unknown
 - Safe seeded data: unknown
+- Data mode: unknown
 
 ## Saved State
 

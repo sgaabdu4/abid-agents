@@ -28,6 +28,7 @@ if (!missing.includes('project.json')) {
       unknowns.push('target url/startCommand');
     }
     if (!project.auth || project.auth.method === 'unknown') unknowns.push('auth method');
+    if (!project.dataMode || project.dataMode.mode === 'unknown') unknowns.push('data mode');
     if (!project.logging || !Array.isArray(project.logging.commands)) unknowns.push('logging commands');
     if (!project.regression || !Array.isArray(project.regression.commands)) unknowns.push('regression commands');
     if (!Array.isArray(project.flows) || !project.flows.length) unknowns.push('flows');

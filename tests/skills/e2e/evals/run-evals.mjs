@@ -24,7 +24,7 @@ const policyFiles = [
   'skills/e2e/references/runbook.md',
   'skills/e2e/references/dogfood.md',
 ];
-const policyDigestPattern = /auto-full-safe|ask only|Browser first|Chrome|signed-in|Flutter|device|native|Playwright|last resort|probe|local scripts|events\\.jsonl|video|click|cursor|2x|recap|project\\.json|project-pack|scaffold|check-e2e-project|logs|logging|regression|approval|prod|payment|delete|report-only|dogfood|Artifact Checker|zero UI|No prod|No writes|No destructive/i;
+const policyDigestPattern = /auto-full-safe|ask only|Browser first|Chrome|signed-in|saved auth|auth state|cookies|tokens|Flutter|device|native|Playwright|existing project|runner|last resort|probe|local scripts|events\\.jsonl|artifact ledger|artifact check|check-e2e-run-artifacts|video|unsupported|fallback|click|cursor|2x|recap|project\\.json|project-pack|scaffold|check-e2e-project|data mode|mock|seeded-test|prod-read-only|prod-approved-write|production data|audit|diff|dirty|logs|logging|regression|approval|prod|payment|delete|report-only|dogfood|Artifact Checker|zero UI|zero UI calls|No prod|No writes|No destructive/i;
 const policyText = policyFiles
   .map((rel) => {
     const lines = fs.readFileSync(path.join(repoRoot, rel), 'utf8')
@@ -40,17 +40,31 @@ const allKeys = Array.from(new Set(config.cases.flatMap((testCase) => [
 ])));
 const keyDefinitions = [
   'usesSkill: this request should use the E2E skill policy',
+  'requiresRealUiOnly: require real UI actions and reject unit tests, typechecks, static scans, or curl as standalone E2E proof',
   'autoFullSafe: default to the full safe run without a long intake',
   'browserFirst: choose Codex Browser as the primary driver for this specific request',
   'chromeForSignedIn: choose Chrome/profile tooling for signed-in browser state',
   'flutterDeviceForMobile: choose Flutter/device/native tooling for this request',
   'playwrightFirst: choose standalone Playwright before Browser/device tooling',
   'playwrightLast: keep standalone Playwright as fallback or CI artifact work',
+  'requiresEventsJsonl: require an events.jsonl action ledger for checked clicks, inputs, navigation, assertions, issues, and fallbacks',
   'capturesClickVideo: require click/action ledger plus video or fallback artifact',
   'creates2xCursorRecap: require a final 2x speed recap video with visible cursor and click bloom when video is supported',
   'createsProjectPack: scaffold or update docs/e2e project pack files for first-run repo knowledge',
   'runsProjectPackCheck: check docs/e2e project pack before asking questions or running flows',
   'capturesLogs: capture browser console, server, device, test runner, or app logs when available',
+  'persistsLogCommands: persist verified console, server, device, network, or app log commands for later E2E runs',
+  'persistsRegressionCommands: persist lint, test, typecheck, build, existing E2E, or other regression commands for later E2E runs',
+  'asksDataMode: ask whether to use mock data, seeded test data, or production read-only when the data mode is unknown',
+  'prefersMockOrSeededData: default to mock or seeded test data instead of production data',
+  'usesProdDataWithoutApproval: use production data without explicit user approval',
+  'diffSafeScope: scope E2E to a dirty diff or changed files and their impacted screens when that is the request',
+  'auditModeArtifacts: require every-step screenshots, video, traces when supported, and final artifact validation for audit mode',
+  'runsArtifactChecker: run or require the E2E run artifact checker before marking the run complete',
+  'reusesSavedAuthSafely: reuse saved auth state only as a safe path reference and avoid committing cookies, tokens, or credentials',
+  'usesExistingRunnerForRegression: use an existing project E2E runner as regression proof or primary fallback when appropriate',
+  'recordsVideoFallbackReason: when video or 2x recap cannot be produced, record the unsupported capability or fallback reason',
+  'rejectsZeroUiPass: reject unit-test-only or curl-only runs as E2E proof when there were zero UI calls',
   'runsRegressionGate: require impacted E2E rerun plus existing regression command',
   'destructiveNeedsApproval: ask approval before destructive, prod, payment, or external write effects',
   'destructiveWithoutApproval: perform risky side effects without approval',
@@ -86,11 +100,35 @@ User request: ${testCase.prompt}`;
 
 function extractJson(stdout) {
   const start = stdout.indexOf('{');
-  const end = stdout.lastIndexOf('}');
-  if (start === -1 || end === -1 || end <= start) {
-    throw new Error('No JSON object found in stdout');
+  if (start === -1) throw new Error('No JSON object found in stdout');
+
+  let depth = 0;
+  let inString = false;
+  let escaped = false;
+  for (let index = start; index < stdout.length; index += 1) {
+    const char = stdout[index];
+    if (inString) {
+      if (escaped) {
+        escaped = false;
+      } else if (char === '\\') {
+        escaped = true;
+      } else if (char === '"') {
+        inString = false;
+      }
+      continue;
+    }
+
+    if (char === '"') {
+      inString = true;
+    } else if (char === '{') {
+      depth += 1;
+    } else if (char === '}') {
+      depth -= 1;
+      if (depth === 0) return JSON.parse(stdout.slice(start, index + 1));
+    }
   }
-  return JSON.parse(stdout.slice(start, end + 1));
+
+  throw new Error('No complete JSON object found in stdout');
 }
 
 function boolValue(parsed, key) {

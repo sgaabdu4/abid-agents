@@ -59,21 +59,27 @@ const dogfood = read('references/dogfood.md');
 assert(skill.includes('auto-full-safe'), 'SKILL.md must default to auto-full-safe');
 assert(skill.includes('Codex Browser first'), 'SKILL.md must state Codex Browser first');
 assert(skill.includes('standalone Playwright is last resort'), 'SKILL.md must make Playwright last resort');
+assert(skill.includes('saved auth/flow reuse'), 'SKILL.md must require project-pack checks before saved auth/flow reuse');
 assert(defaults.includes('ask only'), 'defaults must minimize onboarding questions');
 assert(defaults.includes('regression'), 'defaults must require regression checks');
+assert(defaults.includes('Default data mode is mock or seeded test data'), 'defaults must avoid implicit prod data');
+assert(skill.includes('Confirm data mode before running flows'), 'SKILL.md must require data-mode confirmation');
 assert(projectPack.includes('docs/e2e/project.json'), 'project pack must define persisted project.json');
 assert(projectPack.includes('check-e2e-project.mjs'), 'project pack must require project checker');
+assert(projectPack.includes('prod-read-only'), 'project pack must persist prod-read-only data mode');
 assert(browser.indexOf('Codex Browser first') < browser.indexOf('Standalone Playwright'), 'browser-first policy must list Browser before Playwright');
 assert(browser.includes('stop UI automation probing'), 'browser-first policy must stop after failed probes');
 assert(capture.includes('events.jsonl'), 'capture policy must require events.jsonl');
 assert(capture.includes('videos/<flow>.mp4'), 'capture policy must define video artifacts');
 assert(capture.includes('2x speed recap video'), 'capture policy must require 2x recap video');
 assert(capture.includes('make-2x-recap.mjs'), 'capture policy must link the 2x recap helper');
+assert(capture.includes('check-e2e-run-artifacts.mjs'), 'capture policy must link the run artifact checker');
 assert(capture.includes('click bloom'), 'capture policy must include mouse clicker/click bloom');
 assert(runbook.includes('event row'), 'runbook runner prompt must require event rows');
 assert(runbook.includes('regression commands'), 'runbook report must include regression commands');
 assert(runbook.includes('2x cursor recap'), 'runbook report must include 2x cursor recap');
 assert(dogfood.includes('Artifact Checker'), 'dogfood must define artifact checker expectations');
+assert(dogfood.includes('check-e2e-run-artifacts.mjs'), 'dogfood must use the run artifact checker');
 assert(!/Skill Eval|gpt-5\\.4-mini|model eval/i.test(dogfood), 'dogfood reference must not contain skill-eval guidance');
 
 for (const rel of requiredTemplates) {

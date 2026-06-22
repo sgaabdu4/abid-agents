@@ -103,3 +103,4 @@ After any fix, rerun the impacted flow and the smallest existing regression comm
 
 Include status, driver used and fallback chain, totals, per-flow summary, UI action audit, fixes, risk controls, artifact paths, 2x cursor recap path or fallback reason, regression commands and results, skipped checks, and cleanup result.
 Any flow with zero UI calls makes the run invalid unless the report clearly marks UI proof blocked by tool failure.
+Run `scripts/check-e2e-run-artifacts.mjs --run-dir <docs/e2e/RUN_ID>` before marking the report complete.

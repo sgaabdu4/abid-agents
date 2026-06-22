@@ -54,9 +54,15 @@ Audit capture:
 - final artifact linter before claiming the run is complete.
 
 Never claim a click, input, or navigation was tested if no event row or UI artifact proves it.
-If a 2x recap cannot be produced, record the missing driver or encoder capability in `report.md`.
+If video or a 2x recap cannot be produced because the driver or encoder is unsupported, unavailable, or blocked, record the fallback reason in `report.md`.
 For an existing cursor/click-layer MP4, create the recap with:
 
 ```bash
 node <skill-dir>/scripts/make-2x-recap.mjs --input <video.mp4> --output <recap.mp4>
+```
+
+Before claiming a run is complete, check the artifact ledger:
+
+```bash
+node <skill-dir>/scripts/check-e2e-run-artifacts.mjs --run-dir <docs/e2e/RUN_ID>
 ```

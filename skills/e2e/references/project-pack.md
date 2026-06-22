@@ -34,6 +34,7 @@ node <skill-dir>/scripts/check-e2e-project.mjs --root <repo>
 Then fill only what the current run can verify:
 
 - target URL or start command;
+- data mode: `mock`, `seeded-test`, `prod-read-only`, or `prod-approved-write`;
 - login method and test account owner, without secrets;
 - reusable authenticated-state path when safe and intentionally saved;
 - critical flows, especially login, primary happy path, settings/account, and write-heavy areas;
@@ -50,6 +51,13 @@ If the pack is incomplete, update it from verified facts only and mark unknowns 
 
 Saved auth state is allowed only as a path reference to a safe local artifact.
 The repo pack may say where state is expected, but it must not commit raw cookies, tokens, or credentials.
+
+## Data Mode
+
+Persist the intended data mode in `project.json`.
+Use `mock` or `seeded-test` by default.
+Use `prod-read-only` only with explicit user approval.
+Use `prod-approved-write` only when the user approves exact write actions, target environment, account/tenant, and rollback or cleanup plan.
 
 ## Logs
 

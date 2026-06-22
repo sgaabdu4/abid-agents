@@ -9,7 +9,7 @@ description: >-
 # E2E
 
 Run real UI only. Unit tests, typechecks, static scans, and `curl` can support the run, but never count as E2E proof.
-Default to `auto-full-safe`: infer the target, run the fullest non-destructive coverage, capture proof, and ask only for missing auth, target, or risky side effects.
+Default to `auto-full-safe`: infer the target, run the fullest non-destructive coverage, capture proof, and ask only for missing auth, target, data mode, or risky side effects.
 
 ## Load
 
@@ -26,8 +26,10 @@ Read the focused reference that matches the task:
 
 - Use Codex Browser first for local/public web when callable; use Chrome extension for signed-in browser state when available; use Flutter/device tooling for native flows; standalone Playwright is last resort or CI artifact work.
 - Stop UI-driver probing after one failed or denied Browser/Playwright/node_repl probe; fall back to local scripts/tests and report the limitation.
+- Before first-run setup or saved auth/flow reuse, check the project pack when the helper script is available.
 - Never mark resolved from screenshots alone; reproduce, patch only after cause/ripple checks, and rerun impacted E2E plus regression checks.
 - Every checked action needs UI evidence: action event, settled assertion, screenshot or video frame, and artifact path.
+- Confirm data mode before running flows when it is unknown: mock/seeded test data is default; prod data requires explicit approval and must be read-only unless exact writes are separately approved.
 - No prod writes/deletes, email/SMS, payments, or sharing unless explicitly approved.
 - Capture by default: `events.jsonl`, cursor/click video when possible, step screenshots, supported logs/traces, and a final 2x cursor recap video when video is supported.
 - Artifacts go under `docs/e2e/<RUN_ID>/`; never overwrite prior runs and never count zero UI calls as a pass.
