@@ -11,6 +11,8 @@ const autoSyncScript = fs.readFileSync(path.join(repo, 'scripts', 'auto-sync.sh'
 const cronScript = fs.readFileSync(path.join(repo, 'scripts', 'install-cron.sh'), 'utf8');
 const subtreeSyncScript = fs.readFileSync(path.join(repo, 'scripts', 'sync-subtrees.sh'), 'utf8');
 const submoduleScript = fs.readFileSync(path.join(repo, 'scripts', 'update-submodules.sh'), 'utf8');
+const codexWatchdog = fs.readFileSync(path.join(repo, 'codex', 'bin', 'codex-watchdog'), 'utf8');
+const codexHealth = fs.readFileSync(path.join(repo, 'codex', 'bin', 'codex-health'), 'utf8');
 
 assert.ok(installScript.includes('install_hook post-merge'), 'installer must create post-merge hook');
 assert.ok(installScript.includes('install_hook post-rewrite'), 'installer must create post-rewrite hook for pull --rebase');
@@ -21,6 +23,9 @@ assert.ok(installScript.includes('config --local pull.ff only'), 'installer must
 assert.ok(installScript.includes('ABID_AGENTS_SKIP_SUBMODULE_INIT'), 'installer must support skipping submodule init');
 assert.ok(installScript.includes('ABID_AGENTS_SKIP_SUBMODULE_UPDATE'), 'pull hooks must support skipping submodule updates');
 assert.ok(installScript.includes('ABID_AGENTS_CHECK_SUBMODULES_BEFORE_PUSH'), 'pre-push submodule status must be opt-in');
+assert.ok(installScript.includes('install_codex_watchdog'), 'installer must install the Codex watchdog');
+assert.ok(installScript.includes('dev.abid-agents.codex-watchdog'), 'installer must install the Codex watchdog LaunchAgent');
+assert.ok(installScript.includes('launchctl bootstrap'), 'installer must load the Codex watchdog when missing');
 assert.ok(installScript.includes('install_managed_block'), 'installer must preserve agent files with a managed block');
 assert.ok(installScript.includes('BEGIN managed by abid-agents'), 'managed block must be marker-deduped');
 assert.ok(installScript.includes('Preserving existing file'), 'installer must preserve existing non-managed config files');
@@ -72,6 +77,10 @@ assert.ok(
   submoduleScript.includes('vendor/skill-upstreams/sentry-for-ai:skills'),
   'submodule script must update the official Sentry for AI skill tree'
 );
+assert.ok(codexWatchdog.includes('CODEX_WATCHDOG_KILL_ORPHANS'), 'watchdog must reap orphaned MCP processes');
+assert.ok(codexWatchdog.includes('CODEX_WATCHDOG_KILL_CODEX_APP_ON_STORM'), 'watchdog must handle severe Codex.app storms');
+assert.ok(codexWatchdog.includes('policy_cpu'), 'watchdog must use syspolicyd/trustd as storm evidence');
+assert.ok(codexHealth.includes('mcp counts:'), 'codex-health must report MCP counts');
 
 const prePushHook = path.join(repo, '.git', 'hooks', 'pre-push');
 if (fs.existsSync(prePushHook)) {
@@ -92,7 +101,7 @@ if (fs.existsSync(postRewriteHook)) {
   assert.ok(text.includes('ABID_AGENTS_SKIP_SUBMODULE_UPDATE'), 'installed post-rewrite hook must support skipping submodule updates');
 }
 
-for (const relativePath of ['scripts/auto-sync.sh', 'scripts/install-cron.sh', 'scripts/update-submodules.sh', 'scripts/setup.sh', 'scripts/setup-new-user.sh']) {
+for (const relativePath of ['scripts/auto-sync.sh', 'scripts/install-cron.sh', 'scripts/update-submodules.sh', 'scripts/setup.sh', 'scripts/setup-new-user.sh', 'codex/bin/codex-watchdog', 'codex/bin/codex-health']) {
   const stat = fs.statSync(path.join(repo, relativePath));
   assert.ok((stat.mode & 0o111) !== 0, `${relativePath} must be executable`);
 }

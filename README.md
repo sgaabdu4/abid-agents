@@ -78,6 +78,7 @@ That keeps Claude pointed at the same global rules as the other runtimes.
 | `vendor/skill-upstreams/` | Git submodules for read-only upstream skills. |
 | `hooks/` | Safety hooks for command blocking, secret protection, and Codex session behavior. |
 | `codex/hooks.json` | Codex hook wiring. |
+| `codex/bin/` | Token-free Codex watchdog and health scripts installed under `~/.codex/bin`. |
 | `mcp-config.json` | Shared MCP defaults for `context-mode` and `codebase-memory-mcp`. |
 | `agents/` | Subagent role prompts. |
 | `scripts/` | Install, submodule update, cron, and compatibility helpers. |

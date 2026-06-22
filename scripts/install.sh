@@ -38,6 +38,88 @@ preserve_or_link_file() {
   ln -s "$source" "$target"
 }
 
+install_managed_executable() {
+  local source="$1"
+  local target="$2"
+  mkdir -p "$(dirname "$target")"
+  if [[ -L "$target" ]]; then
+    if [[ "$(readlink "$target")" == "$source" ]]; then
+      return 0
+    fi
+    echo "Preserving existing symlink: $target"
+    return 0
+  elif [[ -e "$target" ]] && ! grep -q 'Managed by abid-agents installer' "$target" 2>/dev/null; then
+    echo "Preserving existing file: $target"
+    return 0
+  fi
+  cp "$source" "$target"
+  chmod 755 "$target"
+}
+
+install_codex_watchdog() {
+  local codex_bin launch_agent launch_label old_launch_label
+  codex_bin="$HOME/.codex/bin"
+  launch_label="dev.abid-agents.codex-watchdog"
+  old_launch_label="com.abid.codex-watchdog"
+  install_managed_executable "$ROOT/codex/bin/codex-watchdog" "$codex_bin/codex-watchdog"
+  install_managed_executable "$ROOT/codex/bin/codex-health" "$codex_bin/codex-health"
+
+  if [[ "$(uname -s)" != "Darwin" ]]; then
+    return 0
+  fi
+
+  launch_agent="$HOME/Library/LaunchAgents/${launch_label}.plist"
+  mkdir -p "$(dirname "$launch_agent")" "$HOME/.codex/logs"
+  cat >"$launch_agent" <<EOF
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN"
+  "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+  <key>Label</key>
+  <string>$launch_label</string>
+  <key>ProgramArguments</key>
+  <array>
+    <string>$codex_bin/codex-watchdog</string>
+  </array>
+  <key>RunAtLoad</key>
+  <true/>
+  <key>StartInterval</key>
+  <integer>120</integer>
+  <key>EnvironmentVariables</key>
+  <dict>
+    <key>CODEX_WATCHDOG_KILL_ORPHANS</key>
+    <string>1</string>
+    <key>CODEX_WATCHDOG_LOAD_WARN</key>
+    <string>32</string>
+    <key>CODEX_WATCHDOG_MCP_WARN</key>
+    <string>12</string>
+    <key>CODEX_WATCHDOG_KILL_CODEX_APP_ON_STORM</key>
+    <string>1</string>
+  </dict>
+  <key>StandardOutPath</key>
+  <string>$HOME/.codex/logs/codex-watchdog.out.log</string>
+  <key>StandardErrorPath</key>
+  <string>$HOME/.codex/logs/codex-watchdog.err.log</string>
+</dict>
+</plist>
+EOF
+
+  if command -v plutil >/dev/null 2>&1; then
+    plutil -lint "$launch_agent" >/dev/null
+  fi
+  if command -v launchctl >/dev/null 2>&1 &&
+    ! launchctl print "gui/$(id -u)/$launch_label" >/dev/null 2>&1; then
+    launchctl bootstrap "gui/$(id -u)" "$launch_agent" 2>/dev/null || {
+      echo "Codex watchdog installed but not loaded; run: launchctl bootstrap gui/$(id -u) $launch_agent" >&2
+    }
+  fi
+  if command -v launchctl >/dev/null 2>&1; then
+    launchctl bootout "gui/$(id -u)/$old_launch_label" >/dev/null 2>&1 || true
+    launchctl disable "gui/$(id -u)/$old_launch_label" >/dev/null 2>&1 || true
+  fi
+}
+
 install_managed_block() {
   local source="$1"
   local target="$2"
@@ -78,6 +160,7 @@ install_managed_block() {
 install_managed_block "$ROOT/AGENTS.md" "$HOME/.codex/AGENTS.md" "AGENTS.md"
 preserve_or_link_file "$ROOT/mcp-config.json" "$HOME/.codex/mcp-config.json"
 preserve_or_link_file "$ROOT/codex/hooks.json" "$HOME/.codex/hooks.json"
+install_codex_watchdog
 install_managed_block "$ROOT/AGENTS.md" "$HOME/.claude/AGENTS.md" "AGENTS.md"
 install_managed_block "$ROOT/AGENTS.md" "$HOME/.copilot/AGENTS.md" "AGENTS.md"
 install_managed_block "$ROOT/AGENTS.md" "$HOME/.pi/AGENTS.md" "AGENTS.md"

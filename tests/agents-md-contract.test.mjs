@@ -28,10 +28,24 @@ assertIncludes(text, 'Docs/agent-rules-only change -> re-read changed file + run
 assertIncludes(text, 'Files over 700 lines are a hard stop when touched');
 assertIncludes(text, 'ends under 700 lines in the same session');
 assertIncludes(text, 'Scope this to touched files only');
-assertIncludes(text, 'Multiple failed fix attempts on the same class of problem count as a verified repeatable miss');
-assertIncludes(text, 'Stop retrying local fixes only');
-assertIncludes(text, 'append a narrow routing-only rule to the nearest project `AGENTS.md`');
-assertIncludes(text, '`AGENTS.md`-only learning is valid only for narrow project routing rules');
+assertIncludes(text, 'Repeated failed fixes or trial-and-error discoveries count as durable project learning');
+assertIncludes(text, 'stop local retry loops');
+assertIncludes(text, 'load `repeated-failure-learning` before final');
+assertIncludes(text, 'narrow routing-only rule -> nearest project `AGENTS.md`');
+assertIncludes(text, 'never global');
+
+const repeatedFailureSkill = path.join(home, '.agents', 'skills', 'repeated-failure-learning', 'SKILL.md');
+const repeatedFailureReference = path.join(home, '.agents', 'skills', 'repeated-failure-learning', 'references', 'capture.md');
+assert.ok(fs.existsSync(repeatedFailureSkill), `${repeatedFailureSkill} must exist`);
+assert.ok(fs.existsSync(repeatedFailureReference), `${repeatedFailureReference} must exist`);
+const repeatedFailureSkillText = fs.readFileSync(repeatedFailureSkill, 'utf8');
+const repeatedFailureReferenceText = fs.readFileSync(repeatedFailureReference, 'utf8');
+assertIncludes(repeatedFailureSkillText, 'trial-and-error process discovery');
+assertIncludes(repeatedFailureSkillText, 'Read `references/capture.md` and follow it.');
+assertIncludes(repeatedFailureReferenceText, 'same class of problem failed at least twice');
+assertIncludes(repeatedFailureReferenceText, 'non-obvious process was discovered through trial and error');
+assertIncludes(repeatedFailureReferenceText, 'create or update `skills/<topic>/SKILL.md`');
+assertIncludes(repeatedFailureReferenceText, 'append the rule to the nearest project `AGENTS.md`');
 
 const tokenCheck = spawnSync('python3', ['-c', `
 import sys

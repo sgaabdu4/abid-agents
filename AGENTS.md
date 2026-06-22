@@ -118,7 +118,7 @@ Load matching skill before answering/editing:
 - Flutter/Dart/Riverpod/Freezed/GoRouter/pubspec -> `building-flutter-apps`.
 - Appwrite/Auth/TablesDB/Storage/Functions/Realtime -> `appwrite-backend`.
 - Online/current info -> `tavily-cli`.
-- Skills/diagnostics/project learning/repeatable misses -> `skill-creator`; update `.agents/skills/`; no secrets/speculation.
+- Repeated fixes/trial-and-error learning/project capture -> `repeated-failure-learning`; skill authoring/evals -> `skill-creator`.
 - Ambiguous planning/features -> `grill-me`; committed shipping validation/push/PR -> `no-mistakes`.
 - Hard bugs/failures/flakes/regressions -> `diagnosing-bugs`.
 - Boundaries/interfaces/ownership/wrappers -> `codebase-design`.
@@ -138,9 +138,9 @@ Load matching skill before answering/editing:
 - Do not compress vendor/submodule/tool-installed skills; update their upstream or CLI owner instead.
 
 ## Project Learning Loop: Skill First
-- "Capture project learning" or verified repeatable miss requires 3 artifacts together: repo skill `skills/<topic>/SKILL.md` with `---` YAML frontmatter containing `name` and concise `description`; nearest project `AGENTS.md` route naming that skill; skill `references/*.md` or script with problem -> fix details.
-- Multiple failed fix attempts on the same class of problem count as a verified repeatable miss once the recurring failure mode and evidence are clear. Stop retrying local fixes only; capture the learning before final, or append a narrow routing-only rule to the nearest project `AGENTS.md` when no reusable workflow/pitfall/script exists.
-- `AGENTS.md`-only learning is valid only for narrow project routing rules; do not bury project behavior in this global file. Store repo commands/tests/E2E/domain workflows/pitfalls in skill references/scripts. Before adding: check docs/skills, use canonical owner, avoid duplicates, measure touched `SKILL.md`, validate skills, mention artifact in final.
+- Repeated failed fixes or trial-and-error discoveries count as durable project learning once the process, outcome, and evidence are clear; stop local retry loops and load `repeated-failure-learning` before final.
+- Capture: reusable workflow/pitfall/commands/tests/E2E/domain rule -> repo skill + nearest project `AGENTS.md` route + `references/*.md` or script; narrow routing-only rule -> nearest project `AGENTS.md`; never global.
+- Before adding: check docs/skills, canonical owner, duplicates; measure touched `SKILL.md`, validate changed skills, mention artifact in final.
 
 ## Implementation Flow
 For non-trivial code tasks:
