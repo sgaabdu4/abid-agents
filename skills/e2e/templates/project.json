@@ -1,0 +1,34 @@
+{
+  "version": 1,
+  "status": "bootstrap",
+  "targets": [
+    {
+      "name": "local",
+      "url": "",
+      "startCommand": "",
+      "notes": "Fill with verified target details."
+    }
+  ],
+  "auth": {
+    "method": "unknown",
+    "testAccountOwner": "",
+    "statePath": "",
+    "secretsPolicy": "Do not commit credentials, cookies, tokens, or private session dumps."
+  },
+  "flows": [
+    {
+      "id": "login",
+      "path": "docs/e2e/flows/README.md",
+      "status": "bootstrap"
+    }
+  ],
+  "logging": {
+    "browserConsole": true,
+    "commands": [],
+    "notes": "Add dev server, device, network, or app log commands when verified."
+  },
+  "regression": {
+    "commands": [],
+    "notes": "Add lint, test, typecheck, build, or existing E2E commands."
+  }
+}

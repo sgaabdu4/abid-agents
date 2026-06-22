@@ -7,7 +7,7 @@ warnings, or paste-ready writing quality. Paste-ready cases must read
 ## Local Check
 
 ```bash
-python3 skills/terse/evals/run-mini-evals.py --label baseline
+python3 tests/skills/terse/evals/run-mini-evals.py --label baseline
 ```
 
 The runner writes timestamped results to `/tmp/terse-evals`, records Codex JSONL

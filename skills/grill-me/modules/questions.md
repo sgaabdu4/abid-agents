@@ -45,7 +45,7 @@ Reply: A/B/C, "use default", "not sure", "skip for now", or your own answer.
 - Avoid jargon in visible prompts. Replace `success metric` with `main pass/fail
   check`; replace `MVP gate` with `what must work before real staff use it`.
 - Do not show `Stage`, `Definitions`, `Acceptance criteria`,
-  `Verification/eval`, `Evidence`, or `Scenario` blocks in the visible prompt.
+  `Verification`, `Evidence`, or `Scenario` blocks in the visible prompt.
 - Put definitions/evidence/acceptance criteria/verification/scenarios in the
   handoff/final plan only.
 - Add `Details (optional)` only when needed; max 2 bullets.
@@ -98,7 +98,7 @@ Internal details:
 - Evidence: <code/docs/user quote | unknown>
 - Why: <dependency unlocked>
 - Acceptance criteria: <happy/fail/edge pass/fail checks | unknown>
-- Verification/eval: <test/prototype/manual/rubric | unknown>
+- Verification: <test/prototype/manual/rubric | unknown>
 - Scenario: <edge case | n/a>
 ```
 

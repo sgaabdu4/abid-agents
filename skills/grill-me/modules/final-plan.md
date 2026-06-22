@@ -16,7 +16,7 @@ Do not expect a Stage Map in `plan_draft.md`; the draft is an answer ledger.
 Do not create/read handoff files for skipped or n/a stages.
 
 Include only goal-relevant decisions, needed Q&A, paths, acceptance checks,
-verification/evals, implementation traceability, high-risk controls, material
+verification, implementation traceability, high-risk controls, material
 risks, domain/ADR changes, and parked unknowns.
 
 ## Synthesis flow
@@ -31,7 +31,7 @@ risks, domain/ADR changes, and parked unknowns.
 7. Write `docs/planning/<slug>/plan.md` as the canonical artifact, sized to need.
 8. If requested or needed, update confirmed `CONTEXT.md` glossary terms or ADRs
    using `modules/domain-docs.md`.
-9. Re-read `plan.md`; verify it contains the needed decisions, artifact refs, acceptance checks, verification/evals, domain docs, risks, unknowns, and traceability only where relevant.
+9. Re-read `plan.md`; verify it contains the needed decisions, artifact refs, acceptance checks, verification, domain docs, risks, unknowns, and traceability only where relevant.
 10. List temp planning state for cleanup after verification:
    `session_state.md`, `plan_draft.md`, temp stage handoffs, empty `stages/`.
 11. Preserve non-temp artifacts: designs, prototypes, mock data, fixtures,
@@ -44,7 +44,7 @@ risks, domain/ADR changes, and parked unknowns.
 
 `plan.md` includes only what the inferred artifact needs:
 summary, assumptions, decisions, needed Q&A, artifact paths/status, relevant
-domain or ADR updates, acceptance checks, verification/evals, implementation
+domain or ADR updates, acceptance checks, verification, implementation
 traceability, high-risk controls, material risks, parked unknowns, owner/next.
 
 Do not write `99-final-plan.md`; final synthesis lives in `plan.md`.
@@ -67,9 +67,9 @@ Do not write `99-final-plan.md`; final synthesis lives in `plan.md`.
 ## Backend/Infra Tech Stack
 ## Vertical Slices and Task Waves
 ## Acceptance Criteria
-## Verification/Eval Plan
+## Verification Plan
 ## Traceability
-| Requirement | Slice/task | Acceptance criteria | Verification/eval |
+| Requirement | Slice/task | Acceptance criteria | Verification |
 |---|---|---|---|
 ## Artifacts
 ## High-Risk Controls
@@ -88,8 +88,8 @@ Omit irrelevant stage sections unless they explain an important decision. Do not
 - Use `modules/domain-docs.md` before writing glossary or ADR updates.
 - Do not put implementation decisions in `CONTEXT.md`.
 - Do not finish while a relevant handoff/artifact is `draft` or `blocked`.
-- Do not finish until each active stage has acceptance checks + verification/eval where relevant, or an explicitly user-parked blocker/unknown.
-- Trace requirements -> slices/tasks -> acceptance criteria -> verification/evals.
+- Do not finish until each active stage has acceptance checks + verification where relevant, or an explicitly user-parked blocker/unknown.
+- Trace requirements -> slices/tasks -> acceptance criteria -> verification.
 - High-risk schema/data/auth/security/deploy/stateful work needs human review, rollback/migration notes, telemetry/audit expectations.
 - Keep evidence labels: code/docs/user quote/unknown.
 - Do not invent certainty.

@@ -1,43 +1,42 @@
 ---
 name: e2e
 description: >-
-  Guided or unattended E2E sweep for Flutter/web apps. Use for real UI
-  smoke/regression flows, browser/device runs, screenshots, triage, fixes, and
-  auditable reports.
+  Browser-first, full safe E2E sweep for web/Flutter apps. Use for real UI
+  smoke/regression flows, Codex Browser/Chrome/device runs, click-video
+  artifacts, triage, fixes, dogfood, and auditable no-regression reports.
 ---
 
 # E2E
 
 Run real UI only. Unit tests, typechecks, static scans, and `curl` can support the run, but never count as E2E proof.
+Default to `auto-full-safe`: infer the target, run the fullest non-destructive coverage, capture proof, and ask only for missing auth, target, or risky side effects.
 
-## Intake
+## Load
 
-Ask one concise block before tools unless already answered:
+Read the focused reference that matches the task:
 
-1. Mode: `guided` or `auto`?
-2. Scope: `full`, `diff`, or route/path/flow?
-3. Stack/target: Flutter or web? device/browser? URL or start server?
-4. Auth/test data: credentials, roles, seeded data, tenant/env?
-5. Risk limits: writes/deletes, email/SMS, payments, prod services?
-6. Coverage: smoke only, or inputs/state/nav/network/permissions too?
-7. Fix policy: report-only, propose patches, or auto-patch? screenshots `fail|all`, video, parallel count?
-
-Defaults: guided, dirty tree -> diff else full, non-prod/no destructive side effects, happy path plus high-risk edges, propose patches in guided, auto-patch in auto, screenshots fail, no video, parallel max 3.
+- `references/defaults.md` for underspecified runs, onboarding questions, scope, and regression gates.
+- `references/project-pack.md` before the first run in a repo, and before reusing saved auth/flows/log commands.
+- `references/browser-first.md` before choosing Browser, Chrome, device tooling, or standalone Playwright.
+- `references/capture-artifacts.md` before running/delegating flows or judging evidence.
+- `references/runbook.md` for plans, runner prompts, triage, fixes, and final reports.
+- `references/dogfood.md` for dogfood fixtures and artifact checks.
 
 ## Rules
 
-- Abort if no UI driver/browser/device can run.
-- Each checked step needs UI-drive evidence.
-- Use real app/device/browser; no SUT mocks.
-- Halt on first failure, triage, then continue only after decision/fix/skip.
-- Artifacts go under `docs/e2e/<RUN_ID>/`; never overwrite prior runs.
-- Patch only after cause/ripple checks; mark resolved only after relevant verification is green.
-- Cleanup anything this run started.
+- Use Codex Browser first for local/public web when callable; use Chrome extension for signed-in browser state when available; use Flutter/device tooling for native flows; standalone Playwright is last resort or CI artifact work.
+- Stop UI-driver probing after one failed or denied Browser/Playwright/node_repl probe; fall back to local scripts/tests and report the limitation.
+- Never mark resolved from screenshots alone; reproduce, patch only after cause/ripple checks, and rerun impacted E2E plus regression checks.
+- Every checked action needs UI evidence: action event, settled assertion, screenshot or video frame, and artifact path.
+- No prod writes/deletes, email/SMS, payments, or sharing unless explicitly approved.
+- Capture by default: `events.jsonl`, cursor/click video when possible, step screenshots, supported logs/traces, and a final 2x cursor recap video when video is supported.
+- Artifacts go under `docs/e2e/<RUN_ID>/`; never overwrite prior runs and never count zero UI calls as a pass.
+- Keep plans short; split flows across agents only when independent.
 
 ## Runbook
 
-Read `references/runbook.md` after intake. It contains artifact schema, discovery/planning, runner prompt, failure triage, report format, and cleanup.
+Read `references/runbook.md` after the relevant policy references above.
 
 ## Exit
 
-Final output: report path, flow/step totals, failures fixed/escalated/spec-gapped, UI tool-call audit, and skipped checks.
+Final output: report path, driver used/fallbacks, flow/step/action totals, artifact links, fixes, unresolved issues, regression commands, skipped checks and why.

@@ -48,7 +48,7 @@ description: >-
 - `understand`: shared understanding only. Explain/map unless user asks to
   plan/build.
 - `build-plan`: implementation sequencing + verification. Run vertical
-  slices/evals; skip design/prototype unless requested or needed for a risky UX
+  slices/verification; skip design/prototype unless requested or needed for a risky UX
   unknown.
 - `full`: full staged pipeline for broad greenfield/major product work.
 - `review`: inspect existing plan/spec/docs/code, find gaps/risks, ask focused
@@ -83,7 +83,7 @@ Stages:
 - Prototype tech stack -> `modules/prototype-tech.md`
 - Mock-data prototype -> `modules/prototype.md`
 - Backend/infra tech stack -> `modules/backend-tech.md`
-- Vertical slices/evals -> `modules/vertical-slices.md`
+- Vertical slices/verification -> `modules/vertical-slices.md`
 
 ## Non-negotiables
 

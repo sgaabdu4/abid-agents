@@ -2,9 +2,11 @@
 import fs from "node:fs";
 import path from "node:path";
 
-const skillRoot = path.resolve(path.dirname(new URL(import.meta.url).pathname), "..");
-const evalsPath = path.join(skillRoot, "evals", "evals.json");
-const triggersPath = path.join(skillRoot, "evals", "trigger-evals.json");
+const evalRoot = path.resolve(path.dirname(new URL(import.meta.url).pathname));
+const repoRoot = path.resolve(evalRoot, "../../../..");
+const skillRoot = path.join(repoRoot, "skills/grill-me");
+const evalsPath = path.join(evalRoot, "evals.json");
+const triggersPath = path.join(evalRoot, "trigger-evals.json");
 const evals = JSON.parse(fs.readFileSync(evalsPath, "utf8"));
 const triggers = JSON.parse(fs.readFileSync(triggersPath, "utf8"));
 

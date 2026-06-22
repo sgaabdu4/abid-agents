@@ -12,8 +12,8 @@ import tiktoken
 
 
 SCRIPT_DIR = Path(__file__).resolve().parent
-SKILL_DIR = SCRIPT_DIR.parent
-REPO_ROOT = SKILL_DIR.parent.parent
+REPO_ROOT = SCRIPT_DIR.parents[3]
+SKILL_DIR = REPO_ROOT / "skills" / "terse"
 EVALS_PATH = SCRIPT_DIR / "evals.json"
 SCHEMA_PATH = SCRIPT_DIR / "eval-output-schema.json"
 ENCODING = tiktoken.get_encoding("o200k_base")

@@ -30,7 +30,7 @@ unneeded UI/design/prototype work.
 ## Local Check
 
 ```bash
-node skills/grill-me/evals/validate-evals.mjs
+node tests/skills/grill-me/evals/validate-evals.mjs
 ```
 
 This validates eval shape, coverage terms, trigger balance, ASCII-only loaded

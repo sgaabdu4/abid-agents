@@ -1,0 +1,53 @@
+# E2E Defaults
+
+Use this when the prompt says to make E2E easy, asks for a full/default flow, or lacks setup detail.
+
+## Default Contract
+
+`auto-full-safe` means:
+
+- infer the app target from repo files, scripts, open servers, and user prompt;
+- run the broadest non-destructive UI coverage the current tools can support;
+- capture each meaningful click, input, navigation, assertion, error, and fallback;
+- ask only when auth, target, seeded data, or risky side effects cannot be inferred;
+- patch only after evidence identifies a cause and the user allowed patches;
+- finish with impacted E2E reruns plus the smallest existing regression checks.
+
+Default scope is dirty tree or requested diff when local changes exist, otherwise full product smoke.
+Default risk limit is no prod mutation, no deletes, no payment, no email/SMS, no external sharing, and no DB writes.
+Default evidence is video plus `events.jsonl` when a driver supports it, step screenshots, console/network logs when available, and traces only on retry/failure unless audit mode is requested.
+
+## Onboarding Questions
+
+Ask one short block only when missing information blocks a safe run:
+
+```text
+I can run `auto-full-safe` by default.
+I only need: target URL/start command, auth or test account, and any flows that must not write externally.
+```
+
+If the user asks for an onboarding list, use these questions as the product flow inventory:
+
+- What roles should be covered?
+- What is the first screen and the expected signed-out state?
+- Which happy path creates the most business value?
+- Which forms, uploads, filters, search, exports, or payments are highest risk?
+- Which clicks cause writes, emails, notifications, payments, deletes, or sharing?
+- Which mobile, tablet, desktop, browser, or native-device targets matter?
+- Which existing unit, integration, or E2E commands should guard regressions?
+- Which screenshots or video moments would prove each feature works to a human reviewer?
+
+## Coverage Matrix
+
+Plan only the axes the app actually has:
+
+- auth gates and role redirects;
+- primary happy path;
+- form validation, empty/loading/error/offline states;
+- navigation, back/forward, deep links, refresh, session expiry;
+- permissions, files, camera/location/native dialogs;
+- data persistence and cross-screen refresh;
+- responsive layout and basic accessibility affordances;
+- regression command for existing tests/lint/typecheck/build.
+
+Use `full-safe` for normal work, `diff-safe` when a dirty patch should be contained, `audit` when every step needs screenshots/video/traces, and `report-only` when the user forbids changes.

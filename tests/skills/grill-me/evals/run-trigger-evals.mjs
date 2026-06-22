@@ -3,10 +3,12 @@ import fs from "node:fs";
 import path from "node:path";
 import { spawn } from "node:child_process";
 
-const skillRoot = path.resolve(path.dirname(new URL(import.meta.url).pathname), "..");
-const evals = JSON.parse(fs.readFileSync(path.join(skillRoot, "evals", "trigger-evals.json"), "utf8"));
+const evalRoot = path.resolve(path.dirname(new URL(import.meta.url).pathname));
+const repoRoot = path.resolve(evalRoot, "../../../..");
+const skillRoot = path.join(repoRoot, "skills/grill-me");
+const evals = JSON.parse(fs.readFileSync(path.join(evalRoot, "trigger-evals.json"), "utf8"));
 const skillMd = fs.readFileSync(path.join(skillRoot, "SKILL.md"), "utf8");
-const schemaPath = path.join(skillRoot, "evals", "trigger-output-schema.json");
+const schemaPath = path.join(evalRoot, "trigger-output-schema.json");
 const runRoot = process.env.GRILL_ME_EVAL_ROOT || "/tmp/grill-me-eval-run";
 const model = process.env.GRILL_ME_EVAL_MODEL || "gpt-5.4-mini";
 const resultPath = path.join(runRoot, "results", "trigger-evals.json");
@@ -41,11 +43,11 @@ const child = spawn("codex", [
   "--sandbox", "workspace-write",
   "--skip-git-repo-check",
   "--ephemeral",
-  "-C", skillRoot,
+  "-C", repoRoot,
   "--output-schema", schemaPath,
   "-o", resultPath,
   prompt
-], { cwd: skillRoot, stdio: ["ignore", "pipe", "pipe"] });
+], { cwd: repoRoot, stdio: ["ignore", "pipe", "pipe"] });
 
 let log = "";
 child.stdout.on("data", (chunk) => { log += chunk.toString(); });

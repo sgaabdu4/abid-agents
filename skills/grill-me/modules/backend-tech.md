@@ -32,7 +32,7 @@ At stage close/final synthesis, `06-backend-tech.md` includes only relevant deci
 - Infra/env/deploy notes.
 - Test/observability/migration plan when needed.
 - High-risk controls only when risk exists.
-- Next-stage handoff for vertical slices/evals only when useful.
+- Next-stage handoff for vertical slices/verification only when useful.
 
 Clarity gate:
 - Prototype approval confirmed or prototype n/a with evidence.

@@ -1,5 +1,7 @@
 # E2E Runbook
 
+Read `defaults.md`, `browser-first.md`, and `capture-artifacts.md` before using this runbook when the prompt is underspecified or tool choice is open.
+
 ## Artifacts
 
 ```text
@@ -7,12 +9,19 @@ docs/e2e/<RUN_ID>/
   state.json
   plans/INDEX.md
   plans/<flow>.md
+  events.jsonl
   issues.md
   screenshots/<flow>/<step>_<status>.png
+  videos/<flow>.mp4
+  recaps/<flow>_2x_cursor.mp4
+  traces/<flow>.zip
+  logs/<flow>.log
+  regression.md
   report.md
 ```
 
-`state.json` tracks run id, scope, stack, mode, fix policy, screenshot policy, risk limits, device/url/session/process ids, flow statuses, tool-call counts, and retry counts.
+`state.json` tracks run id, scope, stack, mode, fix policy, capture policy, risk limits, device/url/session/process ids, driver choice, fallback reason, flow statuses, UI action counts, artifact counts, and retry counts.
+`events.jsonl` records every click, input, navigation, wait, assertion, issue, fallback, and fix verification.
 
 ## Setup
 
@@ -20,8 +29,9 @@ docs/e2e/<RUN_ID>/
 2. Make artifact dirs.
 3. Index/map code with CBM first.
 4. Detect stack from target plus `pubspec.yaml`/`package.json`.
-5. Gate tools: Flutter UI driver/device and analyzer, or browser automation for web.
+5. Choose driver from `browser-first.md`.
 6. Boot app: reuse supplied URL/server when live; otherwise start a dev server and store its process id.
+7. Record capture policy: default, audit, or report-only.
 
 ## Discovery
 
@@ -41,6 +51,7 @@ Each flow plan should be 5-12 steps. Include only relevant axes:
 - permissions/roles
 
 Use `[ ]`, `[x]`, and `[~] (n/a/spec: reason)`.
+Each checked step must name the expected event row and artifact path.
 
 ## Runner Prompt
 
@@ -49,13 +60,16 @@ Run E2E flow <flow>.
 plan-file: <ARTIFACTS>/plans/<flow>.md
 issues-file: <ARTIFACTS>/issues.md
 screenshot-dir: <ARTIFACTS>/screenshots/<flow>/
-screenshot-policy: <fail|all>
+capture-policy: <default|audit|report-only>
+events-file: <ARTIFACTS>/events.jsonl
+video-path: <ARTIFACTS>/videos/<flow>.mp4
 run-id: <RUN_ID>
 device-id/dev-url/session-name: <value>
 risk-limits: <limits>
 
-Drive real UI only. Per step: action -> settle -> verify -> screenshot if policy.
-Tick [x] only with UI tool evidence. Halt on first FAIL, append issue, return <=150 words: status, counts, UI tool-call count, screenshot paths.
+Drive real UI only. Per step: action -> settle -> verify -> event row -> screenshot/video timestamp.
+At flow end, produce a 2x cursor/click recap video when video is supported.
+Tick [x] only with UI evidence. Halt on first FAIL inside the flow, append issue, and return <=150 words: status, action count, event count, artifacts, and fallback reason if any.
 ```
 
 ## Issue Block
@@ -68,10 +82,11 @@ Step: <plan line>
 Repro: <minimal sequence>
 File hint: <screen/component:line via trace>
 Logs: <short decisive lines>
-Screenshot: <path>
-Tool calls so far: <N>
-Category: regression | spec-gap | flake
+Evidence: screenshot/video/log/trace/event paths
+UI actions so far: <N>
+Category: regression | spec-gap | flake | tooling
 Proposed fix: <one line>
+Regression: <command/result or pending>
 - [ ] resolved
 ```
 
@@ -82,7 +97,9 @@ Proposed fix: <one line>
 - Flake: timing/network; one retry passes without code.
 
 Guided mode asks before category/fix. Auto mode uses the heuristic, patches regressions, marks spec gaps, retries flakes once, then escalates after 3 failed loops.
+After any fix, rerun the impacted flow and the smallest existing regression command that could catch the breakage.
 
 ## Report
 
-Include status, totals, per-flow summary, tool-call audit, fixes, risk controls, advisor notes when available, artifact paths, skipped checks, and cleanup result. Any flow with zero UI calls makes the run invalid.
+Include status, driver used and fallback chain, totals, per-flow summary, UI action audit, fixes, risk controls, artifact paths, 2x cursor recap path or fallback reason, regression commands and results, skipped checks, and cleanup result.
+Any flow with zero UI calls makes the run invalid unless the report clearly marks UI proof blocked by tool failure.

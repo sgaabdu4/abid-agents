@@ -24,7 +24,7 @@ Target artifact: <explanation | decision summary | implementation plan | visual 
 - Prototype tech stack: <run | brief | skip | n/a> - <why/evidence>
 - Prototype: <run | brief | skip | n/a> - <why/evidence>
 - Backend/infra tech stack: <run | brief | skip> - <why/evidence>
-- Vertical slices/evals: <run | brief | skip | n/a> - <why/evidence>
+- Vertical slices/verification: <run | brief | skip | n/a> - <why/evidence>
 
 ## Position
 - Active stage: <stage>

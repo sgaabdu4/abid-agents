@@ -51,7 +51,7 @@ Stage skipping:
 
 Classify only what changes routing: profile, work type, repo reality, UI need,
 runtime, visual/prototype need, backend/API/data risk, certainty, desired
-artifact, acceptance checks, verification/evals, and domain-doc impact.
+artifact, acceptance checks, verification, and domain-doc impact.
 
 ## Files
 
@@ -217,10 +217,10 @@ Each turn:
 - No backend/API/auth/storage/realtime integration before the mock-data prototype
   is approved.
 - No final plan until every `run`/`brief` stage is fully clarified: acceptance
-  criteria + verification/eval strategy + risky edge cases, or an explicit
+  criteria + verification strategy + risky edge cases, or an explicit
   user-approved parked unknown.
 - Final plan must be self-contained: summary, decisions, Q&A, artifact refs,
-  acceptance checks, verification/evals, risks, unknowns, traceability.
+  acceptance checks, verification, risks, unknowns, traceability.
 - Do not write `99-final-plan.md`; write `plan.md` only.
 - Schema/data/auth/security/deploy/stateful changes require human review gate,
   rollback/migration notes, and telemetry/audit expectations.

@@ -34,7 +34,7 @@ Trace user input into SQL/NoSQL/raw queries, dynamic filters, markdown/rich text
 
 ## LLM / Agentic Features
 
-Check prompt boundaries, tenant-scoped retrieval, secrets in prompts/logs/traces/evals, model-selected IDs/URLs/file paths/SQL/shell/payment/email/admin actions, output validation, quotas, audit logs, human approval, and token/file/audio cost DoS. Authz lives outside the model.
+Check prompt boundaries, tenant-scoped retrieval, secrets in prompts/logs/traces/test artifacts, model-selected IDs/URLs/file paths/SQL/shell/payment/email/admin actions, output validation, quotas, audit logs, human approval, and token/file/audio cost DoS. Authz lives outside the model.
 
 ## False Positives
 

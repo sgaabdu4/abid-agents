@@ -12,7 +12,7 @@ Decide:
 - Non-goals = explicit exclusions.
 - Success metric = observable outcome.
 - Acceptance criteria = observable pass/fail conditions for MVP.
-- Verification plan = tests/prototype/manual/eval checks that prove acceptance criteria.
+- Verification plan = tests/prototype/manual checks that prove acceptance criteria.
 - Assumptions = believed true but unproven.
 - Constraints = time, budget, policy, data, platform.
 
@@ -41,7 +41,7 @@ Clarity gate:
 - Success metric named or explicitly unknown.
 - Assumptions and constraints captured.
 - Acceptance criteria cover happy/fail/edge cases or blocker is named.
-- Verification plan names tests/prototype/manual/eval path or blocker is named.
+- Verification plan names tests/prototype/manual path or blocker is named.
 
 ## Q pattern
 

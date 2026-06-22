@@ -25,7 +25,7 @@ Modes are generic depth caps, not domain-specific workflows.
 - `build-plan`: implementation sequencing + verification. Use when the user
   wants to build/ship/implement but does not ask for visual exploration or a
   prototype. Run product/backend/UI briefs only where unclear or touched; run
-  vertical slices/evals.
+  vertical slices/verification.
 - `full`: full discovery-to-plan pipeline. Use for broad greenfield apps/sites,
   ambiguous major product work, or explicit "full grill me" requests.
 - `review`: inspect existing plan/spec/docs/code, find gaps/risks, ask focused
@@ -60,7 +60,7 @@ Modes are generic depth caps, not domain-specific workflows.
 - Prototype tech stack: <run | brief | skip | n/a> - <why/evidence>
 - Prototype: <run | brief | skip | n/a> - <why/evidence>
 - Backend/infra tech stack: <run | brief | skip> - <why/evidence>
-- Vertical slices/evals: <run | brief | skip | n/a> - <why/evidence>
+- Vertical slices/verification: <run | brief | skip | n/a> - <why/evidence>
 ```
 
 ## Defaults
@@ -74,16 +74,16 @@ Modes are generic depth caps, not domain-specific workflows.
   only when needed to explain the area; build/design/prototype stages are `n/a`.
 - `build-plan`: product brief if unclear; UI/backend only when touched; visual
   design/prototype `n/a` unless requested or needed to reduce a risky UX
-  unknown; vertical slices/evals run.
+  unknown; vertical slices/verification runs.
 - `full` + greenfield UI: run all, including visual design directions,
   prototype tech stack, styled mock-data full-flow prototype, and vertical
-  slices/evals.
+  slices/verification.
 - `review`: inspect supplied/current artifacts first; run/brief only stages
   needed to explain gaps, risks, contradictions, and next decisions; no design
   or prototype artifacts by default.
 - Existing non-greenfield feature: run only stages touched by the change;
   skip/brief already-decided product, UI, visual design, prototype, and backend
-  sections with evidence; run vertical slices/evals if implementation is
+  sections with evidence; run vertical slices/verification if implementation is
   requested.
 - Simple feature: pin goal, owner, boundary, acceptance check, and verification.
   UI/backend run only if changed; visual/prototype are `n/a` unless needed.
@@ -91,8 +91,8 @@ Modes are generic depth caps, not domain-specific workflows.
   UI flow only if navigation/state changes; visual design only if surface/style
   changes or user needs style choice; prototype tech/prototype only if requested
   or risky UX needs validation; backend/infra only if
-  API/schema/auth/storage/realtime/infra changes; vertical slices/evals for
+  API/schema/auth/storage/realtime/infra changes; vertical slices/verification for
   delivery planning.
 - Backend/API/infra: product brief; UI/visual-design/prototype tech/prototype
   n/a unless user-facing flow/design is part of the request; backend/infra tech
-  run; vertical slices/evals run for build planning.
+  run; vertical slices/verification runs for build planning.
