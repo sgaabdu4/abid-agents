@@ -10,7 +10,7 @@ Check before any tool call. If the prompt conflicts, this section wins.
 - Files over 700 lines are a hard stop when touched: any fix/feature/review/issue edit must split/move code or content so it ends under 700 lines in the same session. Scope this to touched files only; do not sweep other large files or add code/import/export/re-export/wiring/docs without the split.
 - Skill edits cannot put a 3+ step workflow in `SKILL.md`; create or update `references/*.md` or a script and link it from `SKILL.md`.
 - UI component edits with no design SSOT must create/import a separate token/theme/style owner first; no inline `style` or component-local visual constants; no confirmation for standard disabled/loading/focus/hover states.
-- Browser/E2E probe failed or denied, including Playwright/browser MCP/node_repl -> stop UI automation. Do not call `list_apps`, `open -a`, `computer-use`, or `osascript`; use local script/tests.
+- Browser/E2E probe failed or denied, including Playwright/browser MCP/node_repl -> stop UI automation. Exception: a shared-profile lock error that says the browser is already in use, profile is locked, `mcp-chrome`, or `use --isolated` may retry once with an isolated browser profile. If that retry fails or is denied, stop. Do not call `list_apps`, `open -a`, `computer-use`, or `osascript`; use local script/tests.
 
 ## Core
 - Read before claim/edit; uncited = unknown. Use current-session tools only; if absent, say unavailable once and fallback. Never simulate absent tools. Tool unavailable/denied/cancelled -> fallback after one failure.

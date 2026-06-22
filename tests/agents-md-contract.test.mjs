@@ -61,7 +61,7 @@ assert.ok(
   `AGENTS.md token budget exceeded: ${agentsTokens} >= ${maxAgentsTokens}`,
 );
 
-const expectedLinks = [
+const expectedInstalls = [
   path.join(home, '.pi', 'agent', 'AGENTS.md'),
   path.join(home, '.pi', 'AGENTS.md'),
   path.join(home, '.claude', 'AGENTS.md'),
@@ -70,10 +70,27 @@ const expectedLinks = [
 ];
 
 const canonicalReal = fs.realpathSync(canonical);
-for (const link of expectedLinks) {
-  const stat = fs.lstatSync(link);
-  assert.ok(stat.isSymbolicLink(), `${link} must be a symlink`);
-  assert.equal(fs.realpathSync(link), canonicalReal, `${link} must point to ${canonical}`);
+const beginManagedBlock = '<!-- BEGIN managed by abid-agents: AGENTS.md -->';
+const endManagedBlock = '<!-- END managed by abid-agents: AGENTS.md -->';
+const canonicalManagedText = text.replace(/\n$/, '');
+
+function readManagedBlock(file) {
+  const installedText = fs.readFileSync(file, 'utf8');
+  const begin = installedText.indexOf(`${beginManagedBlock}\n`);
+  const end = installedText.indexOf(`\n${endManagedBlock}`, begin + beginManagedBlock.length + 1);
+  assert.ok(begin >= 0, `${file} must include managed AGENTS.md begin marker`);
+  assert.ok(end > begin, `${file} must include managed AGENTS.md end marker`);
+  return installedText.slice(begin + beginManagedBlock.length + 1, end);
+}
+
+for (const installed of expectedInstalls) {
+  const stat = fs.lstatSync(installed);
+  if (stat.isSymbolicLink()) {
+    assert.equal(fs.realpathSync(installed), canonicalReal, `${installed} must point to ${canonical}`);
+    continue;
+  }
+  assert.ok(stat.isFile(), `${installed} must be a symlink or managed file`);
+  assert.equal(readManagedBlock(installed), canonicalManagedText, `${installed} managed block must match ${canonical}`);
 }
 
 const claudeFile = path.join(home, '.claude', 'CLAUDE.md');

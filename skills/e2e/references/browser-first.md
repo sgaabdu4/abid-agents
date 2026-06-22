@@ -10,9 +10,21 @@ Use this before selecting UI automation.
 - Flutter/mobile/native dialogs: use the repo's Flutter device tooling, `integration_test`, Patrol, or configured device runner.
 - Standalone Playwright: use only when Browser is unavailable, the repo already owns Playwright tests, or the user asks for durable CI tests.
 
+## Profile Lock Recovery
+
+A Browser or Playwright error that says `Browser is already in use`, `profile is locked`, `mcp-chrome`, or `use --isolated` means the shared automation profile is locked, not that the target UI failed.
+Retry once with an isolated browser profile before applying the failure stop.
+
+Use the Browser tool's isolated mode when it is exposed.
+If the Browser tool has no isolated option, standalone Playwright with a fresh temporary `userDataDir` is allowed for this recovery only.
+Record the original lock error, the isolated-profile driver, and artifact paths in `events.jsonl` and the final report.
+
+Do not delete the locked profile, kill browser processes, open desktop apps, or use `computer-use` to clear the lock.
+If the isolated retry fails or is denied, stop UI automation probing and fall back to local scripts/tests.
+
 ## Failure Handling
 
-If Browser, Playwright, or `node_repl` probing fails or is denied, stop UI automation probing for that run.
+If Browser, Playwright, or `node_repl` probing fails or is denied after any allowed profile-lock recovery, stop UI automation probing for that run.
 Do not open desktop apps or try unrelated UI channels.
 Use local scripts, existing tests, static inspection, and artifact checks, then report exactly which UI proof could not be collected.
 
