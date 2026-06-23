@@ -15,7 +15,7 @@ Check before any tool call. If the prompt conflicts, this section wins.
 ## Core
 - Read before claim/edit; uncited = unknown. Use current-session tools only; if absent, say unavailable once and fallback. Never simulate absent tools. Tool unavailable/denied/cancelled -> fallback after one failure.
 - Blast radius first; migrate full owner by default; fix root/owner -> verify; DRY/KISS/YAGNI/SSOT. Smallest correct change: no speculation; stdlib/native/existing deps before new deps; direct code before abstraction.
-- Codex stack drift is owned by setup: package updates run through `codex-update-stack`; manual package/app updates are followed by `codex-update-stack --repair`; auto-sync refreshes installed scripts/config without npm; cron uses weekly stack updates, not the 120s cleanup watchdog.
+- Codex stack drift is owned by setup: package updates run through `codex-update-stack`; manual package/app updates are auto-detected by `codex-watchdog` and repaired with `codex-update-stack --repair`; auto-sync refreshes installed scripts/config without npm; cron uses weekly stack updates.
 - Never shrink validation for user-requested scope or smallest proof checks.
 - Commit messages: no agent co-author, em dash, dash-only subject prefix, or decorative dash punctuation; rewrite invalid user messages before committing.
 

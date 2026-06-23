@@ -3,7 +3,7 @@
 set -euo pipefail
 
 ROOT="${ABID_AGENTS_ROOT:-$HOME/.agents}"
-PATH="/opt/homebrew/bin:/usr/local/bin:$HOME/.npm-global/bin:$HOME/.local/bin:/usr/bin:/bin:/usr/sbin:/sbin:${PATH:-}"
+PATH="/opt/homebrew/bin:/usr/local/bin:$HOME/.npm-global/bin:$HOME/.local/bin:$HOME/flutter/bin:$HOME/Workspaces/flutter/bin:$HOME/.pub-cache/bin:/usr/bin:/bin:/usr/sbin:/sbin:${PATH:-}"
 export PATH
 mode="update"
 
@@ -86,10 +86,19 @@ except json.JSONDecodeError as exc:
     fail(f"codex doctor returned invalid JSON: {exc}")
 
 overall = data.get("overallStatus")
-if overall != "ok":
+if overall not in ("ok", "warning"):
     fail(f"codex doctor overallStatus={overall!r}")
 
 checks = data.get("checks") or data.get("issues") or {}
+required_ok = ("config.load", "mcp.config", "state.paths")
+bad_required = []
+for check_name in required_ok:
+    check = checks.get(check_name)
+    if isinstance(check, dict) and check.get("status") != "ok":
+        bad_required.append(f"{check_name}={check.get('status')}")
+if bad_required:
+    fail("codex doctor required checks failed: " + ", ".join(bad_required))
+
 sandbox = checks.get("sandbox.helpers") or {}
 details = sandbox.get("details") or {}
 filesystem = details.get("filesystem sandbox")
@@ -118,6 +127,13 @@ if shadow_cbm.exists() or shadow_cbm.is_symlink():
         fail(f"CBM shadow points at {target}, expected {expected_cbm}")
 
 print("codex doctor ok: filesystem sandbox=unrestricted approval=Never")
+if overall == "warning":
+    warnings = [
+        f"{name}={check.get('status')}"
+        for name, check in checks.items()
+        if isinstance(check, dict) and check.get("status") != "ok"
+    ]
+    print("codex doctor warnings: " + ", ".join(warnings))
 print(f"CBM shadow ok: {shadow_cbm} -> {expected_cbm}")
 PY
 
@@ -137,6 +153,7 @@ doctor = subprocess.run(
     ["context-mode", "doctor"],
     text=True,
     capture_output=True,
+    env={**os.environ, "CONTEXT_MODE_PLATFORM": "codex"},
     timeout=60,
 )
 output = doctor.stdout + "\n" + doctor.stderr
