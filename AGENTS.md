@@ -30,6 +30,7 @@ For non-trivial implementation/reviews. Quality, simplicity, robustness, scale, 
 - Reviews prioritize structural regressions, missed simplifications, spaghetti growth, boundary/type leaks, file size, then legibility nits. Approval blocks on those, missed simpler framing, unjustified file growth, busy-flow ad-hoc branching, or hacky/magical helper.
 
 ## Tool Routing
+- `codebase-memory`, `context-mode`, and `terse` are support tools, not stages.
 - Structure/callers/deps/impact/routes/symbols -> CBM first. Do not raw-search code first.
 - Cmd output/logs/tests/diffs/APIs/data -> context-mode. Do not stream raw command output into context.
 - File edits: native file tools only. `Read` before `Edit`; `Write` for new/full rewrites. Never use `ctx_execute`, `ctx_execute_file`, or Bash to create/modify files.
@@ -99,13 +100,15 @@ Load matching skill before answering/editing:
 - Appwrite/Auth/TablesDB/Storage/Functions/Realtime -> `appwrite-backend`.
 - Online/current info -> `tavily-cli`.
 - Repeated fixes/trial-and-error learning/project capture -> `repeated-failure-learning`; skill authoring/evals -> `skill-creator`.
+- Workflow/skill/next-step/BMAD comparison questions -> `workflow-help`.
 - Ambiguous planning/features -> `grill-me`; committed shipping validation/push/PR -> `no-mistakes`.
 - Hard bugs/failures/flakes/regressions -> `diagnosing-bugs`.
 - Boundaries/interfaces/ownership/wrappers -> `codebase-design`.
 - Resolved context to PRD/spec -> `to-prd`; accepted plan to vertical issues -> `to-issues`.
-- React/Next/perf/composition -> matching React/Vercel skills.
+- React/Next/perf/composition -> `react-doctor` + `fallow` + `vercel-react-best-practices`.
 - Tests/specs/QA/mutation -> `test-quality`.
 - UI/components/design-system/tokens -> `atomic-ui` + `impeccable`.
+- Sentry/observability/issues/setup -> `sentry-workflow` only; setup, feature, and CLI skills are implementation details, not user-facing routing.
 - User-facing replies -> `terse`.
 - Resolve skill refs from dir; missing -> say so.
 
@@ -126,11 +129,13 @@ Load matching skill before answering/editing:
 For non-trivial code tasks:
 1. Scope repo/root, relevant `AGENTS.md`, skills, constraints.
 2. Index/map with CBM, then read exact files before edits.
-3. Fix root owner, not symptom; plan risky or multi-file edits.
-4. Run Gate 2 blast-radius search/trace.
-5. Use `test-quality` for TDD/tests where practical; verify through context-mode.
-6. For committed shipping work, use `/no-mistakes` or `git push no-mistakes`; direct `origin` push only on explicit request or when the gate is unavailable.
-7. Review changed code/docs, touched-file lengths, and uncited claims.
+3. State readiness before implementation: `PASS`, `CONCERNS`, or `FAIL` based on outcome, owner, blast radius, proof path, and risk routing.
+4. Fix root owner, not symptom; plan risky or multi-file edits.
+5. Correct course if scope expands midstream: route back to `grill-me`, `to-prd`, `to-issues`, or `codebase-design` instead of silently widening work.
+6. Run Gate 2 blast-radius search/trace.
+7. Use `test-quality` for TDD/tests where practical; verify through context-mode.
+8. For committed shipping work, use `/no-mistakes` or `git push no-mistakes`; direct `origin` push only on explicit request or when the gate is unavailable.
+9. Review changed code/docs, touched-file lengths, and uncited claims.
 
 ## Subagents
 Use exposed subagent/multi-agent tools only; discover with `tool_search` if needed. Use bounded independent lanes for exploration, audits, log triage, test clusters, multi-file refactors, browser/MCP work, or online research. Split by ownership boundary and give scope, evidence format, and stop condition. Parent owns synthesis, final judgment, edits, and user-facing claims. If no subagent tool exists after discovery, work directly.

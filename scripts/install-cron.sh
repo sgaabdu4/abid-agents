@@ -57,7 +57,7 @@ if [[ "${ABID_AGENTS_SKIP_CODEX_STACK_CRON:-}" == "1" ]] ||
   has_codex_stack=1
 fi
 if [[ "$has_auto_sync" == "1" && "$has_codex_stack" == "1" ]]; then
-  echo "Agent-config cron already installed: auto-sync=$SCHEDULE codex-stack=${ABID_AGENTS_SKIP_CODEX_STACK_CRON:-0}"
+  echo "Agent-config auto-sync cron already installed: auto-sync=$SCHEDULE codex-stack=${ABID_AGENTS_SKIP_CODEX_STACK_CRON:-0}"
   exit 0
 fi
 

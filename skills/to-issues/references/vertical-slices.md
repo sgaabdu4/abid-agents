@@ -21,8 +21,11 @@ specific user-visible slice and cannot be folded into it.
    Put prefactoring first only when it removes real blocker complexity.
 
 4. Add acceptance and verification.
-   Every issue needs behavior-facing acceptance criteria and the smallest
-   relevant check: unit, integration, E2E, manual, migration, or observability.
+    Every issue needs behavior-facing acceptance criteria and the smallest
+    relevant check: unit, integration, E2E, manual, migration, or observability.
+   Include the expected owner, likely touched files/modules, and rollback or
+   risk note when the slice changes data, auth, schema, deployment, or user
+   workflow.
 
 5. Ask one calibration question if needed.
    Only ask when slice granularity, dependency order, or scope boundary is
@@ -33,6 +36,9 @@ specific user-visible slice and cannot be folded into it.
 ```md
 ## What to build
 <one vertical behavior>
+
+## User outcome
+<what the user or operator can do after this slice>
 
 ## Why
 <user value or engineering risk reduced>
@@ -55,8 +61,12 @@ specific user-visible slice and cannot be folded into it.
 ## Verification
 - <test/check/manual proof>
 
+## Rollback / risk note
+- <rollback, migration, monitoring, or risk note | none>
+
 ## Agent context
 - Owner files/modules:
+- Likely touched files:
 - Contracts/routes/schema/storage:
 - Risks:
 ```

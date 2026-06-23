@@ -103,11 +103,12 @@ There are two types:
 - Upstream skills: pinned as submodules and exposed through symlinks.
 - Tool-installed skills: written by their CLI owner, such as `no-mistakes`.
 
-Workflow defaults: use `grill-me` to clarify ambiguous work before building, then use [`no-mistakes`](https://github.com/kunchenguid/no-mistakes) through `/no-mistakes` or `git push no-mistakes` to validate committed shipping work after implementation.
+Workflow defaults: use `workflow-help` when the next step is unclear, `grill-me` to clarify ambiguous work before building, then use [`no-mistakes`](https://github.com/kunchenguid/no-mistakes) through `/no-mistakes` or `git push no-mistakes` to validate committed shipping work after implementation.
 
 Planning and engineering helpers:
 
 - `diagnosing-bugs`: isolate hard bugs before patching.
+- `workflow-help`: choose the next stage, skill, proof path, and what not to run.
 - `codebase-design`: decide module ownership, public interfaces, and abstraction shape.
 - `to-prd`: turn resolved context into a PRD or implementation brief.
 - `to-issues`: split an accepted plan into vertical-slice issues.
@@ -116,6 +117,7 @@ Quick routing:
 
 | Need | Use |
 | --- | --- |
+| Choose the next workflow, skill, or stage | `workflow-help` |
 | Clarify ambiguous work before building | `grill-me` |
 | Diagnose hard bugs, flakes, regressions | `diagnosing-bugs` |
 | Decide module ownership or abstraction shape | `codebase-design` |
@@ -123,11 +125,19 @@ Quick routing:
 | Split a plan into agent-ready slices | `to-issues` |
 | Design or repair tests | `test-quality` |
 | UI systems, tokens, or product polish | `atomic-ui` + `impeccable` |
+| React or Next.js implementation/review | `react-doctor` + `fallow` + `vercel-react-best-practices` |
+| Sentry or observability work | `sentry-workflow` |
 | User-like UI regression proof | `e2e` |
 | Latency or efficiency work | `performance-rescue` |
 | Security, auth, secrets, or data exposure | `security-review` |
 | Strict maintainability review | `thermo-nuclear-code-quality-review` |
 | Final validation, push, PR, or CI gate | `no-mistakes` |
+
+BMAD inspiration, local rules win:
+
+- Steal: help/front-door routing, readiness checks, next-action clarity, and sharper vertical slices.
+- Do not steal: BMAD personas, menu codes, generated story state, or planning ceremony that slows implementation.
+- Local delivery stays stricter: code evidence, readiness, owner-first implementation, E2E proof, thermo review, and `no-mistakes`.
 
 Local skill budget:
 
@@ -142,7 +152,7 @@ Upstream and tool-installed skills are updated from their source repos or CLI ow
 
 ## 5. Upstream skill pins
 
-| Active skill | Upstream repo | Source path |
+| Skill link | Upstream repo | Source path |
 | --- | --- | --- |
 | `skills/vercel-react-best-practices` | `vercel-labs/agent-skills` | `skills/react-best-practices` |
 | `skills/impeccable` | `pbakaus/impeccable` | `.agents/skills/impeccable` |
@@ -152,12 +162,12 @@ Upstream and tool-installed skills are updated from their source repos or CLI ow
 | `skills/tavily-cli` | `tavily-ai/skills` | `skills/tavily-cli` |
 | `skills/appwrite-backend` | `sgaabdu4/appwrite-backend` | repo root |
 | `skills/building-flutter-apps` | `sgaabdu4/building-flutter-apps` | repo root |
-| `skills/sentry-cli` | `getsentry/cli` | `plugins/sentry-cli/skills/sentry-cli` |
-| `skills/sentry-feature-setup` | `getsentry/sentry-for-ai` | `skills/sentry-feature-setup` |
-| `skills/sentry-sdk-setup` | `getsentry/sentry-for-ai` | `skills/sentry-sdk-setup` |
 | `skills/sentry-workflow` | `getsentry/sentry-for-ai` | `skills/sentry-workflow` |
+| `skills/sentry-cli` (support only) | `getsentry/cli` | `plugins/sentry-cli/skills/sentry-cli` |
+| `skills/sentry-feature-setup` (support only) | `getsentry/sentry-for-ai` | `skills/sentry-feature-setup` |
+| `skills/sentry-sdk-setup` (support only) | `getsentry/sentry-for-ai` | `skills/sentry-sdk-setup` |
 
-Sentry is exposed through `sentry-cli` plus three router skills. The full SDK skill library stays in `getsentry/sentry-for-ai`, and leaf skills are loaded only when the task needs them.
+User-facing Sentry work routes through `sentry-workflow`. The setup, feature, and CLI skills stay linked as implementation details for the Sentry workflow to use when needed.
 
 ---
 

@@ -40,6 +40,25 @@ assertIncludes(text, 'stop local retry loops');
 assertIncludes(text, 'load `repeated-failure-learning` before final');
 assertIncludes(text, 'narrow routing-only rule -> nearest project `AGENTS.md`');
 assertIncludes(text, 'never global');
+assertIncludes(text, 'Workflow/skill/next-step/BMAD comparison questions -> `workflow-help`.');
+assertIncludes(text, 'React/Next/perf/composition -> `react-doctor` + `fallow` + `vercel-react-best-practices`.');
+assertIncludes(text, 'Sentry/observability/issues/setup -> `sentry-workflow` only');
+assertIncludes(text, 'State readiness before implementation: `PASS`, `CONCERNS`, or `FAIL`');
+assertIncludes(text, 'Correct course if scope expands midstream');
+assertIncludes(text, '`codebase-memory`, `context-mode`, and `terse` are support tools, not stages.');
+
+const workflowHelpSkill = path.join(home, '.agents', 'skills', 'workflow-help', 'SKILL.md');
+const workflowHelpReference = path.join(home, '.agents', 'skills', 'workflow-help', 'references', 'route-map.md');
+assert.ok(fs.existsSync(workflowHelpSkill), `${workflowHelpSkill} must exist`);
+assert.ok(fs.existsSync(workflowHelpReference), `${workflowHelpReference} must exist`);
+const workflowHelpSkillText = fs.readFileSync(workflowHelpSkill, 'utf8');
+const workflowHelpReferenceText = fs.readFileSync(workflowHelpReference, 'utf8');
+assertIncludes(workflowHelpSkillText, 'Routes work without treating support tools as stages.');
+assertIncludes(workflowHelpSkillText, 'Load `references/route-map.md` before answering.');
+assertIncludes(workflowHelpReferenceText, 'React/Next.js');
+assertIncludes(workflowHelpReferenceText, '`react-doctor` + `fallow` + `vercel-react-best-practices`');
+assertIncludes(workflowHelpReferenceText, '`sentry-workflow`');
+assertIncludes(workflowHelpReferenceText, 'State readiness as `PASS`, `CONCERNS`, or `FAIL`');
 
 const repeatedFailureSkill = path.join(home, '.agents', 'skills', 'repeated-failure-learning', 'SKILL.md');
 const repeatedFailureReference = path.join(home, '.agents', 'skills', 'repeated-failure-learning', 'references', 'capture.md');

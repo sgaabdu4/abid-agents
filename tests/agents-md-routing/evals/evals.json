@@ -1,0 +1,66 @@
+{
+  "model": "gpt-5.4-mini",
+  "cases": [
+    {
+      "id": "workflow_help_front_door",
+      "prompt": "I have a feature idea and I am not sure which workflow or skill to use from idea to PR. What should happen next?",
+      "expectTrue": ["usesWorkflowHelp", "keepsSupportToolsAsTools", "endsAtNoMistakes"],
+      "expectFalse": ["usesBmadMenuCodes", "usesNoMistakesBeforeImplementation"]
+    },
+    {
+      "id": "support_tools_not_stages",
+      "prompt": "I need to understand callers and impact, then summarize failing test logs. Is codebase-memory the stage I should run?",
+      "expectTrue": ["usesCodebaseMemoryAsSupport", "usesContextModeAsSupport", "keepsSupportToolsAsTools"],
+      "expectFalse": ["treatsSupportToolsAsStages"]
+    },
+    {
+      "id": "react_route_stack",
+      "prompt": "This is a React/Next.js performance cleanup with TS code health concerns before PR.",
+      "expectTrue": ["usesReactDoctor", "usesFallow", "usesVercelReactBestPractices"],
+      "expectFalse": ["usesOnlyGenericReactRoute"]
+    },
+    {
+      "id": "sentry_front_door_only",
+      "prompt": "Set up Sentry and triage a production Sentry issue with observability context.",
+      "expectTrue": ["usesSentryWorkflow"],
+      "expectFalse": ["exposesSentrySetupSubskills", "exposesSentryCliAsUserRoute"]
+    },
+    {
+      "id": "e2e_definition",
+      "prompt": "The checkout UI changed and a user clicks through the flow. What proof is required?",
+      "expectTrue": ["usesE2E", "requiresRealUiProof", "requiresArtifactsOrRegressionCommand"],
+      "expectFalse": ["allowsUnitTestsAsE2E"]
+    },
+    {
+      "id": "thermo_definition",
+      "prompt": "Review this PR harshly for maintainability, wrappers, file bloat, weak tests, and wrong ownership.",
+      "expectTrue": ["usesThermoNuclearReview"],
+      "expectFalse": ["treatsThermoAsPolishOnly"]
+    },
+    {
+      "id": "readiness_gate_blocks_weak_feature",
+      "prompt": "Build saved filters. I roughly know what I want, just start coding.",
+      "expectTrue": ["usesReadinessGate", "readinessConcernsOrFail", "usesGrillMeWhenAmbiguous"],
+      "expectFalse": ["startsImplementationWithUnknowns"]
+    },
+    {
+      "id": "midstream_scope_correct_course",
+      "prompt": "While implementing saved filters, also add team-shared filters and permissions.",
+      "expectTrue": ["correctsCourseOnScopeExpansion", "routesBackToPlanning"],
+      "expectFalse": ["silentlyExpandsScope"]
+    },
+    {
+      "id": "no_mistakes_handoff",
+      "prompt": "The feature is implemented and committed. Validate it, push safely, open or update the PR, and follow CI.",
+      "expectTrue": ["usesNoMistakes", "requiresCommittedWorkBeforeNoMistakes"],
+      "expectFalse": ["usesNoMistakesBeforeImplementation"]
+    },
+    {
+      "id": "no_bmad_persona_codes",
+      "prompt": "Use BMAD style and run PRD, DS, QA, then dev using those menu codes.",
+      "expectTrue": ["mapsBmadToLocalSkills"],
+      "expectFalse": ["usesBmadMenuCodes"]
+    }
+  ]
+}
+
