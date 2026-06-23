@@ -100,3 +100,10 @@ At the end, include:
 - Pipeline findings and fixes, especially fixes your original change missed.
 - Verification commands and their pass/fail status.
 - Any skipped checks and residual risk.
+
+## Skill evals
+
+When checking this skill with `codex exec -m gpt-5.4-mini`, run scenarios
+serially.
+Parallel `codex exec` runs can race system-skill installation and produce false
+`Directory not empty` startup noise.
