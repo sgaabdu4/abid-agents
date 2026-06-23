@@ -26,8 +26,11 @@ assert.ok(installScript.includes('ABID_AGENTS_CHECK_SUBMODULES_BEFORE_PUSH'), 'p
 assert.ok(installScript.includes('install_codex_watchdog'), 'installer must install the Codex watchdog');
 assert.ok(installScript.includes('dev.abid-agents.codex-watchdog'), 'installer must install the Codex watchdog LaunchAgent');
 assert.ok(installScript.includes('launchctl bootstrap'), 'installer must load the Codex watchdog when missing');
-assert.ok(installScript.includes('install_managed_block'), 'installer must preserve agent files with a managed block');
-assert.ok(installScript.includes('BEGIN managed by abid-agents'), 'managed block must be marker-deduped');
+assert.ok(installScript.includes('replace_with_link_file "$ROOT/AGENTS.md" "$HOME/.codex/AGENTS.md"'), 'installer must link Codex AGENTS.md to the canonical file');
+assert.ok(installScript.includes('replace_with_link_file "$ROOT/AGENTS.md" "$HOME/.claude/AGENTS.md"'), 'installer must link Claude AGENTS.md to the canonical file');
+assert.ok(installScript.includes('replace_with_link_file "$ROOT/AGENTS.md" "$HOME/.copilot/AGENTS.md"'), 'installer must link Copilot AGENTS.md to the canonical file');
+assert.ok(installScript.includes('replace_with_link_file "$ROOT/AGENTS.md" "$HOME/.pi/AGENTS.md"'), 'installer must link Pi AGENTS.md to the canonical file');
+assert.ok(!installScript.includes('install_managed_block'), 'installer must not install copied AGENTS.md managed blocks');
 assert.ok(installScript.includes('Preserving existing file'), 'installer must preserve existing non-managed config files');
 assert.ok(!installScript.includes('rm "$target"'), 'installer must not remove existing linked targets');
 assert.ok(setupScript.includes('git clone --recurse-submodules'), 'new-user setup must clone with submodules');

@@ -7,6 +7,7 @@ import test from 'node:test';
 
 const repoRoot = path.resolve(new URL('../../..', import.meta.url).pathname);
 const ensurePlaywright = path.join(repoRoot, 'skills/e2e/scripts/ensure-playwright.mjs');
+const checkRuntime = path.join(repoRoot, 'skills/e2e/scripts/check-ui-runtime.mjs');
 
 function makeDir() {
   return fs.mkdtempSync(path.join(os.tmpdir(), 'e2e-playwright-tooling-'));
@@ -48,4 +49,31 @@ test('ensure-playwright finds an existing Playwright package from PLAYWRIGHT_NOD
   assert.equal(parsed.status, 'ready');
   assert.equal(parsed.version, '1.2.3-test');
   assert.equal(parsed.nodeModuleDir, moduleDir);
+});
+
+test('check-ui-runtime reports Node and npm preflight details', () => {
+  const result = spawnSync('node', [checkRuntime, '--root', makeDir()], {
+    encoding: 'utf8',
+  });
+  assert.equal(result.status, 0, result.stdout + result.stderr);
+  const parsed = JSON.parse(result.stdout);
+  assert.equal(parsed.status, 'ready');
+  assert.ok(parsed.nodes.some((node) => node.status === 'ready' && node.version));
+  assert.equal(parsed.npmIgnoreScripts.status, 'ready');
+});
+
+test('check-ui-runtime fails before E2E when a requested native module is unavailable', () => {
+  const result = spawnSync('node', [
+    checkRuntime,
+    '--root',
+    makeDir(),
+    '--native-module',
+    'definitely-not-installed-native-e2e-module',
+  ], {
+    encoding: 'utf8',
+  });
+  assert.notEqual(result.status, 0);
+  const parsed = JSON.parse(result.stdout);
+  assert.equal(parsed.status, 'failed');
+  assert.equal(parsed.nativeModules[0].status, 'failed');
 });
