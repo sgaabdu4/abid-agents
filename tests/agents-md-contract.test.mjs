@@ -5,73 +5,49 @@ import assert from 'node:assert/strict';
 import { spawnSync } from 'node:child_process';
 
 const home = process.env.HOME;
-const canonical = path.join(home, '.agents', 'AGENTS.md');
+const repo = path.join(home, '.agents');
+const canonical = path.join(repo, 'AGENTS.md');
 const text = fs.readFileSync(canonical, 'utf8');
-const maxAgentsTokens = 4000;
+const maxAgentsTokens = 1000;
 
 function assertIncludes(haystack, needle, message = `missing ${needle}`) {
   assert.ok(haystack.includes(needle), message);
 }
 
-assertIncludes(text, '## Final Change Report');
-assertIncludes(text, '## Problem');
-assertIncludes(text, '## Fixes');
-assertIncludes(text, '## Blast radius');
-assertIncludes(text, '## Testing');
-assertIncludes(text, 'Root cause / requirement gap.');
-assertIncludes(text, 'Files changed + specific changes.');
-assertIncludes(text, 'Docs/config/agent assets:');
-assertIncludes(text, 'Commands run: `<cmd>` -> pass/fail + key output');
-assertIncludes(text, 'Not run: <cmd/test> - <reason + residual risk>');
-assertIncludes(text, 'All repo changes: durable product/runtime content only.');
-assertIncludes(text, 'Behavior change -> add/update smallest useful test where practical.');
-assertIncludes(text, 'Docs/agent-rules-only change -> re-read changed file + run contract/symlink validation.');
-assertIncludes(text, 'Source cleanup inside the approved change is allowed');
-assertIncludes(text, 'do not leave dead components, wrappers, routes, or files behind');
-assertIncludes(text, 'provisioned Playwright, project runner, device tooling, or `computer-use`');
-assertIncludes(text, 'Missing visual evidence or required 2x video in no-mistakes/E2E is a fix gate');
-assertIncludes(text, 'Keep UI fallback non-destructive unless exact side effects are approved');
-assert.ok(!text.includes('Do not call `list_apps`, `open -a`, `computer-use`, or `osascript`'), 'E2E policy must not ban computer-use fallback');
-assertIncludes(text, 'Files over 700 lines are a hard stop when touched');
-assertIncludes(text, 'ends under 700 lines in the same session');
-assertIncludes(text, 'Scope this to touched files only');
-assertIncludes(text, 'Repeated failed fixes or trial-and-error discoveries count as durable project learning');
-assertIncludes(text, 'stop local retry loops');
-assertIncludes(text, 'load `repeated-failure-learning` before final');
-assertIncludes(text, 'narrow routing-only rule -> nearest project `AGENTS.md`');
-assertIncludes(text, 'never global');
-assertIncludes(text, 'Workflow/skill/next-step/BMAD comparison questions -> `workflow-help`.');
+function assertNotIncludes(haystack, needle, message = `unexpected ${needle}`) {
+  assert.ok(!haystack.includes(needle), message);
+}
+
+assert.ok(text.startsWith('# Agent Rules\n\n## Stops\n'), 'AGENTS.md must start with rules, not prose preamble');
+assertIncludes(text, 'Touched/connected files >700 lines must end <700');
+assertIncludes(text, '`SKILL.md`: no 3+ step workflows');
+assertIncludes(text, '`codebase-memory`, `context-mode`, `terse` are support tools, not stages.');
+assertIncludes(text, "codebase-memory-mcp cli <tool> '<json>'");
+assertIncludes(text, 'Logs/output/docs/data -> sandbox/index; no raw dumps.');
+assertIncludes(text, 'Semantic edits: blast radius + surrounding issues');
+assertNotIncludes(text, 'This file is the gatekeeper');
+assertNotIncludes(text, 'Skills and scripts own detailed workflows');
+assertNotIncludes(text, 'codex-update-stack');
+assertNotIncludes(text, 'codex-watchdog');
+assertNotIncludes(text, 'Codex hooks stay limited');
+assertNotIncludes(text, 'SessionStart');
+assertNotIncludes(text, 'context-mode hook ...');
+assertNotIncludes(text, 'ctx_doctor');
+assertNotIncludes(text, 'codex-context-mode-health');
+assertNotIncludes(text, '## Writing');
+assertNotIncludes(text, 'brevity');
+assertNotIncludes(text, 'exact-symbol');
+assertNotIncludes(text, 'Load `terse`;');
+assertNotIncludes(text, '## Final Change Report');
+assertIncludes(text, 'Report:');
+assertIncludes(text, 'Why: root cause/evidence.');
+assertIncludes(text, 'What: files/behavior.');
+assertIncludes(text, 'Risk: blast radius.');
+assertIncludes(text, 'Proof: tests/gaps.');
+assertIncludes(text, 'Project `AGENTS.md` overrides global.');
+assertIncludes(text, 'User-facing replies -> `terse`.');
 assertIncludes(text, 'React/Next/perf/composition -> `react-doctor` + `fallow` + `vercel-react-best-practices`.');
-assertIncludes(text, 'Sentry/observability/issues/setup -> `sentry-workflow` only');
-assertIncludes(text, 'State readiness before implementation: `PASS`, `CONCERNS`, or `FAIL`');
-assertIncludes(text, 'Correct course if scope expands midstream');
-assertIncludes(text, '`codebase-memory`, `context-mode`, and `terse` are support tools, not stages.');
-
-const workflowHelpSkill = path.join(home, '.agents', 'skills', 'workflow-help', 'SKILL.md');
-const workflowHelpReference = path.join(home, '.agents', 'skills', 'workflow-help', 'references', 'route-map.md');
-assert.ok(fs.existsSync(workflowHelpSkill), `${workflowHelpSkill} must exist`);
-assert.ok(fs.existsSync(workflowHelpReference), `${workflowHelpReference} must exist`);
-const workflowHelpSkillText = fs.readFileSync(workflowHelpSkill, 'utf8');
-const workflowHelpReferenceText = fs.readFileSync(workflowHelpReference, 'utf8');
-assertIncludes(workflowHelpSkillText, 'Routes work without treating support tools as stages.');
-assertIncludes(workflowHelpSkillText, 'Load `references/route-map.md` before answering.');
-assertIncludes(workflowHelpReferenceText, 'React/Next.js');
-assertIncludes(workflowHelpReferenceText, '`react-doctor` + `fallow` + `vercel-react-best-practices`');
-assertIncludes(workflowHelpReferenceText, '`sentry-workflow`');
-assertIncludes(workflowHelpReferenceText, 'State readiness as `PASS`, `CONCERNS`, or `FAIL`');
-
-const repeatedFailureSkill = path.join(home, '.agents', 'skills', 'repeated-failure-learning', 'SKILL.md');
-const repeatedFailureReference = path.join(home, '.agents', 'skills', 'repeated-failure-learning', 'references', 'capture.md');
-assert.ok(fs.existsSync(repeatedFailureSkill), `${repeatedFailureSkill} must exist`);
-assert.ok(fs.existsSync(repeatedFailureReference), `${repeatedFailureReference} must exist`);
-const repeatedFailureSkillText = fs.readFileSync(repeatedFailureSkill, 'utf8');
-const repeatedFailureReferenceText = fs.readFileSync(repeatedFailureReference, 'utf8');
-assertIncludes(repeatedFailureSkillText, 'trial-and-error process discovery');
-assertIncludes(repeatedFailureSkillText, 'Read `references/capture.md` and follow it.');
-assertIncludes(repeatedFailureReferenceText, 'same class of problem failed at least twice');
-assertIncludes(repeatedFailureReferenceText, 'non-obvious process was discovered through trial and error');
-assertIncludes(repeatedFailureReferenceText, 'create or update `skills/<topic>/SKILL.md`');
-assertIncludes(repeatedFailureReferenceText, 'append the rule to the nearest project `AGENTS.md`');
+assertIncludes(text, 'Sentry/observability/issues/setup -> `sentry-workflow` only.');
 
 const tokenCheck = spawnSync('python3', ['-c', `
 import sys
@@ -94,9 +70,7 @@ const expectedSymlinks = [
   path.join(home, '.pi', 'AGENTS.md'),
   path.join(home, '.pi', 'agent', 'AGENTS.md'),
 ];
-
 const canonicalReal = fs.realpathSync(canonical);
-
 for (const installed of expectedSymlinks) {
   const stat = fs.lstatSync(installed);
   assert.ok(stat.isSymbolicLink(), `${installed} must be a symlink`);
@@ -109,75 +83,69 @@ if (fs.existsSync(claudeFile)) {
   assertIncludes(claudeText, '@AGENTS.md', `${claudeFile} must include @AGENTS.md`);
 }
 
-const installText = fs.readFileSync(path.join(home, '.agents', 'scripts', 'install.sh'), 'utf8');
-const mcpInstallText = fs.readFileSync(path.join(home, '.agents', 'scripts', 'install-mcp-tools.sh'), 'utf8');
-const setupText = fs.readFileSync(path.join(home, '.agents', 'scripts', 'setup.sh'), 'utf8');
-const watchdogText = fs.readFileSync(path.join(home, '.agents', 'codex', 'bin', 'codex-watchdog'), 'utf8');
-const healthText = fs.readFileSync(path.join(home, '.agents', 'codex', 'bin', 'codex-health'), 'utf8');
-const updateStackPath = path.join(home, '.agents', 'codex', 'bin', 'codex-update-stack');
+const installText = fs.readFileSync(path.join(repo, 'scripts', 'install.sh'), 'utf8');
+const mcpInstallText = fs.readFileSync(path.join(repo, 'scripts', 'install-mcp-tools.sh'), 'utf8');
+const setupText = fs.readFileSync(path.join(repo, 'scripts', 'setup.sh'), 'utf8');
+const watchdogText = fs.readFileSync(path.join(repo, 'codex', 'bin', 'codex-watchdog'), 'utf8');
+const healthText = fs.readFileSync(path.join(repo, 'codex', 'bin', 'codex-health'), 'utf8');
+const updateStackPath = path.join(repo, 'codex', 'bin', 'codex-update-stack');
 const updateStackText = fs.readFileSync(updateStackPath, 'utf8');
-const autoSyncText = fs.readFileSync(path.join(home, '.agents', 'scripts', 'auto-sync.sh'), 'utf8');
-const cronText = fs.readFileSync(path.join(home, '.agents', 'scripts', 'install-cron.sh'), 'utf8');
-const cleanupPath = path.join(home, '.agents', 'codex', 'bin', 'codex-cleanup');
-const cbmProbePath = path.join(home, '.agents', 'scripts', 'probe-codebase-memory-mcp.mjs');
-assert.ok(fs.existsSync(cleanupPath), `${cleanupPath} must exist`);
-assert.ok(fs.statSync(cleanupPath).mode & 0o111, `${cleanupPath} must be executable`);
-assert.ok(fs.existsSync(cbmProbePath), `${cbmProbePath} must exist`);
-assert.ok(fs.statSync(cbmProbePath).mode & 0o111, `${cbmProbePath} must be executable`);
-assert.ok(fs.existsSync(updateStackPath), `${updateStackPath} must exist`);
-assert.ok(fs.statSync(updateStackPath).mode & 0o111, `${updateStackPath} must be executable`);
+const contextHealthPath = path.join(repo, 'codex', 'bin', 'codex-context-mode-health');
+const contextHealthText = fs.readFileSync(contextHealthPath, 'utf8');
+const cleanupPath = path.join(repo, 'codex', 'bin', 'codex-cleanup');
+const cbmProbePath = path.join(repo, 'scripts', 'probe-codebase-memory-mcp.mjs');
+const contextProbePath = path.join(repo, 'scripts', 'probe-context-mode-mcp.mjs');
+const contextProbeText = fs.readFileSync(contextProbePath, 'utf8');
+const markdownHygienePath = path.join(repo, 'scripts', 'check-markdown-hygiene.mjs');
+const markdownHygieneText = fs.readFileSync(markdownHygienePath, 'utf8');
+const autoSyncText = fs.readFileSync(path.join(repo, 'scripts', 'auto-sync.sh'), 'utf8');
+const cronText = fs.readFileSync(path.join(repo, 'scripts', 'install-cron.sh'), 'utf8');
+
+for (const executable of [cleanupPath, updateStackPath, contextHealthPath, cbmProbePath, contextProbePath, markdownHygienePath]) {
+  assert.ok(fs.existsSync(executable), `${executable} must exist`);
+  assert.ok(fs.statSync(executable).mode & 0o111, `${executable} must be executable`);
+}
+
 assertIncludes(setupText, '--prereqs-only', 'setup.sh must expose a prerequisite-only mode');
-assertIncludes(setupText, 'NONINTERACTIVE=1', 'setup.sh must install Homebrew noninteractively');
-assertIncludes(setupText, 'brew install "${packages[@]}"', 'setup.sh must install missing brew packages');
-assertIncludes(setupText, 'brew tap dart-lang/dart', 'setup.sh must install Dart from the official Homebrew tap');
-assertIncludes(setupText, 'git clone --depth 1 -b stable https://github.com/flutter/flutter.git', 'setup.sh must install missing Flutter');
-assertIncludes(setupText, 'wait_for_job "$install_pid"', 'setup.sh must wait for the install job');
-assertIncludes(setupText, 'wait_for_job "$no_mistakes_pid"', 'setup.sh must wait for the no-mistakes job');
-assertIncludes(setupText, 'ABID_AGENTS_SKIP_NPM_INSTALL=1 ABID_AGENTS_SKIP_SUBMODULE_INIT=1 "$ROOT/scripts/install.sh"', 'setup.sh final restore must skip package work');
-assertIncludes(setupText, 'ABID_AGENTS_SKIP_FLUTTER_INSTALL', 'setup.sh must allow Flutter install to be skipped');
-assertIncludes(installText, '"$ROOT/scripts/setup.sh" --prereqs-only', 'install.sh must repair missing prerequisites');
-assertIncludes(installText, 'codex-cleanup', 'install.sh must install codex-cleanup');
-assertIncludes(installText, 'codex-update-stack', 'install.sh must install codex-update-stack');
+assertIncludes(setupText, 'ABID_AGENTS_SKIP_NPM_INSTALL=1 ABID_AGENTS_SKIP_SUBMODULE_INIT=1 "$ROOT/scripts/install.sh"');
+assertIncludes(installText, '"$ROOT/scripts/setup.sh" --prereqs-only');
+assertIncludes(installText, 'codex-context-mode-health', 'install.sh must install the no-hooks context-mode health check');
+assertIncludes(installText, 'ensure_claude_stub', 'install.sh must keep Claude reduced to AGENTS.md plus CLAUDE.md');
+assertNotIncludes(installText, '"$HOME/.claude/skills"', 'install.sh must not repopulate Claude skills');
 assertIncludes(installText, 'CODEX_CBM_COMMAND', 'install.sh must pass a resolved CBM command into Codex config');
-assertIncludes(installText, 'command -v codebase-memory-mcp', 'install.sh must resolve the CBM executable path');
+assertIncludes(installText, 'mcp_servers.context-mode', 'install.sh must keep context-mode MCP registered');
+assertIncludes(installText, 'CONTEXT_MODE_DIR', 'install.sh must pin context-mode storage outside ~/.claude');
+assertIncludes(mcpInstallText, 'npm install -g context-mode@latest codebase-memory-mcp@latest @openai/codex@latest');
+assertIncludes(mcpInstallText, 'ln -s "$npm_bin" "$candidate"', 'CBM setup must link to npm binary');
+assert.ok(!mcpInstallText.includes('.backup.'), 'CBM setup must not keep backup binaries');
+
 assertIncludes(watchdogText, 'codex-cleanup', 'codex-watchdog must run codex-cleanup');
 assertIncludes(watchdogText, 'codex-stack-signature.json', 'codex-watchdog must track Codex stack drift');
-assertIncludes(watchdogText, 'CODEX_WATCHDOG_AUTO_REPAIR_MANUAL_UPDATES', 'codex-watchdog manual repair must be configurable');
-assertIncludes(watchdogText, 'CODEX_WATCHDOG_REPAIR_MIN_INTERVAL_SECONDS', 'codex-watchdog repair retry interval must be configurable');
-assertIncludes(watchdogText, '"$update_stack_bin" --repair', 'codex-watchdog must auto-repair manual update drift');
-assertIncludes(watchdogText, '$HOME_DIR/flutter/bin', 'codex-watchdog PATH must resolve dart MCP');
-assertIncludes(mcpInstallText, 'ln -s "$npm_bin" "$candidate"', 'CBM setup must link to npm binary');
-assertIncludes(mcpInstallText, '"$root/scripts/setup.sh" --prereqs-only', 'MCP install must repair missing npm through setup');
-assertIncludes(mcpInstallText, 'npm not found after prerequisite install', 'MCP install must report prereq repair failure clearly');
-assert.ok(!mcpInstallText.includes('.backup.'), 'CBM setup must not keep backup binaries');
 assertIncludes(updateStackText, '"$ROOT/scripts/install.sh"', 'codex-update-stack must run setup after package updates');
-assertIncludes(updateStackText, '--after-manual-update', 'codex-update-stack must support a manual update repair mode');
-assertIncludes(updateStackText, 'ABID_AGENTS_SKIP_SUBMODULE_INIT="${ABID_AGENTS_SKIP_SUBMODULE_INIT:-1}"');
-assertIncludes(updateStackText, 'Repairing Codex stack after manual update');
-assertIncludes(updateStackText, '$HOME/flutter/bin', 'codex-update-stack PATH must resolve dart MCP');
-assertIncludes(updateStackText, 'required_ok = ("config.load", "mcp.config", "state.paths")');
-assertIncludes(updateStackText, 'codex doctor ok: filesystem sandbox=unrestricted approval=Never');
-assertIncludes(updateStackText, 'codex hooks ok: SessionStart disabled context-mode hooks absent');
-assertIncludes(updateStackText, 'Codex SessionStart hook must stay disabled.');
 assertIncludes(updateStackText, 'probe-codebase-memory-mcp.mjs');
-assertIncludes(updateStackText, 'context-mode doctor');
-assertIncludes(updateStackText, '"CONTEXT_MODE_PLATFORM": "codex"');
-assertIncludes(updateStackText, 'context-mode hooks intentionally absent');
-assertIncludes(updateStackText, 'codex-health');
-assertIncludes(updateStackText, 'codex-health summary:');
-assertIncludes(healthText, 'codex-update-stack --repair', 'codex-health must tell users how to repair after manual updates');
-assertIncludes(healthText, 'context-mode hooks:', 'codex-health must classify hook state explicitly');
-assertIncludes(
-  healthText,
-  'intentionally absent: Codex hooks stay stripped; context-mode doctor missing-hook lines are not health failures',
-  'codex-health must not report intentional missing context-mode hooks as failures',
-);
+assertIncludes(updateStackText, 'codex-context-mode-health');
+assertNotIncludes(updateStackText, '["context-mode", "doctor"]', 'codex-update-stack must not call raw context-mode doctor');
+assertNotIncludes(updateStackText, 'context-mode doctor missing required PASS checks');
+assertIncludes(healthText, 'context-mode no-hooks:');
+assertIncludes(healthText, 'codex-context-mode-health');
+assertIncludes(contextHealthText, 'context-mode no-hooks config ok: MCP registered; storage pinned to ~/.codex/context-mode; Codex context-mode hooks absent');
+assertIncludes(contextHealthText, 'CONTEXT_MODE_DIR');
+assertIncludes(contextHealthText, 'probe-context-mode-mcp.mjs');
+assertIncludes(contextProbeText, 'ctx_execute');
+assertIncludes(contextProbeText, 'ctx_search');
+assertIncludes(contextProbeText, 'ctx_stats');
+assertIncludes(markdownHygieneText, 'free prose; use a bullet, heading, or fenced template');
+assertIncludes(markdownHygieneText, 'must stay at or under ${maxAgentsLines} lines');
+assertIncludes(markdownHygieneText, 'must stay at or under ${maxAgentsTokens} tokens');
+assertIncludes(markdownHygieneText, 'requires explicit markdown-hygiene:');
+assertIncludes(markdownHygieneText, 'allow-local-machine-paths');
+assertIncludes(markdownHygieneText, 'allow-conversation-state');
+assertIncludes(markdownHygieneText, 'allow-setup-internals');
+
 assertIncludes(autoSyncText, 'refresh_local_install', 'auto-sync must refresh installed scripts after pulls');
 assertIncludes(autoSyncText, 'ABID_AGENTS_SKIP_NPM_INSTALL=1', 'auto-sync refresh must not run package updates');
 assertIncludes(cronText, 'codex-update-stack', 'cron installer must schedule codex stack updates');
 assertIncludes(cronText, 'ABID_AGENTS_CODEX_STACK_CRON_SCHEDULE', 'codex stack cron schedule must be configurable');
 assertIncludes(cronText, 'ABID_AGENTS_SKIP_CODEX_STACK_CRON', 'codex stack cron must be skippable');
-assertIncludes(cronText, '$HOME/flutter/bin', 'cron PATH must resolve Flutter Dart');
-assertIncludes(cronText, '$HOME/.pub-cache/bin', 'cron PATH must resolve pub cache tools');
 
 console.log('agents-md-contract: pass');

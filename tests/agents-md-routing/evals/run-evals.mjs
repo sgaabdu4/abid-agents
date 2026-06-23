@@ -26,7 +26,7 @@ const policyFiles = [
   'skills/workflow-help/references/route-map.md',
 ];
 
-const policyDigestPattern = /workflow-help|grill-me|to-prd|to-issues|readiness|PASS|CONCERNS|FAIL|correct course|scope expands|codebase-memory|context-mode|support tools|not stages|react-doctor|fallow|vercel-react-best-practices|sentry-workflow|sentry-cli|sentry-sdk-setup|sentry-feature-setup|e2e|real UI|screenshots|events|regression command|thermo-nuclear-code-quality-review|maintainability|no-mistakes|committed|BMAD|menu codes|Treehouse/i;
+const policyDigestPattern = /workflow-help|grill-me|to-prd|to-issues|readiness|PASS|CONCERNS|FAIL|correct course|scope expands|codebase-memory|context-mode|support tools|not stages|react-doctor|fallow|vercel-react-best-practices|sentry-workflow|sentry-cli|sentry-sdk-setup|sentry-feature-setup|e2e|real UI|screenshots|events|regression command|thermo-nuclear-code-quality-review|maintainability|no-mistakes|committed|BMAD|menu codes|Treehouse|700|blast radius|surrounding issues|Report:|Why:|What:|Risk:|Proof:/i;
 
 const policyText = policyFiles
   .map((rel) => {
@@ -75,6 +75,13 @@ const keyDefinitions = [
   'usesNoMistakesBeforeImplementation: incorrectly starts no-mistakes before implementation proof',
   'mapsBmadToLocalSkills: maps BMAD-style requests to local skills and workflow names',
   'usesBmadMenuCodes: follows BMAD persona/menu codes as local workflow commands',
+  'requires700LineSplit: requires touched or connected files over 700 lines to be split below 700 lines',
+  'skips700LineSplit: incorrectly leaves a touched or connected file over 700 lines unchanged',
+  'requiresBlastRadius: requires semantic changes to include blast radius analysis',
+  'fixesSurroundingIssues: requires surrounding issues found in blast radius to be fixed',
+  'skipsBlastRadius: incorrectly allows semantic edits without blast radius analysis',
+  'usesCompactReportTemplate: reports using Why, What, Risk, and Proof fields',
+  'usesLongReportTemplate: incorrectly reports using the old long Problem/Fixes/Blast radius/Testing template',
 ].join('\n');
 
 if (requestedCases && cases.length !== requestedCases.size) {
@@ -224,4 +231,3 @@ for (const result of results) {
   console.log(`${result.passed ? 'PASS' : 'FAIL'} ${result.id}${result.errors.length ? `: ${result.errors.join('; ')}` : ''}`);
 }
 process.exit(summary.passed === summary.total ? 0 : 1);
-

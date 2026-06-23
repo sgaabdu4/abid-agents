@@ -20,4 +20,5 @@ Use for every user-facing reply.
 - Expand for destructive actions, security or data-loss risk, ambiguity, or requested walkthroughs.
 - Use arrows or equals only when they clarify cause or equivalence.
 - If evidence is missing, say what is unknown.
+- In Markdown files, remove setup notes, conversation state, explanations, and duplicated skill details unless that file explicitly owns them.
 - Read `human-writing.md` only for paste-ready artifacts.

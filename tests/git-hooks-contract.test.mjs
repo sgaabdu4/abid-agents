@@ -16,6 +16,7 @@ const codexHealth = fs.readFileSync(path.join(repo, 'codex', 'bin', 'codex-healt
 
 assert.ok(installScript.includes('install_hook post-merge'), 'installer must create post-merge hook');
 assert.ok(installScript.includes('install_hook post-rewrite'), 'installer must create post-rewrite hook for pull --rebase');
+assert.ok(installScript.includes('install_hook pre-commit'), 'installer must create pre-commit hook');
 assert.ok(installScript.includes('install_hook pre-push'), 'installer must create pre-push hook');
 assert.ok(
   installScript.includes('hooks_dir="$ROOT/$hooks_dir"'),
@@ -35,6 +36,10 @@ assert.ok(installScript.includes('replace_with_link_file "$ROOT/AGENTS.md" "$HOM
 assert.ok(installScript.includes('replace_with_link_file "$ROOT/AGENTS.md" "$HOME/.copilot/AGENTS.md"'), 'installer must link Copilot AGENTS.md to the canonical file');
 assert.ok(installScript.includes('replace_with_link_file "$ROOT/AGENTS.md" "$HOME/.pi/AGENTS.md"'), 'installer must link Pi AGENTS.md to the canonical file');
 assert.ok(!installScript.includes('install_managed_block'), 'installer must not install copied AGENTS.md managed blocks');
+assert.ok(installScript.includes('scripts/check-markdown-hygiene.mjs'), 'pre-commit hook must run Markdown hygiene');
+assert.ok(installScript.includes('Blocked commit: staged files over 700 lines must be split below 700.'), 'pre-commit hook must block staged files over 700 lines');
+assert.ok(installScript.includes("':!scripts/check-markdown-hygiene.mjs'"), 'pre-commit private-path scan must not flag the checker pattern');
+assert.ok(installScript.includes("':!tests/markdown-hygiene.test.mjs'"), 'pre-commit private-path scan must not flag the hygiene test fixture');
 assert.ok(installScript.includes('Preserving existing file'), 'installer must preserve existing non-managed config files');
 assert.ok(!installScript.includes('rm "$target"'), 'installer must not remove existing linked targets');
 assert.ok(setupScript.includes('git clone --recurse-submodules'), 'new-user setup must clone with submodules');
@@ -96,6 +101,18 @@ if (fs.existsSync(prePushHook)) {
   assert.ok((stat.mode & 0o111) !== 0, 'installed pre-push hook must be executable');
   assert.ok(text.includes('ABID_AGENTS_CHECK_SUBMODULES_BEFORE_PUSH'), 'installed pre-push hook must keep submodule status opt-in');
   assert.ok(text.includes('Blocked push: reachable git history contains private path or secret-like references.'));
+}
+
+const preCommitHook = path.join(repo, '.git', 'hooks', 'pre-commit');
+if (fs.existsSync(preCommitHook)) {
+  const stat = fs.statSync(preCommitHook);
+  const text = fs.readFileSync(preCommitHook, 'utf8');
+  assert.ok((stat.mode & 0o111) !== 0, 'installed pre-commit hook must be executable');
+  assert.ok(text.includes('scripts/check-markdown-hygiene.mjs'), 'installed pre-commit hook must run Markdown hygiene');
+  assert.ok(text.includes('Blocked commit: staged files over 700 lines must be split below 700.'), 'installed pre-commit hook must block staged files over 700 lines');
+  assert.ok(text.includes("':!scripts/check-markdown-hygiene.mjs'"), 'installed pre-commit hook must ignore checker pattern file');
+  assert.ok(text.includes("':!tests/markdown-hygiene.test.mjs'"), 'installed pre-commit hook must ignore test fixture pattern file');
+  assert.ok(text.includes('Blocked commit: staged content contains private project/local path references.'));
 }
 
 const postRewriteHook = path.join(repo, '.git', 'hooks', 'post-rewrite');

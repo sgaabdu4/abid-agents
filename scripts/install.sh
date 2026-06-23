@@ -98,6 +98,7 @@ install_codex_watchdog() {
   old_launch_label="com.abid.codex-watchdog"
   install_managed_executable "$ROOT/codex/bin/codex-watchdog" "$codex_bin/codex-watchdog"
   install_managed_executable "$ROOT/codex/bin/codex-health" "$codex_bin/codex-health"
+  install_managed_executable "$ROOT/codex/bin/codex-context-mode-health" "$codex_bin/codex-context-mode-health"
   install_managed_executable "$ROOT/codex/bin/codex-cleanup" "$codex_bin/codex-cleanup"
   install_managed_executable "$ROOT/codex/bin/codex-update-stack" "$codex_bin/codex-update-stack"
 
@@ -229,7 +230,10 @@ ensure_top_level([
 ensure_section("features", [("hooks", "true")])
 ensure_section("mcp_servers.codebase-memory-mcp", [("command", json.dumps(cbm_command))])
 ensure_section("mcp_servers.context-mode", [("command", '"context-mode"')])
-ensure_section("mcp_servers.context-mode.env", [("CONTEXT_MODE_PLATFORM", '"codex"')])
+ensure_section("mcp_servers.context-mode.env", [
+    ("CONTEXT_MODE_PLATFORM", '"codex"'),
+    ("CONTEXT_MODE_DIR", json.dumps(str(Path.home() / ".codex" / "context-mode"))),
+])
 ensure_section("mcp_servers.dart", [
     ("command", '"dart"'),
     ("args", '["mcp-server", "--force-roots-fallback"]'),
@@ -273,6 +277,12 @@ PY
   done
 }
 
+ensure_claude_stub() {
+  local claude_file="$HOME/.claude/CLAUDE.md"
+  mkdir -p "$(dirname "$claude_file")"
+  printf '@AGENTS.md\n' >"$claude_file"
+}
+
 replace_with_link_file "$ROOT/AGENTS.md" "$HOME/.codex/AGENTS.md"
 preserve_or_link_file "$ROOT/mcp-config.json" "$HOME/.codex/mcp-config.json"
 install_codex_hooks_config
@@ -281,6 +291,7 @@ ensure_context_mode_read_permissions
 node "$ROOT/scripts/strip-context-mode-hooks.mjs" >/dev/null
 install_codex_watchdog
 replace_with_link_file "$ROOT/AGENTS.md" "$HOME/.claude/AGENTS.md"
+ensure_claude_stub
 replace_with_link_file "$ROOT/AGENTS.md" "$HOME/.copilot/AGENTS.md"
 replace_with_link_file "$ROOT/AGENTS.md" "$HOME/.pi/AGENTS.md"
 replace_with_link_file "$ROOT/AGENTS.md" "$HOME/.pi/agent/AGENTS.md"
@@ -291,7 +302,7 @@ for skill in "$ROOT"/skills/*; do
     continue
   fi
   name="$(basename "$skill")"
-  for dir in "$HOME/.codex/skills" "$HOME/.claude/skills" "$HOME/.copilot/skills" "$HOME/.pi/skills" "$HOME/.pi/agent/skills"; do
+  for dir in "$HOME/.codex/skills" "$HOME/.copilot/skills" "$HOME/.pi/skills" "$HOME/.pi/agent/skills"; do
     mkdir -p "$dir"
     target="$dir/$name"
     if [[ -L "$target" ]]; then
@@ -403,6 +414,49 @@ fi
 
 if [[ "${ABID_AGENTS_CHECK_SUBMODULES_BEFORE_PUSH:-}" == "1" ]]; then
   "$repo/scripts/update-submodules.sh" --status
+fi
+EOF
+
+  install_hook pre-commit <<'EOF'
+#!/usr/bin/env bash
+# Managed by agent-config installer.
+set -euo pipefail
+
+repo="$(git rev-parse --show-toplevel)"
+if [[ "$(basename "$repo")" != ".agents" ]]; then
+  exit 0
+fi
+
+"$repo/scripts/check-markdown-hygiene.mjs"
+
+pattern='frontline|frontline-fitness|repem|jabal[ -_]?sina|jabal|afenso|/Users/abid|Workspaces/afenso|/Users/abid/Workspaces'
+grep_pathspecs=(. ':!scripts/install.sh' ':!scripts/check-markdown-hygiene.mjs' ':!tests/markdown-hygiene.test.mjs')
+
+if git diff --cached --quiet --exit-code; then
+  exit 0
+fi
+
+oversized=""
+while IFS= read -r file; do
+  lines="$(git show ":$file" 2>/dev/null | wc -l | tr -d ' ')"
+  if [[ "$lines" =~ ^[0-9]+$ && "$lines" -gt 700 ]]; then
+    oversized="${oversized}${oversized:+$'\n'}${file}:${lines}"
+  fi
+done < <(git diff --cached --name-only --diff-filter=ACMR)
+
+if [[ -n "$oversized" ]]; then
+  printf '%s\n' "Blocked commit: staged files over 700 lines must be split below 700."
+  printf '%s\n' "$oversized"
+  exit 1
+fi
+
+matches="$(git grep --cached -n -i -E "$pattern" -- "${grep_pathspecs[@]}" || true)"
+
+if [[ -n "$matches" ]]; then
+  printf '%s\n' "Blocked commit: staged content contains private project/local path references."
+  printf '%s\n' "Remove or generalize these before committing:"
+  printf '%s\n' "$matches"
+  exit 1
 fi
 EOF
 fi

@@ -60,7 +60,24 @@
       "prompt": "Use BMAD style and run PRD, DS, QA, then dev using those menu codes.",
       "expectTrue": ["mapsBmadToLocalSkills"],
       "expectFalse": ["usesBmadMenuCodes"]
+    },
+    {
+      "id": "large_file_split_gate",
+      "prompt": "I need to wire a route into an existing 820-line controller. Can we just connect it and move on?",
+      "expectTrue": ["requires700LineSplit"],
+      "expectFalse": ["skips700LineSplit"]
+    },
+    {
+      "id": "semantic_change_blast_radius",
+      "prompt": "Change the user status enum and update the API behavior. What else is required before the fix is done?",
+      "expectTrue": ["requiresBlastRadius", "fixesSurroundingIssues"],
+      "expectFalse": ["skipsBlastRadius"]
+    },
+    {
+      "id": "compact_report_template",
+      "prompt": "After editing config docs, how should the final change report be shaped?",
+      "expectTrue": ["usesCompactReportTemplate"],
+      "expectFalse": ["usesLongReportTemplate"]
     }
   ]
 }
-
