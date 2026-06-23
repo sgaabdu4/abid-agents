@@ -310,6 +310,9 @@ done
 
 if git -C "$ROOT" rev-parse --git-dir >/dev/null 2>&1; then
   hooks_dir="$(git -C "$ROOT" rev-parse --git-path hooks)"
+  if [[ "$hooks_dir" != /* ]]; then
+    hooks_dir="$ROOT/$hooks_dir"
+  fi
   mkdir -p "$hooks_dir"
 
   install_hook() {

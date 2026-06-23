@@ -20,6 +20,8 @@ TOON to stdout and progress to stderr.
 - If another branch has an active run, leave it alone.
 - If the repo is not initialized, follow the tool's `no-mistakes init` guidance.
 - If the command is missing or unhealthy, run `no-mistakes doctor`.
+- If setup reports `Directory not empty`, keep the existing repo state and follow
+  the tool's recovery guidance instead of deleting or recreating it.
 - Never run the pipeline from the default branch for new shipping work.
 
 ## Intent
@@ -100,3 +102,5 @@ At the end, include:
 - Pipeline findings and fixes, especially fixes your original change missed.
 - Verification commands and their pass/fail status.
 - Any skipped checks and residual risk.
+
+For local skill-behavior proof, run scenarios serially with `codex exec -m gpt-5.4-mini` and report the pass/fail summary.

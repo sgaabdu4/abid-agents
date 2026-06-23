@@ -6,8 +6,9 @@ import { pathToFileURL } from 'node:url';
 
 const managedStart = '<!-- nm-pr-evidence:start -->';
 const managedEnd = '<!-- nm-pr-evidence:end -->';
-const localRefPattern = /\/Users\/|\/var\/folders\/|no-mistakes-evidence|127\.0\.0\.1|localhost|local file|file:/i;
+const localRefPattern = /\/Users\/|\/var\/folders\/|\/tmp\/|no-mistakes-evidence|127\.0\.0\.1|localhost|local file|file:/i;
 const imagePathPattern = /(?:\/Users\/|\/var\/folders\/|\/tmp\/|\/private\/var\/folders\/)[^<>"'`)\s]+?\.(?:png|jpe?g|gif|webp)/gi;
+const videoPathPattern = /(?:\/Users\/|\/var\/folders\/|\/tmp\/|\/private\/var\/folders\/)[^<>"'`)\s]+?\.(?:mp4|mov|m4v|webm)/gi;
 
 function run(command, args, options = {}) {
   const result = spawnSync(command, args, {
@@ -29,7 +30,9 @@ export function parseArgs(argv) {
     repo: null,
     dryRun: false,
     checkReviewThreads: false,
+    e2eVideoRequired: false,
     screenshots: [],
+    videos: [],
   };
 
   for (let index = 0; index < argv.length; index += 1) {
@@ -37,6 +40,9 @@ export function parseArgs(argv) {
     if (arg === '--pr') options.pr = argv[++index];
     else if (arg === '--repo') options.repo = argv[++index];
     else if (arg === '--screenshots') options.screenshots.push(argv[++index]);
+    else if (arg === '--videos') options.videos.push(argv[++index]);
+    else if (arg === '--video') options.videos.push(argv[++index]);
+    else if (arg === '--e2e-video-required') options.e2eVideoRequired = true;
     else if (arg === '--dry-run') options.dryRun = true;
     else if (arg === '--check-review-threads') options.checkReviewThreads = true;
     else throw new Error(`Unknown argument: ${arg}`);
@@ -51,6 +57,27 @@ export function extractLocalImagePaths(body) {
 
 export function extractHostedImageMarkdown(body) {
   return [...new Set(body.match(/^!\[[^\]]*\]\(https:\/\/github\.com\/user-attachments\/assets\/[a-z0-9-]+\)$/gim) || [])];
+}
+
+export function extractLocalVideoPaths(body) {
+  return [...new Set(body.match(videoPathPattern) || [])];
+}
+
+export function extractHostedVideoMarkdown(body) {
+  const lines = body.split('\n').filter((line) => {
+    return /(?:2x|e2e|video|recap)/i.test(line)
+      && /https:\/\/github\.com\/user-attachments\/assets\/[a-z0-9-]+/i.test(line);
+  });
+  const markdown = [];
+  for (const line of lines) {
+    const linked = line.match(/(?<!!)\[[^\]]+\]\(https:\/\/github\.com\/user-attachments\/assets\/[a-z0-9-]+\)/gi) || [];
+    markdown.push(...linked);
+    if (linked.length === 0) {
+      const urls = line.match(/https:\/\/github\.com\/user-attachments\/assets\/[a-z0-9-]+/gi) || [];
+      markdown.push(...urls.map((url) => `[2x E2E video](${url})`));
+    }
+  }
+  return [...new Set(markdown)];
 }
 
 function expandScreenshotInputs(inputs) {
@@ -71,6 +98,37 @@ function expandScreenshotInputs(inputs) {
     }
   }
   return [...new Set(files)];
+}
+
+function expandVideoInputs(inputs) {
+  const files = [];
+  for (const input of inputs) {
+    if (!input || /^https:\/\//i.test(input) || /^\[[^\]]+\]\(https:\/\//i.test(input)) continue;
+    if (!fs.existsSync(input)) continue;
+    const stat = fs.statSync(input);
+    if (stat.isDirectory()) {
+      for (const name of fs.readdirSync(input)) {
+        const fullPath = path.join(input, name);
+        if (/\.(?:mp4|mov|m4v|webm)$/i.test(name) && fs.statSync(fullPath).isFile()) {
+          files.push(fullPath);
+        }
+      }
+    } else if (stat.isFile() && /\.(?:mp4|mov|m4v|webm)$/i.test(input)) {
+      files.push(input);
+    }
+  }
+  return [...new Set(files)];
+}
+
+function hostedVideosFromInputs(inputs) {
+  const links = [];
+  for (const input of inputs) {
+    if (!input) continue;
+    const markdown = input.match(/^\[[^\]]+\]\(https:\/\/[^)]+\)$/i);
+    if (markdown) links.push(input);
+    else if (/^https:\/\//i.test(input)) links.push(`[2x E2E video](${input})`);
+  }
+  return [...new Set(links)];
 }
 
 function removeManagedSection(body) {
@@ -104,6 +162,8 @@ export function sanitizeBody(body) {
   let clean = body.replace(/\r\n/g, '\n');
   clean = removeManagedSection(clean);
   clean = removeHeadingSection(clean, 'Screenshots');
+  clean = removeHeadingSection(clean, 'E2E videos');
+  clean = removeHeadingSection(clean, '2x E2E video');
   clean = removeHeadingSectionAlways(clean, 'No-mistakes Warnings Fixed');
   clean = clean.replace(/^Uploading Screen Recording.*$/gim, '');
   clean = removeContaminatedDetails(clean);
@@ -195,6 +255,34 @@ export function screenshotStatusRows({ screenshots, uploadError }) {
   }];
 }
 
+export function videoStatusRows({ videos, localVideos, required }) {
+  if (videos.length > 0) {
+    return [{
+      status: 'Resolved',
+      issue: '2x E2E video attached',
+      evidence: `${videos.length} video link(s) in PR evidence`,
+    }];
+  }
+
+  if (required && localVideos.length > 0) {
+    return [{
+      status: 'Open',
+      issue: '2x E2E video not hosted',
+      evidence: `${localVideos.length} local video artifact(s) found; attach a reviewer-openable 2x video link`,
+    }];
+  }
+
+  if (required) {
+    return [{
+      status: 'Open',
+      issue: 'No 2x E2E video attached',
+      evidence: 'UI or phone E2E requires a reviewer-openable 2x video link in PR evidence',
+    }];
+  }
+
+  return [];
+}
+
 function reviewThreadRowsFromNodes(nodes) {
   if (!Array.isArray(nodes)) {
     return [{
@@ -233,7 +321,7 @@ export function reviewThreadRowsFromGraphql(payload) {
   return reviewThreadRowsFromNodes(payload?.data?.repository?.pullRequest?.reviewThreads?.nodes);
 }
 
-export function buildEvidenceSection({ screenshots, statusRows, uploadError }) {
+export function buildEvidenceSection({ screenshots, videos = [], statusRows, uploadError, e2eVideoRequired = false }) {
   const lines = [managedStart, '## No-mistakes Evidence', ''];
 
   lines.push('### Screenshots', '');
@@ -243,6 +331,15 @@ export function buildEvidenceSection({ screenshots, statusRows, uploadError }) {
     lines.push(`Screenshots were captured, but upload failed: ${uploadError}`, '');
   } else {
     lines.push('No screenshot artifacts were found for this run.', '');
+  }
+
+  if (videos.length > 0 || e2eVideoRequired) {
+    lines.push('### 2x E2E video', '');
+    if (videos.length > 0) {
+      lines.push(...videos, '');
+    } else {
+      lines.push('No reviewer-openable 2x E2E video link was found for this run.', '');
+    }
   }
 
   lines.push('### Issue status', '');
@@ -447,8 +544,16 @@ async function main() {
     ...extractLocalImagePaths(originalBody),
     ...expandScreenshotInputs(options.screenshots),
   ].filter((file) => fs.existsSync(file));
+  const localVideos = [
+    ...extractLocalVideoPaths(originalBody),
+    ...expandVideoInputs(options.videos),
+  ].filter((file) => fs.existsSync(file));
 
   const hostedScreenshots = extractHostedImageMarkdown(originalBody);
+  const hostedVideos = [
+    ...extractHostedVideoMarkdown(originalBody),
+    ...hostedVideosFromInputs(options.videos),
+  ];
   let screenshotMarkdown = [];
   let uploadError = '';
   if (options.dryRun && localScreenshots.length > 0) {
@@ -468,14 +573,21 @@ async function main() {
 
   const statusRows = [
     ...screenshotStatusRows({ screenshots: screenshotMarkdown, uploadError }),
+    ...videoStatusRows({
+      videos: [...new Set(hostedVideos)],
+      localVideos,
+      required: options.e2eVideoRequired,
+    }),
     ...noMistakesStatusRows(),
     ...(options.checkReviewThreads ? githubReviewThreadRows(pr, repoSlug) : []),
     ...noMistakesFixRows(repoSlug),
   ];
   const section = buildEvidenceSection({
     screenshots: screenshotMarkdown,
+    videos: [...new Set(hostedVideos)],
     statusRows,
     uploadError,
+    e2eVideoRequired: options.e2eVideoRequired,
   });
   const newBody = insertEvidenceSection(sanitizeBody(originalBody), section);
 

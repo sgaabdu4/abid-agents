@@ -144,8 +144,8 @@ Use exposed subagent/multi-agent tools only; discover with `tool_search` if need
 - Bugs: reproduce first in user-like flow when feasible; load `diagnosing-bugs` when not isolated.
 - Load `test-quality`; it owns scenarios, real implementation, boundaries, red/mutation proof, and gap audit.
 - Run smallest relevant verification through context-mode. If it fails, fix root cause; never mask, skip, or weaken checks.
-- E2E/product checks: load `e2e`; inspect pixels when a driver works; otherwise use local script/tests. Do not install tooling unless asked.
-- Missing visual evidence in no-mistakes/E2E is a fix gate, not approval; run E2E fallbacks and runtime preflight before accepting artifact limits.
+- E2E/product checks: load `e2e`; inspect pixels when a driver works; UI or phone E2E requires a 2x video artifact; otherwise use local script/tests. Do not install tooling unless asked.
+- Missing visual evidence or required 2x video in no-mistakes/E2E is a fix gate, not approval; run E2E fallbacks and runtime preflight before accepting artifact limits.
 - Docs/agent-rules-only edits: re-read changed file; run contract/symlink validation.
 
 ## UI Design System

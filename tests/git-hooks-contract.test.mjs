@@ -17,6 +17,10 @@ const codexHealth = fs.readFileSync(path.join(repo, 'codex', 'bin', 'codex-healt
 assert.ok(installScript.includes('install_hook post-merge'), 'installer must create post-merge hook');
 assert.ok(installScript.includes('install_hook post-rewrite'), 'installer must create post-rewrite hook for pull --rebase');
 assert.ok(installScript.includes('install_hook pre-push'), 'installer must create pre-push hook');
+assert.ok(
+  installScript.includes('hooks_dir="$ROOT/$hooks_dir"'),
+  'installer must make relative git hook paths repo-absolute for LaunchAgent cwd safety'
+);
 assert.ok(installScript.includes('scripts/update-submodules.sh'), 'installer and hooks must update submodules');
 assert.ok(installScript.includes('config --local pull.rebase false'), 'installer must disable pull rebases for this repo');
 assert.ok(installScript.includes('config --local pull.ff only'), 'installer must force fast-forward-only pulls for this repo');

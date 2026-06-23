@@ -26,9 +26,7 @@ Read `references/pr-evidence.md` before finalizing any PR-backed run.
   consent such as `--yes`.
 - On `checks-passed` or `passed`, report what was validated, what was found,
   and every pipeline fix applied.
-- Before finalizing a PR-backed run, repair the PR evidence section so it has
-  hosted screenshots, no local paths, and clear screenshot and no-mistakes
-  status.
+- Before finalizing a PR-backed run, repair the PR evidence section so it has hosted screenshots, required 2x E2E video links, no local paths, and clear screenshot/video and no-mistakes status.
 - Only check GitHub review threads after external PR review has run or the user
   explicitly asks for comment handling.
 
@@ -42,6 +40,7 @@ no-mistakes axi respond --action approve
 no-mistakes axi status
 no-mistakes axi logs --step <name> --full
 node "$HOME/.agents/skills/no-mistakes/scripts/repair-pr-evidence.mjs"
+node "$HOME/.agents/skills/no-mistakes/scripts/repair-pr-evidence.mjs" --e2e-video-required --videos "<hosted 2x video URL>"
 ```
 
 If a command fails, read the returned `help` lines and continue from the exact

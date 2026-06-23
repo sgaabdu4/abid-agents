@@ -29,7 +29,7 @@ assertIncludes(text, 'Docs/agent-rules-only change -> re-read changed file + run
 assertIncludes(text, 'Source cleanup inside the approved change is allowed');
 assertIncludes(text, 'do not leave dead components, wrappers, routes, or files behind');
 assertIncludes(text, 'provisioned Playwright, project runner, device tooling, or `computer-use`');
-assertIncludes(text, 'Missing visual evidence in no-mistakes/E2E is a fix gate');
+assertIncludes(text, 'Missing visual evidence or required 2x video in no-mistakes/E2E is a fix gate');
 assertIncludes(text, 'Keep UI fallback non-destructive unless exact side effects are approved');
 assert.ok(!text.includes('Do not call `list_apps`, `open -a`, `computer-use`, or `osascript`'), 'E2E policy must not ban computer-use fallback');
 assertIncludes(text, 'Files over 700 lines are a hard stop when touched');
@@ -166,6 +166,12 @@ assertIncludes(updateStackText, 'context-mode hooks intentionally absent');
 assertIncludes(updateStackText, 'codex-health');
 assertIncludes(updateStackText, 'codex-health summary:');
 assertIncludes(healthText, 'codex-update-stack --repair', 'codex-health must tell users how to repair after manual updates');
+assertIncludes(healthText, 'context-mode hooks:', 'codex-health must classify hook state explicitly');
+assertIncludes(
+  healthText,
+  'intentionally absent: Codex hooks stay stripped; context-mode doctor missing-hook lines are not health failures',
+  'codex-health must not report intentional missing context-mode hooks as failures',
+);
 assertIncludes(autoSyncText, 'refresh_local_install', 'auto-sync must refresh installed scripts after pulls');
 assertIncludes(autoSyncText, 'ABID_AGENTS_SKIP_NPM_INSTALL=1', 'auto-sync refresh must not run package updates');
 assertIncludes(cronText, 'codex-update-stack', 'cron installer must schedule codex stack updates');

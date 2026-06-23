@@ -2,7 +2,9 @@
 import assert from 'node:assert/strict';
 import {
   buildEvidenceSection,
+  extractHostedVideoMarkdown,
   extractLocalImagePaths,
+  extractLocalVideoPaths,
   extractHostedImageMarkdown,
   hasLocalRefs,
   insertEvidenceSection,
@@ -12,10 +14,15 @@ import {
   reviewThreadRowsFromGraphql,
   sanitizeBody,
   screenshotStatusRows,
+  videoStatusRows,
 } from '../../../skills/no-mistakes/scripts/repair-pr-evidence.mjs';
 
 assert.equal(parseArgs(['--dry-run']).checkReviewThreads, false);
 assert.equal(parseArgs(['--check-review-threads']).checkReviewThreads, true);
+assert.equal(parseArgs(['--e2e-video-required']).e2eVideoRequired, true);
+assert.deepEqual(parseArgs(['--videos', 'https://github.com/user-attachments/assets/video']).videos, [
+  'https://github.com/user-attachments/assets/video',
+]);
 
 const body = `## Intent
 
@@ -28,6 +35,7 @@ Uploading Screen Recording 2026-06-22 at 21.37.28.mov...
 ## Testing
 
 - Evidence: Desktop (local file: <code>/var/folders/x/no-mistakes-evidence/run/screenshots/desktop.png</code>)
+- Video: 2x recap (local file: <code>/tmp/no-mistakes-evidence/run/recaps/login_2x_cursor.mp4</code>)
 
 <details>
 <summary>Evidence ledger</summary>
@@ -47,8 +55,14 @@ assert.deepEqual(paths, [
   '/var/folders/x/no-mistakes-evidence/run/screenshots/desktop.png',
   '/Users/example/tmp/no-mistakes-evidence/screenshots/mobile.png',
 ]);
+assert.deepEqual(extractLocalVideoPaths(body), [
+  '/tmp/no-mistakes-evidence/run/recaps/login_2x_cursor.mp4',
+]);
 assert.deepEqual(extractHostedImageMarkdown(body), [
   '![old](https://github.com/user-attachments/assets/old)',
+]);
+assert.deepEqual(extractHostedVideoMarkdown('2x video: [2x recap](https://github.com/user-attachments/assets/vid)'), [
+  '[2x recap](https://github.com/user-attachments/assets/vid)',
 ]);
 
 const sanitized = sanitizeBody(body);
@@ -60,6 +74,11 @@ const statusRows = [
   ...screenshotStatusRows({
     screenshots: ['![Desktop board](https://github.com/user-attachments/assets/abc)'],
     uploadError: '',
+  }),
+  ...videoStatusRows({
+    videos: ['[2x E2E video](https://github.com/user-attachments/assets/vid)'],
+    localVideos: [],
+    required: true,
   }),
   ...parseNoMistakesStatus('run:\n  findings: none\n'),
   ...reviewThreadRowsFromGraphql({
@@ -93,14 +112,18 @@ const statusRows = [
 ];
 const section = buildEvidenceSection({
   screenshots: ['![Desktop board](https://github.com/user-attachments/assets/abc)'],
+  videos: ['[2x E2E video](https://github.com/user-attachments/assets/vid)'],
   statusRows,
   uploadError: '',
+  e2eVideoRequired: true,
 });
 const repaired = insertEvidenceSection(sanitized, section);
 
 assert.ok(repaired.includes('## No-mistakes Evidence'));
 assert.ok(repaired.includes('![Desktop board](https://github.com/user-attachments/assets/abc)'));
+assert.ok(repaired.includes('[2x E2E video](https://github.com/user-attachments/assets/vid)'));
 assert.ok(repaired.includes('PR screenshots attached'));
+assert.ok(repaired.includes('2x E2E video attached'));
 assert.ok(repaired.includes('No open no-mistakes findings'));
 assert.ok(repaired.includes('copilot-pull-request-reviewer: External player links should use noopener noreferrer.'));
 assert.ok(repaired.includes('[views/problems.ejs:114](https://github.com/a-s-abbas/lmtb/pull/3#discussion_r1)'));
@@ -134,6 +157,24 @@ assert.deepEqual(
     status: 'Open',
     issue: 'No PR screenshots attached',
     evidence: 'No screenshot artifacts or hosted screenshot links found',
+  }],
+);
+
+assert.deepEqual(
+  videoStatusRows({ videos: [], localVideos: ['/tmp/recap.mp4'], required: true }),
+  [{
+    status: 'Open',
+    issue: '2x E2E video not hosted',
+    evidence: '1 local video artifact(s) found; attach a reviewer-openable 2x video link',
+  }],
+);
+
+assert.deepEqual(
+  videoStatusRows({ videos: [], localVideos: [], required: true }),
+  [{
+    status: 'Open',
+    issue: 'No 2x E2E video attached',
+    evidence: 'UI or phone E2E requires a reviewer-openable 2x video link in PR evidence',
   }],
 );
 

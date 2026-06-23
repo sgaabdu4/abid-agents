@@ -32,7 +32,8 @@ Read the focused reference that matches the task:
 - Every checked flow must use or leave a runnable automated E2E command; manual-only runs are incomplete.
 - Confirm data mode before running flows when it is unknown: mock/seeded test data is default; prod data requires explicit approval and must be read-only unless exact writes are separately approved.
 - No prod writes/deletes, email/SMS, payments, or sharing unless explicitly approved.
-- Capture by default: `events.jsonl`, cursor/click video when possible, step screenshots, supported logs/traces, and a final 2x cursor recap video when video is supported.
+- UI or phone E2E requires a video artifact at 2x speed so exact appearance is reviewable.
+- Capture by default: `events.jsonl`, cursor/click video, step screenshots, supported logs/traces, and a final 2x cursor recap video. If video is blocked after driver fallbacks, report it as an artifact limit instead of a clean pass.
 - Artifacts go under `docs/e2e/<RUN_ID>/`; never overwrite prior runs and never count zero UI calls as a pass.
 - Keep plans short; split flows across agents only when independent.
 

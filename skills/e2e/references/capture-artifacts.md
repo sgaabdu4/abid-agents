@@ -39,8 +39,8 @@ If the driver cannot render an overlay, record coordinates in `events.jsonl` and
 
 Default capture:
 
-- continuous video when supported by the chosen driver;
-- final 2x speed recap video with visible cursor and click bloom when video is supported;
+- continuous video for UI or phone flows;
+- final 2x speed recap video with visible cursor and click bloom;
 - `events.jsonl` for every click, input, navigation, wait, assertion, fallback, issue, and fix verification;
 - screenshot after each verified step or on every failure;
 - console/network logs when available;
@@ -54,7 +54,7 @@ Audit capture:
 - final artifact linter before claiming the run is complete.
 
 Never claim a click, input, or navigation was tested if no event row or UI artifact proves it.
-If video or a 2x recap cannot be produced because the driver or encoder is unsupported, unavailable, or blocked, record the fallback reason in `report.md`.
+If video or a 2x recap cannot be produced because every viable driver or encoder is unsupported, unavailable, or blocked, record the fallback reason in `report.md` and list the run as incomplete for visual proof.
 For an existing cursor/click-layer MP4, create the recap with:
 
 ```bash

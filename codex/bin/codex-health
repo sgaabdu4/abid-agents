@@ -47,6 +47,9 @@ echo "codex doctor:"
 codex doctor --json 2>/dev/null |
   python3 -c 'import json,sys; d=json.load(sys.stdin); print("overallStatus="+str(d.get("overallStatus"))); print("codexVersion="+str(d.get("codexVersion"))); print("mcpServers="+str(len(d.get("mcpServers") or []))); checks=d.get("checks") or {}; [print(k+"="+str(v.get("status"))+((": "+str(v.get("message"))) if v.get("message") else "")) for k,v in checks.items() if isinstance(v,dict) and v.get("status")!="ok"]'
 echo
+echo "context-mode hooks:"
+echo "intentionally absent: Codex hooks stay stripped; context-mode doctor missing-hook lines are not health failures"
+echo
 echo "manual update repair:"
 if [ -x "$HOME/.codex/bin/codex-update-stack" ]; then
   echo "$HOME/.codex/bin/codex-update-stack --repair"

@@ -6,10 +6,12 @@ Use this before finalizing any no-mistakes run that opened or updated a PR.
 
 - PR description contains actual GitHub links, not machine-local paths.
 - UI work has screenshots when the run captured them.
+- UI or phone E2E has a reviewer-openable 2x video link, or the evidence table
+  stays open until one is attached.
 - Screenshots are GitHub `user-attachments` URLs or another reviewer-openable
   URL, never committed evidence files.
-- Screenshot evidence is tracked in the issue-status table as resolved, missing,
-  or upload-failed.
+- Screenshot and required video evidence are tracked in the issue-status table
+  as resolved, missing, unhosted, or upload-failed.
 - no-mistakes findings are shown as resolved or open.
 - GitHub review threads are not checked by default because the pipeline creates
   the PR before external review exists.
@@ -18,7 +20,8 @@ Use this before finalizing any no-mistakes run that opened or updated a PR.
 - When `--check-review-threads` is used, any unresolved GitHub review thread
   keeps the evidence table open until it is resolved or explicitly handled.
 - Removed local-only values include `/Users`, `/var/folders`,
-  `no-mistakes-evidence`, `localhost`, `127.0.0.1`, `file:`, and `local file`.
+  `/tmp`, `no-mistakes-evidence`, `localhost`, `127.0.0.1`, `file:`, and
+  `local file`.
 
 ## Command
 
@@ -33,6 +36,7 @@ Useful flags:
 ```sh
 node "$HOME/.agents/skills/no-mistakes/scripts/repair-pr-evidence.mjs" --pr 3
 node "$HOME/.agents/skills/no-mistakes/scripts/repair-pr-evidence.mjs" --screenshots /path/to/screenshots
+node "$HOME/.agents/skills/no-mistakes/scripts/repair-pr-evidence.mjs" --e2e-video-required --videos "https://github.com/user-attachments/assets/..."
 node "$HOME/.agents/skills/no-mistakes/scripts/repair-pr-evidence.mjs" --check-review-threads
 node "$HOME/.agents/skills/no-mistakes/scripts/repair-pr-evidence.mjs" --dry-run
 ```
@@ -56,6 +60,19 @@ image links into the PR body with `gh pr edit <number> --body`.
 
 Never commit screenshot files for PR evidence.
 Never leave local screenshot paths in the PR body.
+
+## Adding 2x E2E videos to a PR
+
+For UI or phone E2E, attach or upload the final 2x video so reviewers can open
+it from the PR, then pass the hosted URL to the repair script:
+
+```sh
+node "$HOME/.agents/skills/no-mistakes/scripts/repair-pr-evidence.mjs" --pr 3 --e2e-video-required --videos "https://github.com/user-attachments/assets/..."
+```
+
+Do not leave local MP4/MOV/WebM paths in the PR body.
+If only local video files are available, the script keeps the evidence table
+open until a reviewer-openable 2x video link is attached.
 
 ## If upload fails
 
