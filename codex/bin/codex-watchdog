@@ -12,6 +12,7 @@ load_warn="${CODEX_WATCHDOG_LOAD_WARN:-32}"
 mcp_warn="${CODEX_WATCHDOG_MCP_WARN:-12}"
 kill_orphans="${CODEX_WATCHDOG_KILL_ORPHANS:-1}"
 kill_codex_app_on_storm="${CODEX_WATCHDOG_KILL_CODEX_APP_ON_STORM:-1}"
+cleanup_bin="$HOME_DIR/.codex/bin/codex-cleanup"
 
 now="$(date '+%Y-%m-%d %H:%M:%S %Z')"
 load1="$(sysctl -n vm.loadavg 2>/dev/null | awk '{ print $2 }')"
@@ -95,4 +96,8 @@ if [ "$kill_codex_app_on_storm" = "1" ] && [ "$storm" -eq 1 ]; then
     done
     echo "$now killed_codex_app_storm pids=$targets load1=$load1 mcp=$mcp_total policy_cpu=$policy_cpu" >> "$LOG_FILE"
   fi
+fi
+
+if [ -x "$cleanup_bin" ]; then
+  "$cleanup_bin" >> "$LOG_FILE" 2>&1 || true
 fi

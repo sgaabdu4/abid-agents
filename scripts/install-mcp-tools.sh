@@ -14,29 +14,32 @@ fi
 npm install -g context-mode@latest codebase-memory-mcp@latest @openai/codex@latest
 
 sync_shadowed_codebase_memory() {
-  local npm_root npm_bin active active_version npm_version backup
+  local npm_root npm_prefix npm_bin candidate
   npm_root="$(npm root -g)"
-  npm_bin="$npm_root/codebase-memory-mcp/bin/codebase-memory-mcp"
+  npm_prefix="$(npm prefix -g)"
+  npm_bin="$npm_prefix/bin/codebase-memory-mcp"
+  if [[ ! -x "$npm_bin" ]]; then
+    npm_bin="$npm_root/codebase-memory-mcp/bin.js"
+  fi
   if [[ ! -x "$npm_bin" ]]; then
     return 0
   fi
 
-  active="$(command -v codebase-memory-mcp || true)"
-  if [[ -z "$active" || "$active" == "$npm_bin" || "$active" == "$HOME/.npm-global/bin/codebase-memory-mcp" ]]; then
-    return 0
-  fi
+  for candidate in "$HOME/.local/bin/codebase-memory-mcp" "$(command -v codebase-memory-mcp || true)"; do
+    if [[ -z "$candidate" || "$candidate" == "$npm_bin" || "$candidate" == "$HOME/.npm-global/bin/codebase-memory-mcp" ]]; then
+      continue
+    fi
+    if [[ ! -e "$candidate" && ! -L "$candidate" ]]; then
+      continue
+    fi
+    if [[ -L "$candidate" ]] && [[ "$(readlink "$candidate")" == "$npm_bin" ]]; then
+      continue
+    fi
 
-  active_version="$("$active" --version 2>/dev/null || true)"
-  npm_version="$("$npm_bin" --version 2>/dev/null || true)"
-  if [[ -z "$npm_version" || "$active_version" == "$npm_version" ]]; then
-    return 0
-  fi
-
-  backup="$active.backup.$(date +%Y%m%d%H%M%S)"
-  mv "$active" "$backup"
-  cp "$npm_bin" "$active"
-  chmod 755 "$active"
-  echo "Updated shadowed codebase-memory-mcp at $active; backup: $backup"
+    rm -f "$candidate"
+    ln -s "$npm_bin" "$candidate"
+    echo "Linked shadowed codebase-memory-mcp at $candidate to $npm_bin"
+  done
 }
 
 sync_shadowed_codebase_memory
