@@ -38,6 +38,21 @@ preserve_or_link_file() {
   ln -s "$source" "$target"
 }
 
+replace_with_link_file() {
+  local source="$1"
+  local target="$2"
+  mkdir -p "$(dirname "$target")"
+  if [[ -L "$target" ]]; then
+    if [[ "$(readlink "$target")" == "$source" ]]; then
+      return 0
+    fi
+    mv "$target" "$(backup_path "$target")"
+  elif [[ -e "$target" ]]; then
+    mv "$target" "$(backup_path "$target")"
+  fi
+  ln -s "$source" "$target"
+}
+
 install_managed_executable() {
   local source="$1"
   local target="$2"
@@ -120,51 +135,14 @@ EOF
   fi
 }
 
-install_managed_block() {
-  local source="$1"
-  local target="$2"
-  local name="$3"
-  local begin="<!-- BEGIN managed by abid-agents: $name -->"
-  local end="<!-- END managed by abid-agents: $name -->"
-  local tmp
-
-  mkdir -p "$(dirname "$target")"
-
-  if [[ -L "$target" ]]; then
-    if [[ "$(readlink "$target")" == "$source" ]]; then
-      mv "$target" "$(backup_path "$target")"
-    else
-      echo "Preserving existing symlink: $target"
-      return 0
-    fi
-  fi
-
-  tmp="$(mktemp)"
-
-  {
-    printf '%s\n' "$begin"
-    cat "$source"
-    printf '%s\n\n' "$end"
-    if [[ -f "$target" ]]; then
-      awk -v begin="$begin" -v end="$end" '
-        $0 == begin { skip = 1; next }
-        $0 == end { skip = 0; next }
-        !skip { print }
-      ' "$target"
-    fi
-  } >"$tmp"
-
-  mv "$tmp" "$target"
-}
-
-install_managed_block "$ROOT/AGENTS.md" "$HOME/.codex/AGENTS.md" "AGENTS.md"
+replace_with_link_file "$ROOT/AGENTS.md" "$HOME/.codex/AGENTS.md"
 preserve_or_link_file "$ROOT/mcp-config.json" "$HOME/.codex/mcp-config.json"
 preserve_or_link_file "$ROOT/codex/hooks.json" "$HOME/.codex/hooks.json"
 install_codex_watchdog
-install_managed_block "$ROOT/AGENTS.md" "$HOME/.claude/AGENTS.md" "AGENTS.md"
-install_managed_block "$ROOT/AGENTS.md" "$HOME/.copilot/AGENTS.md" "AGENTS.md"
-install_managed_block "$ROOT/AGENTS.md" "$HOME/.pi/AGENTS.md" "AGENTS.md"
-preserve_or_link_file "$ROOT/AGENTS.md" "$HOME/.pi/agent/AGENTS.md"
+replace_with_link_file "$ROOT/AGENTS.md" "$HOME/.claude/AGENTS.md"
+replace_with_link_file "$ROOT/AGENTS.md" "$HOME/.copilot/AGENTS.md"
+replace_with_link_file "$ROOT/AGENTS.md" "$HOME/.pi/AGENTS.md"
+replace_with_link_file "$ROOT/AGENTS.md" "$HOME/.pi/agent/AGENTS.md"
 
 for skill in "$ROOT"/skills/*; do
   [[ -d "$skill" ]] || continue

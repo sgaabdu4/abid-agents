@@ -25,7 +25,7 @@ Read the focused reference that matches the task:
 ## Rules
 
 - Use Codex Browser first for local/public web when callable; use Chrome extension for signed-in browser state when available; use Flutter/device tooling for native flows; standalone Playwright is last resort or CI artifact work.
-- Stop UI-driver probing after one failed or denied Browser/Playwright/node_repl probe; profile-lock errors first follow `references/browser-first.md` isolated-profile recovery, then stop if recovery fails.
+- Stop only the failed UI driver after one denied/non-profile-lock probe; continue through `references/browser-first.md` fallbacks before accepting missing visual evidence.
 - Before first-run setup or saved auth/flow reuse, check the project pack when the helper script is available; saved auth reuse still needs an automated E2E command.
 - Never mark resolved from screenshots alone; reproduce, patch only after cause/ripple checks, and rerun impacted E2E plus regression checks.
 - Every checked action needs UI evidence: action event, settled assertion, screenshot or video frame, and artifact path.

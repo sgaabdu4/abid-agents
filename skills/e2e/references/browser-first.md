@@ -30,6 +30,17 @@ If Browser is unavailable and Playwright is justified but missing, provision it 
 node <skill-dir>/scripts/ensure-playwright.mjs --install --with-browser chromium
 ```
 
+## Runtime Preflight
+
+Before treating Node, npm, or native bindings as an E2E blocker, run:
+
+```bash
+node <skill-dir>/scripts/check-ui-runtime.mjs --root <repo> --native-module better-sqlite3
+```
+
+Use the report to pin the command runtime, override `npm_config_ignore_scripts=false` for the repair command only, or switch to a working installed Node.
+Do this before downgrading visual proof to server-rendered HTML or static checks.
+
 ## Profile Lock Recovery
 
 A Browser or Playwright error that says `Browser is already in use`, `profile is locked`, `mcp-chrome`, or `use --isolated` means the shared automation profile is locked, not that the target UI failed.
@@ -40,14 +51,14 @@ If the Browser tool has no isolated option, standalone Playwright with a fresh t
 Record the original lock error, the isolated-profile driver, and artifact paths in `events.jsonl` and the final report.
 
 Do not delete the locked profile, kill browser processes, open desktop apps, or use `computer-use` to clear the lock.
-If the isolated retry fails or is denied, stop UI automation probing and fall back to local scripts/tests.
+If the isolated retry fails or is denied, stop that browser profile and continue to standalone Playwright, project runner, device tooling, or Computer Use when exposed.
 
 ## Failure Handling
 
-If Browser, Playwright, or `node_repl` probing fails or is denied after any allowed profile-lock recovery, stop UI automation probing for that run.
+If Browser or `node_repl` probing fails or is denied after any allowed profile-lock recovery, stop that driver and continue to the next E2E-owned fallback: standalone Playwright, project runner, device tooling, or Computer Use when exposed.
 Do not use `open -a`, `osascript`, or unrelated UI channels.
-Use Computer Use as the desktop UI fallback when it is exposed and target-app scoped; keep it non-destructive and record screenshots or fallback limits.
-Use local scripts, existing tests, static inspection, and artifact checks, then report exactly which UI proof could not be collected.
+If standalone Playwright fails because of Node, npm, or native bindings, run the runtime preflight before treating it as a blocker.
+Use local scripts, existing tests, static inspection, and artifact checks only after every safe UI driver is unavailable, then report exactly which UI proof could not be collected.
 
 ## Playwright Last Resort Shape
 

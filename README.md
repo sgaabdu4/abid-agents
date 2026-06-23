@@ -27,7 +27,7 @@ When run in a terminal, setup asks whether to install `no-mistakes`, enable cron
 
 The setup is conservative:
 
-- prepends a deduped managed block to existing agent `AGENTS.md` files instead of replacing local content
+- links agent `AGENTS.md` files to the canonical `~/.agents/AGENTS.md`
 - preserves existing non-managed config files and conflicting skill folders instead of overwriting them
 - initializes pinned submodules
 - installs local Git hooks for this repo
@@ -49,7 +49,7 @@ Useful setup switches:
 
 ## 2. What gets linked
 
-Existing agent instruction files are preserved. Setup refreshes only the marked `abid-agents` block and leaves local rules below it.
+Agent instruction files are symlinks to `~/.agents/AGENTS.md`. Keep local overrides in project-level `AGENTS.md` files, not in installed global copies.
 
 | Agent/runtime | Linked config |
 | --- | --- |
