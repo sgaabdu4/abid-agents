@@ -135,9 +135,123 @@ EOF
   fi
 }
 
+ensure_codex_mcp_config() {
+  mkdir -p "$HOME/.codex"
+  CODEX_CONFIG_PATH="$HOME/.codex/config.toml" python3 <<'PY'
+from pathlib import Path
+import os
+import re
+
+path = Path(os.environ["CODEX_CONFIG_PATH"])
+lines = path.read_text().splitlines() if path.exists() else []
+
+section_re = re.compile(r"^\s*\[([^\]]+)\]\s*(?:#.*)?$")
+
+def bounds(section):
+    start = None
+    for index, line in enumerate(lines):
+        match = section_re.match(line)
+        if not match:
+            continue
+        if match.group(1).strip() == section:
+            start = index
+            continue
+        if start is not None:
+            return start, index
+    if start is None:
+        return None
+    return start, len(lines)
+
+def ensure_section(section, assignments):
+    global lines
+    found = bounds(section)
+    if found is None:
+        if lines and lines[-1].strip():
+            lines.append("")
+        lines.append(f"[{section}]")
+        lines.extend(f"{key} = {value}" for key, value in assignments)
+        return
+
+    start, end = found
+    for key, value in assignments:
+        key_re = re.compile(rf"^\s*{re.escape(key)}\s*=")
+        for index in range(start + 1, end):
+            if key_re.match(lines[index]):
+                lines[index] = f"{key} = {value}"
+                break
+        else:
+            lines.insert(end, f"{key} = {value}")
+            end += 1
+
+def ensure_top_level(assignments):
+    global lines
+    first_section = next((index for index, line in enumerate(lines) if section_re.match(line)), len(lines))
+    for key, value in assignments:
+        key_re = re.compile(rf"^\s*{re.escape(key)}\s*=")
+        for index in range(first_section):
+            if key_re.match(lines[index]):
+                lines[index] = f"{key} = {value}"
+                break
+        else:
+            lines.insert(first_section, f"{key} = {value}")
+            first_section += 1
+
+ensure_top_level([
+    ("approval_policy", '"never"'),
+    ("sandbox_mode", '"danger-full-access"'),
+])
+ensure_section("features", [("hooks", "true")])
+ensure_section("mcp_servers.codebase-memory-mcp", [("command", '"codebase-memory-mcp"')])
+ensure_section("mcp_servers.context-mode", [("command", '"context-mode"')])
+ensure_section("mcp_servers.context-mode.env", [("CONTEXT_MODE_PLATFORM", '"codex"')])
+ensure_section("mcp_servers.dart", [
+    ("command", '"dart"'),
+    ("args", '["mcp-server", "--force-roots-fallback"]'),
+])
+
+path.write_text("\n".join(lines).rstrip() + "\n")
+PY
+}
+
+ensure_context_mode_read_permissions() {
+  local settings_path
+  for settings_path in "$HOME/.codex/settings.json" "$HOME/.copilot/settings.json"; do
+    mkdir -p "$(dirname "$settings_path")"
+    SETTINGS_PATH="$settings_path" AGENTS_ROOT="$ROOT" python3 <<'PY'
+from pathlib import Path
+import json
+import os
+
+path = Path(os.environ["SETTINGS_PATH"])
+root = Path(os.environ["AGENTS_ROOT"])
+home = Path.home()
+
+if path.exists():
+    data = json.loads(path.read_text())
+else:
+    data = {}
+
+permissions = data.setdefault("permissions", {})
+allow = permissions.setdefault("allow", [])
+required = [
+    f"Read({home}/.codex/skills/**)",
+    f"Read({root}/skills/**)",
+    f"Read({root}/vendor/skill-upstreams/**)",
+]
+for entry in required:
+    if entry not in allow:
+        allow.append(entry)
+
+path.write_text(json.dumps(data, indent=2) + "\n")
+PY
+  done
+}
+
 replace_with_link_file "$ROOT/AGENTS.md" "$HOME/.codex/AGENTS.md"
 preserve_or_link_file "$ROOT/mcp-config.json" "$HOME/.codex/mcp-config.json"
 preserve_or_link_file "$ROOT/codex/hooks.json" "$HOME/.codex/hooks.json"
+ensure_codex_mcp_config
+ensure_context_mode_read_permissions
 install_codex_watchdog
 replace_with_link_file "$ROOT/AGENTS.md" "$HOME/.claude/AGENTS.md"
 replace_with_link_file "$ROOT/AGENTS.md" "$HOME/.copilot/AGENTS.md"

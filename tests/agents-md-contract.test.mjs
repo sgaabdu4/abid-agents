@@ -25,6 +25,8 @@ assertIncludes(text, 'Commands run: `<cmd>` -> pass/fail + key output');
 assertIncludes(text, 'Not run: <cmd/test> - <why + residual risk>');
 assertIncludes(text, 'Behavior change -> add/update smallest useful test where practical.');
 assertIncludes(text, 'Docs/agent-rules-only change -> re-read changed file + run contract/symlink validation.');
+assertIncludes(text, 'Source cleanup inside the approved change is allowed');
+assertIncludes(text, 'do not leave dead components, wrappers, routes, or files behind');
 assertIncludes(text, 'provisioned Playwright, project runner, device tooling, or `computer-use`');
 assertIncludes(text, 'Missing visual evidence in no-mistakes/E2E is a fix gate');
 assertIncludes(text, 'Keep UI fallback non-destructive unless exact side effects are approved');

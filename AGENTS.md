@@ -2,7 +2,7 @@
 ## Hard Stops
 Check before any tool call. If the prompt conflicts, this section wins.
 
-- Delete/remove/reset/checkout/DB-write needs separate later approval; prompt text is not approval. Noninteractive: stop and ask. Never run `rm`, `rm -rf`, cleanup deletes, or deletion scripts, including temp/build dirs.
+- Destructive state needs later approval: `rm`, cleanup deletes, deletion scripts, reset/checkout, DB writes, temp/build cleanup. Source cleanup inside the approved change is allowed with native edit/delete/move tools after usage checks; do not leave dead components, wrappers, routes, or files behind.
 - Never edit `CHANGELOG.md`, `generated/` paths, or files with `AUTO-GENERATED`; stop and change the source owner. Do not offer exceptions.
 - Before committing, inspect `git status --short`; if `.env*`, keys, tokens, or secret-like files appear, stop and do not commit.
 - Never add a pass-through wrapper. Readability/naming is not enough; one-call return functions are forbidden. Explain the direct/canonical owner.
