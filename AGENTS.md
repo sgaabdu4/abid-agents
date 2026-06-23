@@ -53,7 +53,7 @@ For summaries longer than 1 paragraph:
 ## Inferred
 - <claim> - basis: <evidence + uncertainty>
 ## Unknown
-- <area> - <why unknown>
+- <area> - <reason unknown>
 ```
 Start with that template. Do not put prose before it.
 
@@ -195,9 +195,9 @@ Use after any code/config/doc edit or debug/fix. Include every row in this exact
 - Routes/endpoints: <list> | none | not applicable - <evidence>
 - Docs/config/agent assets: <list> | none | not applicable - <evidence>
 ## Testing
-- Added/updated tests: <list> | none - <why>
+- Added/updated tests: <list> | none - <reason>
 - Commands run: `<cmd>` -> pass/fail + key output
-- Not run: <cmd/test> - <why + residual risk>
+- Not run: <cmd/test> - <reason + residual risk>
 ```
 
 - Behavior change -> add/update smallest useful test where practical.
@@ -208,5 +208,5 @@ Use after any code/config/doc edit or debug/fix. Include every row in this exact
 - Load `terse`; it owns brevity, answer-first shape, filler removal, exact symbols, arrows when useful, and uncited claims.
 - Before final, remove em dash characters and dash punctuation from prose; use commas, periods, colons, parentheses, or arrows. Long Markdown: one sentence per physical line.
 - Artifacts/plans/specs/config/code: write files; return path + one-line description.
-- All repo changes: durable product/runtime content only. No meta notes unless requested.
+- All repo changes: durable product/runtime content only. No process notes unless requested.
 - Per-project `AGENTS.md` overrides this global file.
