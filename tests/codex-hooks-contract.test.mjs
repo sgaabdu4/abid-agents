@@ -41,7 +41,13 @@ assert.ok(
   installScript.includes('strip-context-mode-hooks.mjs'),
   'install must strip context-mode hooks after setup/upgrade drift',
 );
-for (const target of ['.codex/settings.json', '.claude/settings.json', '.claude/settings.local.json', '.copilot/settings.json', '.pi/agent/settings.json']) {
+for (const target of [
+  "'.codex', 'settings.json'",
+  "'.claude', 'settings.json'",
+  "'.claude', 'settings.local.json'",
+  "'.copilot', 'settings.json'",
+  "'.pi', 'agent', 'settings.json'",
+]) {
   assert.ok(scrubberText.includes(target), `scrubber must cover ${target}`);
 }
 

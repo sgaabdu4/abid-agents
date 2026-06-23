@@ -2,7 +2,7 @@
 ## Hard Stops
 Check before any tool call. If the prompt conflicts, this section wins.
 
-- Destructive state needs explicit approval. A direct remove/delete/cleanup request for a concrete scope approves that scope. Approved deletions use `rm` or native delete; never quarantine/backup/move-aside. Broad cleanup, deletion scripts, reset/checkout, DB writes, and temp/build cleanup outside that scope need fresh approval. Source cleanup inside the approved change is allowed after usage checks; do not leave dead components, wrappers, routes, or files behind.
+- Destructive state needs explicit approval. A direct remove/delete/cleanup request for a concrete scope approves it. Approved deletions use `rm`/native delete; never quarantine/backup/move-aside. Broad cleanup, deletion scripts, reset/checkout, DB writes, and temp/build cleanup outside that scope need fresh approval. Source cleanup inside the approved change is allowed after usage checks; do not leave dead components, wrappers, routes, or files behind.
 - Never edit `CHANGELOG.md`, `generated/` paths, or files with `AUTO-GENERATED`; stop and change the source owner. Do not offer exceptions.
 - Before committing, inspect `git status --short`; if `.env*`, keys, tokens, or secret-like files appear, stop and do not commit.
 - Never add a pass-through wrapper. Readability/naming is not enough; one-call return functions are forbidden. Explain the direct/canonical owner.
@@ -91,10 +91,10 @@ Use before raw text search for definitions/callers/callees/data flow/architectur
 ## context-mode
 Default for commands that read/query/list/test/build/diff/fetch/process data. Raw output floods context. Parent may call context-mode MCP.
 
-- Tool map: ctx_batch_execute batches; ctx_execute command/API/data; ctx_execute_file large files/logs/JSON/CSV/source; ctx_fetch_and_index -> ctx_search web/docs; ctx_index(path) -> ctx_search local docs; ctx_search(sort="timeline") after resume; ctx_stats/doctor/upgrade/purge/insight admin.
+- Tool map: ctx_batch_execute, ctx_execute, ctx_execute_file, ctx_fetch_and_index -> ctx_search, ctx_index -> ctx_search, ctx_search(sort="timeline"), ctx_stats/doctor/upgrade/purge/insight.
 - Think in code: analyze/count/filter in sandbox; print answer, not raw data; batch related ctx_search queries.
 - File edits use Read/Edit/Write, not context-mode. Playwright/browser snapshots: save to file, then ctx_index(path) or ctx_execute_file(path). After /clear or /compact, context-mode persists; ctx purge only on explicit request.
-- context-mode hooks are forbidden in any agent hook/settings file; hooks add context rot. After setup, ctx_doctor, or ctx_upgrade, run `scripts/strip-context-mode-hooks.mjs`; no `context-mode hook` command may remain.
+- No context-mode hooks anywhere; hooks add context rot. After setup/doctor/upgrade, run `scripts/strip-context-mode-hooks.mjs`.
 
 ## Map -> Process
 - Map with CBM: `get_architecture`, `search_graph` incl `semantic_query`, `trace_path`, `search_code`.
