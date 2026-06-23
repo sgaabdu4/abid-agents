@@ -40,7 +40,7 @@
 - Online/current info -> `tavily-cli`.
 - Repeated fixes/project learning -> `repeated-failure-learning`; skill authoring/evals -> `skill-creator`.
 - Workflow/skill/next-step -> `workflow-help`.
-- Features -> Treehouse first, `grill-me`, plan, build/prove; PR -> `no-mistakes`.
+- Features -> Treehouse/`grill-me`, plan, build/verify loop; PR -> `no-mistakes`.
 - Hard bugs/failures/flakes/regressions -> `diagnosing-bugs`.
 - Boundaries/interfaces/ownership/wrappers -> `codebase-design`.
 - Post-`grill-me`: clear skip; brief `to-prd`; slices `to-issues`; big `to-prd` then `to-issues`.

@@ -48,7 +48,7 @@ assertIncludes(text, 'Project `AGENTS.md` overrides global.');
 assertIncludes(text, 'User-facing replies -> `terse`.');
 assertIncludes(text, 'React/Next/perf/composition -> `react-doctor` + `fallow` + `vercel-react-best-practices`.');
 assertIncludes(text, 'Sentry/observability/issues/setup -> `sentry-workflow` only.');
-assertIncludes(text, 'Features -> Treehouse first, `grill-me`, plan, build/prove; PR -> `no-mistakes`.');
+assertIncludes(text, 'Features -> Treehouse/`grill-me`, plan, build/verify loop; PR -> `no-mistakes`.');
 assertIncludes(text, 'Post-`grill-me`: clear skip; brief `to-prd`; slices `to-issues`; big `to-prd` then `to-issues`.');
 
 const tokenCheck = spawnSync('python3', ['-c', `
@@ -120,7 +120,20 @@ assertNotIncludes(readmeText, 'curl -fsSL https://raw.githubusercontent.com/sgaa
 assertIncludes(routeMapText, 'Create a Treehouse worktree before planning/coding.');
 assertIncludes(routeMapText, 'Create the Treehouse worktree before feature planning/coding.');
 assertIncludes(routeMapText, 'Reroute to `no-mistakes` only after committed implementation work is ready for the gate.');
-assertIncludes(featureFlowHtml, 'Treehouse worktree exists.');
+assertIncludes(routeMapText, 'Run `security-review` or `performance-rescue` when requested or when those risks were touched, then `thermo-nuclear-code-quality-review`, then `e2e` last');
+assertIncludes(routeMapText, 'Loop back to Implement until tests, reviews, and required E2E are clean.');
+assertIncludes(featureFlowHtml, 'Plan, Implement, Verify');
+assertIncludes(featureFlowHtml, 'Implement with touched-area skills');
+assertIncludes(featureFlowHtml, 'Run tests, requested or touched risk reviews, thermo review, then E2E.');
+assertIncludes(featureFlowHtml, '/security-review');
+assertIncludes(featureFlowHtml, '/performance-rescue');
+assertIncludes(featureFlowHtml, '3b. Risk reviews');
+assertIncludes(featureFlowHtml, 'Security/perf if requested or touched.');
+assertIncludes(featureFlowHtml, '3c. Thermo review');
+assertIncludes(featureFlowHtml, '3d. E2E');
+assertIncludes(featureFlowHtml, 'If any fail: back to 2. Implement, then rerun Verify.');
+assertIncludes(featureFlowHtml, 'Pass: go to 4. Final Gate.');
+assertIncludes(featureFlowHtml, 'local verify loop is clean');
 assertIncludes(featureFlowHtml, 'no-mistakes');
 assertIncludes(setupText, 'install_or_update_treehouse');
 assertIncludes(setupText, 'ABID_AGENTS_SETUP_TREEHOUSE');

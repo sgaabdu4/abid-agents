@@ -27,7 +27,7 @@ const policyFiles = [
   'skills/workflow-help/references/route-map.md',
 ];
 
-const policyDigestPattern = /workflow-help|grill-me|to-prd|to-issues|readiness|PASS|CONCERNS|FAIL|correct course|scope expands|codebase-memory|context-mode|support tools|not stages|react-doctor|fallow|vercel-react-best-practices|sentry-workflow|sentry-cli|sentry-sdk-setup|sentry-feature-setup|e2e|real UI|screenshots|events|regression command|thermo-nuclear-code-quality-review|maintainability|no-mistakes|committed|BMAD|menu codes|Treehouse|700|blast radius|surrounding issues|Report:|Why:|What:|Risk:|Proof:/i;
+const policyDigestPattern = /workflow-help|grill-me|to-prd|to-issues|readiness|PASS|CONCERNS|FAIL|correct course|scope expands|codebase-memory|context-mode|support tools|not stages|react-doctor|fallow|vercel-react-best-practices|sentry-workflow|sentry-cli|sentry-sdk-setup|sentry-feature-setup|security-review|performance-rescue|e2e|real UI|screenshots|events|regression command|thermo-nuclear-code-quality-review|maintainability|no-mistakes|committed|BMAD|menu codes|Treehouse|700|blast radius|surrounding issues|Report:|Why:|What:|Risk:|Proof:/i;
 
 const policyText = policyFiles
   .map((rel) => {
@@ -63,6 +63,17 @@ const keyDefinitions = [
   'allowsUnitTestsAsE2E: incorrectly allows unit tests alone to count as E2E proof',
   'usesThermoNuclearReview: routes strict maintainability PR/diff review to thermo-nuclear-code-quality-review',
   'treatsThermoAsPolishOnly: incorrectly treats thermo review as optional cosmetic polish',
+  'usesSecurityReviewWhenTouched: routes security, auth, secrets, or data-exposure risk to security-review when requested or touched',
+  'usesPerformanceRescueWhenTouched: routes latency, bundle, query, or efficiency risk to performance-rescue when requested or touched',
+  'keepsRiskReviewsConditional: treats security-review and performance-rescue as conditional reviews for requested or touched risks, not default stages',
+  'runsRiskReviewsBeforeThermo: places conditional security/performance reviews before thermo-nuclear-code-quality-review in the verify loop',
+  'treatsRiskReviewsAsDefaultStages: incorrectly requires security-review or performance-rescue for every feature regardless of touched risk',
+  'usesVerifyLoop: requires a local verify loop between implementation and proof until blockers are gone',
+  'runsThermoBeforeE2E: runs thermo-nuclear-code-quality-review before expensive E2E in the local verify loop',
+  'runsE2ELastWhenNeeded: runs E2E last when a user-visible flow changed',
+  'loopsBackAfterVerificationFailure: sends tests, review, or E2E failures back to implementation and reruns affected proof',
+  'waitsForCleanLoopBeforeNoMistakes: requires clean tests/review/required E2E plus committed work before no-mistakes',
+  'runsNoMistakesBeforeCleanLoop: incorrectly runs no-mistakes before the local verify loop is clean',
   'usesReadinessGate: requires readiness before implementation',
   'readinessConcernsOrFail: marks weak readiness as CONCERNS or FAIL instead of PASS',
   'usesGrillMeWhenAmbiguous: routes ambiguous feature scope to grill-me',

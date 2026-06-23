@@ -38,6 +38,18 @@
       "expectFalse": ["treatsThermoAsPolishOnly"]
     },
     {
+      "id": "verify_loop_before_no_mistakes",
+      "prompt": "I implemented a user-visible feature. Explain the order if targeted tests pass, thermo review finds issues, and then E2E finds a bug. When can no-mistakes start?",
+      "expectTrue": ["usesVerifyLoop", "usesThermoNuclearReview", "runsThermoBeforeE2E", "usesE2E", "runsE2ELastWhenNeeded", "loopsBackAfterVerificationFailure", "waitsForCleanLoopBeforeNoMistakes"],
+      "expectFalse": ["runsNoMistakesBeforeCleanLoop", "usesNoMistakesBeforeImplementation", "treatsThermoAsPolishOnly", "allowsUnitTestsAsE2E"]
+    },
+    {
+      "id": "conditional_risk_reviews_in_verify",
+      "prompt": "This feature touches auth permissions and possible data exposure, and I explicitly asked you to check performance for a slow dashboard query. Where do security-review and performance-rescue fit in the Plan / Implement / Verify flow, and when can no-mistakes start?",
+      "expectTrue": ["usesVerifyLoop", "usesSecurityReviewWhenTouched", "usesPerformanceRescueWhenTouched", "keepsRiskReviewsConditional", "runsRiskReviewsBeforeThermo", "waitsForCleanLoopBeforeNoMistakes"],
+      "expectFalse": ["treatsRiskReviewsAsDefaultStages", "runsNoMistakesBeforeCleanLoop"]
+    },
+    {
       "id": "readiness_gate_blocks_weak_feature",
       "prompt": "Build saved filters. I roughly know what I want, just start coding.",
       "expectTrue": ["usesReadinessGate", "readinessConcernsOrFail", "usesGrillMeWhenAmbiguous"],
