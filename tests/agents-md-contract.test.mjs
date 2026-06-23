@@ -89,4 +89,15 @@ if (fs.existsSync(claudeFile)) {
   assertIncludes(claudeText, '@AGENTS.md', `${claudeFile} must include @AGENTS.md`);
 }
 
+const installText = fs.readFileSync(path.join(home, '.agents', 'scripts', 'install.sh'), 'utf8');
+const mcpInstallText = fs.readFileSync(path.join(home, '.agents', 'scripts', 'install-mcp-tools.sh'), 'utf8');
+const watchdogText = fs.readFileSync(path.join(home, '.agents', 'codex', 'bin', 'codex-watchdog'), 'utf8');
+const cleanupPath = path.join(home, '.agents', 'codex', 'bin', 'codex-cleanup');
+assert.ok(fs.existsSync(cleanupPath), `${cleanupPath} must exist`);
+assert.ok(fs.statSync(cleanupPath).mode & 0o111, `${cleanupPath} must be executable`);
+assertIncludes(installText, 'codex-cleanup', 'install.sh must install codex-cleanup');
+assertIncludes(watchdogText, 'codex-cleanup', 'codex-watchdog must run codex-cleanup');
+assertIncludes(mcpInstallText, 'ln -s "$npm_bin" "$candidate"', 'CBM setup must link to npm binary');
+assert.ok(!mcpInstallText.includes('.backup.'), 'CBM setup must not keep backup binaries');
+
 console.log('agents-md-contract: pass');

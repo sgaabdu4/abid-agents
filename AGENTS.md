@@ -208,5 +208,5 @@ Use after any code/config/doc edit or debug/fix. Include every row in this exact
 - Load `terse`; it owns brevity, answer-first shape, filler removal, exact symbols, arrows when useful, and uncited claims.
 - Before final, remove em dash characters and dash punctuation from prose; use commas, periods, colons, parentheses, or arrows. Long Markdown: one sentence per physical line.
 - Artifacts/plans/specs/config/code: write files; return path + one-line description.
-- Artifacts/docs/configs/instruction files: durable runtime content only. No transient notes or edit meta unless requested.
+- All repo changes: durable product/runtime content only. No meta notes unless requested.
 - Per-project `AGENTS.md` overrides this global file.
