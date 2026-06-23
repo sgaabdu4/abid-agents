@@ -61,11 +61,30 @@ const LEVELS = { critical: 1, high: 2, strict: 3 };
 const EMOJIS = { critical: '🚨', high: '⛔', strict: '⚠️' };
 const LOG_DIR = path.join(process.env.HOME, '.claude', 'hooks-logs');
 
+function summarizeText(value) {
+  return { redacted: true, length: String(value || '').length };
+}
+
+function summarizePath(value) {
+  return { redacted: true, length: String(value || '').length };
+}
+
+function sanitizeLogData(data) {
+  const safe = {};
+  for (const [key, value] of Object.entries(data)) {
+    if (key === 'command' || key === 'cmd') safe[key] = summarizeText(value);
+    else if (key === 'cwd' || key === 'filePath') safe[key] = summarizePath(value);
+    else if (key === 'session_id' || key === 'sessionId') safe[key] = value ? { redacted: true } : value;
+    else safe[key] = value;
+  }
+  return safe;
+}
+
 function log(data) {
   try {
     if (!fs.existsSync(LOG_DIR)) fs.mkdirSync(LOG_DIR, { recursive: true });
     const file = path.join(LOG_DIR, `${new Date().toISOString().slice(0, 10)}.jsonl`);
-    fs.appendFileSync(file, JSON.stringify({ ts: new Date().toISOString(), ...data }) + '\n');
+    fs.appendFileSync(file, JSON.stringify({ ts: new Date().toISOString(), ...sanitizeLogData(data) }) + '\n');
   } catch {}
 }
 

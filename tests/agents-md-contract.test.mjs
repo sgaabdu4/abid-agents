@@ -42,12 +42,14 @@ assertNotIncludes(text, '## Final Change Report');
 assertIncludes(text, 'Report:');
 assertIncludes(text, 'Why: root cause/evidence.');
 assertIncludes(text, 'What: files/behavior.');
-assertIncludes(text, 'Risk: blast radius.');
+assertIncludes(text, 'Risk: Direct callers; Cross-package; Schema/index; Cache/storage keys; Tests/fixtures; Routes/endpoints; Docs/config/agent assets.');
 assertIncludes(text, 'Proof: tests/gaps.');
 assertIncludes(text, 'Project `AGENTS.md` overrides global.');
 assertIncludes(text, 'User-facing replies -> `terse`.');
 assertIncludes(text, 'React/Next/perf/composition -> `react-doctor` + `fallow` + `vercel-react-best-practices`.');
 assertIncludes(text, 'Sentry/observability/issues/setup -> `sentry-workflow` only.');
+assertIncludes(text, 'Features -> Treehouse first, `grill-me`, plan, build/prove; PR -> `no-mistakes`.');
+assertIncludes(text, 'Post-`grill-me`: clear skip; brief `to-prd`; slices `to-issues`; big `to-prd` then `to-issues`.');
 
 const tokenCheck = spawnSync('python3', ['-c', `
 import sys
@@ -86,6 +88,9 @@ if (fs.existsSync(claudeFile)) {
 const installText = fs.readFileSync(path.join(repo, 'scripts', 'install.sh'), 'utf8');
 const mcpInstallText = fs.readFileSync(path.join(repo, 'scripts', 'install-mcp-tools.sh'), 'utf8');
 const setupText = fs.readFileSync(path.join(repo, 'scripts', 'setup.sh'), 'utf8');
+const readmeText = fs.readFileSync(path.join(repo, 'README.md'), 'utf8');
+const routeMapText = fs.readFileSync(path.join(repo, 'skills', 'workflow-help', 'references', 'route-map.md'), 'utf8');
+const featureFlowHtml = fs.readFileSync(path.join(repo, 'docs', 'feature-to-no-mistakes-flow.html'), 'utf8');
 const watchdogText = fs.readFileSync(path.join(repo, 'codex', 'bin', 'codex-watchdog'), 'utf8');
 const healthText = fs.readFileSync(path.join(repo, 'codex', 'bin', 'codex-health'), 'utf8');
 const updateStackPath = path.join(repo, 'codex', 'bin', 'codex-update-stack');
@@ -96,6 +101,7 @@ const cleanupPath = path.join(repo, 'codex', 'bin', 'codex-cleanup');
 const cbmProbePath = path.join(repo, 'scripts', 'probe-codebase-memory-mcp.mjs');
 const contextProbePath = path.join(repo, 'scripts', 'probe-context-mode-mcp.mjs');
 const contextProbeText = fs.readFileSync(contextProbePath, 'utf8');
+const routingEvalText = fs.readFileSync(path.join(repo, 'tests', 'agents-md-routing', 'evals', 'run-evals.mjs'), 'utf8');
 const markdownHygienePath = path.join(repo, 'scripts', 'check-markdown-hygiene.mjs');
 const markdownHygieneText = fs.readFileSync(markdownHygienePath, 'utf8');
 const autoSyncText = fs.readFileSync(path.join(repo, 'scripts', 'auto-sync.sh'), 'utf8');
@@ -107,6 +113,22 @@ for (const executable of [cleanupPath, updateStackPath, contextHealthPath, cbmPr
 }
 
 assertIncludes(setupText, '--prereqs-only', 'setup.sh must expose a prerequisite-only mode');
+assertIncludes(setupText, 'ABID_AGENTS_ALLOW_HOMEBREW_BOOTSTRAP');
+assertNotIncludes(setupText, 'ABID_AGENTS_SKIP_HOMEBREW_INSTALL');
+assertIncludes(readmeText, 'curl -fsSLO https://raw.githubusercontent.com/sgaabdu4/abid-agents/main/scripts/setup.sh && less setup.sh && bash setup.sh');
+assertNotIncludes(readmeText, 'curl -fsSL https://raw.githubusercontent.com/sgaabdu4/abid-agents/main/scripts/setup.sh | bash');
+assertIncludes(routeMapText, 'Create a Treehouse worktree before planning/coding.');
+assertIncludes(routeMapText, 'Create the Treehouse worktree before feature planning/coding.');
+assertIncludes(routeMapText, 'Reroute to `no-mistakes` only after committed implementation work is ready for the gate.');
+assertIncludes(featureFlowHtml, 'Treehouse worktree exists.');
+assertIncludes(featureFlowHtml, 'no-mistakes');
+assertIncludes(setupText, 'install_or_update_treehouse');
+assertIncludes(setupText, 'ABID_AGENTS_SETUP_TREEHOUSE');
+assertIncludes(setupText, 'ABID_AGENTS_SKIP_TREEHOUSE');
+assertIncludes(setupText, 'https://kunchenguid.github.io/treehouse/install.sh');
+assertIncludes(readmeText, '[`Treehouse`](https://github.com/kunchenguid/treehouse)');
+assertIncludes(setupText, 'install_python_prerequisites');
+assertIncludes(setupText, 'python3 -m pip install --user tiktoken');
 assertIncludes(setupText, 'ABID_AGENTS_SKIP_NPM_INSTALL=1 ABID_AGENTS_SKIP_SUBMODULE_INIT=1 "$ROOT/scripts/install.sh"');
 assertIncludes(installText, '"$ROOT/scripts/setup.sh" --prereqs-only');
 assertIncludes(installText, 'codex-context-mode-health', 'install.sh must install the no-hooks context-mode health check');
@@ -115,7 +137,11 @@ assertNotIncludes(installText, '"$HOME/.claude/skills"', 'install.sh must not re
 assertIncludes(installText, 'CODEX_CBM_COMMAND', 'install.sh must pass a resolved CBM command into Codex config');
 assertIncludes(installText, 'mcp_servers.context-mode', 'install.sh must keep context-mode MCP registered');
 assertIncludes(installText, 'CONTEXT_MODE_DIR', 'install.sh must pin context-mode storage outside ~/.claude');
-assertIncludes(mcpInstallText, 'npm install -g context-mode@latest codebase-memory-mcp@latest @openai/codex@latest');
+assertIncludes(mcpInstallText, 'ABID_AGENTS_CONTEXT_MODE_VERSION');
+assertIncludes(mcpInstallText, '"context-mode@$context_mode_version"');
+assertIncludes(mcpInstallText, '"codebase-memory-mcp@$cbm_version"');
+assertIncludes(mcpInstallText, '"@openai/codex@$codex_version"');
+assertIncludes(setupText, 'ABID_AGENTS_NO_MISTAKES_VERSION');
 assertIncludes(mcpInstallText, 'ln -s "$npm_bin" "$candidate"', 'CBM setup must link to npm binary');
 assert.ok(!mcpInstallText.includes('.backup.'), 'CBM setup must not keep backup binaries');
 
@@ -128,12 +154,15 @@ assertNotIncludes(updateStackText, '["context-mode", "doctor"]', 'codex-update-s
 assertNotIncludes(updateStackText, 'context-mode doctor missing required PASS checks');
 assertIncludes(healthText, 'context-mode no-hooks:');
 assertIncludes(healthText, 'codex-context-mode-health');
+assertIncludes(healthText, 'details=(checks.get("mcp.config") or {}).get("details") or {}');
 assertIncludes(contextHealthText, 'context-mode no-hooks config ok: MCP registered; storage pinned to ~/.codex/context-mode; Codex context-mode hooks absent');
 assertIncludes(contextHealthText, 'CONTEXT_MODE_DIR');
 assertIncludes(contextHealthText, 'probe-context-mode-mcp.mjs');
 assertIncludes(contextProbeText, 'ctx_execute');
 assertIncludes(contextProbeText, 'ctx_search');
 assertIncludes(contextProbeText, 'ctx_stats');
+assertIncludes(routingEvalText, 'AGENTS_ROUTING_EVAL_OUT_DIR');
+assertIncludes(routingEvalText, "path.join('/tmp', 'agents-md-routing-evals')");
 assertIncludes(markdownHygieneText, 'free prose; use a bullet, heading, or fenced template');
 assertIncludes(markdownHygieneText, 'must stay at or under ${maxAgentsLines} lines');
 assertIncludes(markdownHygieneText, 'must stay at or under ${maxAgentsTokens} tokens');
@@ -144,6 +173,10 @@ assertIncludes(markdownHygieneText, 'allow-setup-internals');
 
 assertIncludes(autoSyncText, 'refresh_local_install', 'auto-sync must refresh installed scripts after pulls');
 assertIncludes(autoSyncText, 'ABID_AGENTS_SKIP_NPM_INSTALL=1', 'auto-sync refresh must not run package updates');
+assertIncludes(autoSyncText, 'update_treehouse', 'auto-sync must update Treehouse when installed');
+assertIncludes(autoSyncText, 'ABID_AGENTS_SKIP_TREEHOUSE_UPDATE', 'auto-sync must allow skipping Treehouse update');
+assertIncludes(autoSyncText, 'ABID_AGENTS_TREEHOUSE_BIN', 'auto-sync must allow overriding Treehouse binary');
+assertIncludes(autoSyncText, '"$binary" update', 'auto-sync must call treehouse update through the resolved binary');
 assertIncludes(cronText, 'codex-update-stack', 'cron installer must schedule codex stack updates');
 assertIncludes(cronText, 'ABID_AGENTS_CODEX_STACK_CRON_SCHEDULE', 'codex stack cron schedule must be configurable');
 assertIncludes(cronText, 'ABID_AGENTS_SKIP_CODEX_STACK_CRON', 'codex stack cron must be skippable');

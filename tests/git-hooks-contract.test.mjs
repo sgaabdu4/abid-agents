@@ -13,6 +13,8 @@ const subtreeSyncScript = fs.readFileSync(path.join(repo, 'scripts', 'sync-subtr
 const submoduleScript = fs.readFileSync(path.join(repo, 'scripts', 'update-submodules.sh'), 'utf8');
 const codexWatchdog = fs.readFileSync(path.join(repo, 'codex', 'bin', 'codex-watchdog'), 'utf8');
 const codexHealth = fs.readFileSync(path.join(repo, 'codex', 'bin', 'codex-health'), 'utf8');
+const securityHook = fs.readFileSync(path.join(repo, 'hooks', 'security-pretooluse.js'), 'utf8');
+const dangerousHook = fs.readFileSync(path.join(repo, 'hooks', 'claude-code-hooks', 'block-dangerous-commands.js'), 'utf8');
 
 assert.ok(installScript.includes('install_hook post-merge'), 'installer must create post-merge hook');
 assert.ok(installScript.includes('install_hook post-rewrite'), 'installer must create post-rewrite hook for pull --rebase');
@@ -37,7 +39,10 @@ assert.ok(installScript.includes('replace_with_link_file "$ROOT/AGENTS.md" "$HOM
 assert.ok(installScript.includes('replace_with_link_file "$ROOT/AGENTS.md" "$HOME/.pi/AGENTS.md"'), 'installer must link Pi AGENTS.md to the canonical file');
 assert.ok(!installScript.includes('install_managed_block'), 'installer must not install copied AGENTS.md managed blocks');
 assert.ok(installScript.includes('scripts/check-markdown-hygiene.mjs'), 'pre-commit hook must run Markdown hygiene');
+assert.ok(installScript.includes('Blocked commit: staged forbidden files must not be edited.'), 'pre-commit hook must block forbidden edited files');
 assert.ok(installScript.includes('Blocked commit: staged files over 700 lines must be split below 700.'), 'pre-commit hook must block staged files over 700 lines');
+assert.ok(installScript.includes('Blocked commit: staged content contains secret-like values.'), 'pre-commit hook must block secret-like staged values');
+assert.ok(installScript.includes('[[ "$mode" == "160000" ]]'), 'pre-commit hook must skip staged submodule gitlinks');
 assert.ok(installScript.includes("':!scripts/check-markdown-hygiene.mjs'"), 'pre-commit private-path scan must not flag the checker pattern');
 assert.ok(installScript.includes("':!tests/markdown-hygiene.test.mjs'"), 'pre-commit private-path scan must not flag the hygiene test fixture');
 assert.ok(installScript.includes('Preserving existing file'), 'installer must preserve existing non-managed config files');
@@ -45,6 +50,10 @@ assert.ok(!installScript.includes('rm "$target"'), 'installer must not remove ex
 assert.ok(setupScript.includes('git clone --recurse-submodules'), 'new-user setup must clone with submodules');
 assert.ok(setupScript.includes('scripts/install.sh'), 'new-user setup must run the main installer');
 assert.ok(setupScript.includes('no-mistakes'), 'new-user setup must install or initialize no-mistakes');
+assert.ok(setupScript.includes('install_or_update_treehouse'), 'setup must install or update Treehouse');
+assert.ok(setupScript.includes('ABID_AGENTS_SETUP_TREEHOUSE'), 'setup must allow non-interactive Treehouse choice');
+assert.ok(setupScript.includes('ABID_AGENTS_SKIP_TREEHOUSE'), 'setup must allow skipping Treehouse install');
+assert.ok(setupScript.includes('https://kunchenguid.github.io/treehouse/install.sh'), 'setup must use Treehouse upstream installer');
 assert.ok(setupScript.includes('ask_yes_no'), 'setup must ask questions when interactive');
 assert.ok(setupScript.includes('ABID_AGENTS_SETUP_NO_MISTAKES'), 'setup must allow non-interactive no-mistakes choice');
 assert.ok(setupScript.includes('ABID_AGENTS_ENABLE_CRON'), 'setup must allow cron choice');
@@ -55,6 +64,7 @@ assert.ok(
   installScript.includes('Blocked push: reachable git history contains private path or secret-like references.'),
   'pre-push hook must block private path or secret-like history matches'
 );
+assert.ok(installScript.includes("awk -F: '{ print $1 \":\" $2 \":\" $3 }'"), 'pre-push hook must avoid printing matched secret content');
 assert.ok(installScript.includes('scan_history_fixed'), 'pre-push history scan must avoid giant revision argv');
 assert.ok(autoSyncScript.includes('git rev-parse --git-path agent-config-auto-sync.lock'), 'auto-sync lock must be repo-local');
 assert.ok(autoSyncScript.includes('git pull --ff-only origin main'), 'auto-sync must pull main with ff-only');
@@ -62,6 +72,9 @@ assert.ok(autoSyncScript.includes('scripts/update-submodules.sh" --remote'), 'au
 assert.ok(autoSyncScript.includes('ABID_AGENTS_SKIP_SUBMODULE_BUMP'), 'auto-sync must allow disabling upstream submodule bumps');
 assert.ok(autoSyncScript.includes('ABID_AGENTS_SKIP_NO_MISTAKES_UPDATE'), 'auto-sync must allow disabling no-mistakes updates');
 assert.ok(autoSyncScript.includes('ABID_AGENTS_NO_MISTAKES_BIN'), 'auto-sync must allow overriding the no-mistakes binary path');
+assert.ok(autoSyncScript.includes('update_treehouse'), 'auto-sync must update Treehouse');
+assert.ok(autoSyncScript.includes('ABID_AGENTS_SKIP_TREEHOUSE_UPDATE'), 'auto-sync must allow disabling Treehouse updates');
+assert.ok(autoSyncScript.includes('ABID_AGENTS_TREEHOUSE_BIN'), 'auto-sync must allow overriding the Treehouse binary path');
 assert.ok(autoSyncScript.includes('NO_MISTAKES_NO_UPDATE_CHECK=1'), 'auto-sync must avoid nested no-mistakes update checks');
 assert.ok(autoSyncScript.includes('update --yes'), 'auto-sync must update no-mistakes non-interactively');
 assert.ok(autoSyncScript.includes('git commit -m "Auto-update skill submodules"'), 'auto-sync must commit changed submodule pins');
@@ -91,8 +104,15 @@ assert.ok(
 );
 assert.ok(codexWatchdog.includes('CODEX_WATCHDOG_KILL_ORPHANS'), 'watchdog must reap orphaned MCP processes');
 assert.ok(codexWatchdog.includes('CODEX_WATCHDOG_KILL_CODEX_APP_ON_STORM'), 'watchdog must handle severe Codex.app storms');
+assert.ok(codexWatchdog.includes('CODEX_WATCHDOG_KILL_ORPHANS:-0'), 'watchdog must not kill orphan MCP processes by default');
+assert.ok(codexWatchdog.includes('CODEX_WATCHDOG_KILL_CODEX_APP_ON_STORM:-0'), 'watchdog must not kill Codex.app by default');
+assert.ok(installScript.includes('<key>CODEX_WATCHDOG_KILL_ORPHANS</key>\n    <string>0</string>'), 'installed watchdog must keep orphan killing opt-in');
+assert.ok(installScript.includes('<key>CODEX_WATCHDOG_KILL_CODEX_APP_ON_STORM</key>\n    <string>0</string>'), 'installed watchdog must keep Codex.app killing opt-in');
 assert.ok(codexWatchdog.includes('policy_cpu'), 'watchdog must use syspolicyd/trustd as storm evidence');
 assert.ok(codexHealth.includes('mcp counts:'), 'codex-health must report MCP counts');
+assert.ok(codexHealth.includes('mcp.config'), 'codex-health must read MCP count from doctor check details');
+assert.ok(securityHook.includes('sanitizeLogData(data)'), 'security hook logs must be sanitized before writing');
+assert.ok(dangerousHook.includes('sanitizeLogData(data)'), 'dangerous command hook logs must be sanitized before writing');
 
 const prePushHook = path.join(repo, '.git', 'hooks', 'pre-push');
 if (fs.existsSync(prePushHook)) {
@@ -109,7 +129,10 @@ if (fs.existsSync(preCommitHook)) {
   const text = fs.readFileSync(preCommitHook, 'utf8');
   assert.ok((stat.mode & 0o111) !== 0, 'installed pre-commit hook must be executable');
   assert.ok(text.includes('scripts/check-markdown-hygiene.mjs'), 'installed pre-commit hook must run Markdown hygiene');
+  assert.ok(text.includes('Blocked commit: staged forbidden files must not be edited.'), 'installed pre-commit hook must block forbidden files');
   assert.ok(text.includes('Blocked commit: staged files over 700 lines must be split below 700.'), 'installed pre-commit hook must block staged files over 700 lines');
+  assert.ok(text.includes('Blocked commit: staged content contains secret-like values.'), 'installed pre-commit hook must block secret-like values');
+  assert.ok(text.includes('[[ "$mode" == "160000" ]]'), 'installed pre-commit hook must skip staged submodule gitlinks');
   assert.ok(text.includes("':!scripts/check-markdown-hygiene.mjs'"), 'installed pre-commit hook must ignore checker pattern file');
   assert.ok(text.includes("':!tests/markdown-hygiene.test.mjs'"), 'installed pre-commit hook must ignore test fixture pattern file');
   assert.ok(text.includes('Blocked commit: staged content contains private project/local path references.'));

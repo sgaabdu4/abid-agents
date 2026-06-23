@@ -27,7 +27,10 @@ if ! command -v npm >/dev/null 2>&1; then
   exit 1
 fi
 
-npm install -g context-mode@latest codebase-memory-mcp@latest @openai/codex@latest
+context_mode_version="${ABID_AGENTS_CONTEXT_MODE_VERSION:-1.0.166}"
+cbm_version="${ABID_AGENTS_CBM_VERSION:-0.8.1}"
+codex_version="${ABID_AGENTS_CODEX_VERSION:-0.142.0}"
+npm install -g "context-mode@$context_mode_version" "codebase-memory-mcp@$cbm_version" "@openai/codex@$codex_version"
 
 sync_shadowed_codebase_memory() {
   local npm_root npm_prefix npm_bin candidate

@@ -127,13 +127,13 @@ install_codex_watchdog() {
   <key>EnvironmentVariables</key>
   <dict>
     <key>CODEX_WATCHDOG_KILL_ORPHANS</key>
-    <string>1</string>
+    <string>0</string>
     <key>CODEX_WATCHDOG_LOAD_WARN</key>
     <string>32</string>
     <key>CODEX_WATCHDOG_MCP_WARN</key>
     <string>12</string>
     <key>CODEX_WATCHDOG_KILL_CODEX_APP_ON_STORM</key>
-    <string>1</string>
+    <string>0</string>
   </dict>
   <key>StandardOutPath</key>
   <string>$HOME/.codex/logs/codex-watchdog.out.log</string>
@@ -402,13 +402,14 @@ scan_history_regex() {
 
 home_matches="$(scan_history_fixed "$HOME")"
 secret_pattern='(github_pat_[A-Za-z0-9_]{20,}|gh[pousr]_[A-Za-z0-9_]{20,}|sk-[A-Za-z0-9_-]{20,}|AKIA[0-9A-Z]{16}|-----BEGIN [A-Z ]*PRIVATE KEY-----)'
+generated_marker="AUTO""-GENERATED"
 secret_matches="$(scan_history_regex "$secret_pattern")"
 matches="${home_matches}${home_matches:+$'\n'}${secret_matches}"
 
 if [[ -n "$matches" ]]; then
   printf '%s\n' "Blocked push: reachable git history contains private path or secret-like references."
   printf '%s\n' "Rewrite or edit history before pushing:"
-  printf '%s\n' "$matches"
+  printf '%s\n' "$matches" | awk -F: '{ print $1 ":" $2 ":" $3 }'
   exit 1
 fi
 
@@ -431,18 +432,43 @@ fi
 
 pattern='frontline|frontline-fitness|repem|jabal[ -_]?sina|jabal|afenso|/Users/abid|Workspaces/afenso|/Users/abid/Workspaces'
 grep_pathspecs=(. ':!scripts/install.sh' ':!scripts/check-markdown-hygiene.mjs' ':!tests/markdown-hygiene.test.mjs')
+secret_pattern='(github_pat_[A-Za-z0-9_]{20,}|gh[pousr]_[A-Za-z0-9_]{20,}|sk-[A-Za-z0-9_-]{20,}|AKIA[0-9A-Z]{16}|-----BEGIN [A-Z ]*PRIVATE KEY-----)'
 
 if git diff --cached --quiet --exit-code; then
   exit 0
 fi
 
 oversized=""
+forbidden=""
+secret_files=""
 while IFS= read -r file; do
+  mode="$(git ls-files -s -- "$file" | awk '{ print $1 }')"
+  if [[ "$mode" == "160000" ]]; then
+    continue
+  fi
   lines="$(git show ":$file" 2>/dev/null | wc -l | tr -d ' ')"
   if [[ "$lines" =~ ^[0-9]+$ && "$lines" -gt 700 ]]; then
     oversized="${oversized}${oversized:+$'\n'}${file}:${lines}"
   fi
+  case "$file" in
+    .env|.env.*|*/.env|*/.env.*|CHANGELOG.md|*/CHANGELOG.md|generated/*|*/generated/*)
+      forbidden="${forbidden}${forbidden:+$'\n'}${file}"
+      ;;
+  esac
+  content="$(git show ":$file" 2>/dev/null || true)"
+  if [[ "$file" != "AGENTS.md" && "$content" == *"$generated_marker"* ]]; then
+    forbidden="${forbidden}${forbidden:+$'\n'}${file}"
+  fi
+  if printf '%s\n' "$content" | grep -E -i "$secret_pattern" >/dev/null 2>&1; then
+    secret_files="${secret_files}${secret_files:+$'\n'}${file}"
+  fi
 done < <(git diff --cached --name-only --diff-filter=ACMR)
+
+if [[ -n "$forbidden" ]]; then
+  printf '%s\n' "Blocked commit: staged forbidden files must not be edited."
+  printf '%s\n' "$forbidden" | sort -u
+  exit 1
+fi
 
 if [[ -n "$oversized" ]]; then
   printf '%s\n' "Blocked commit: staged files over 700 lines must be split below 700."
@@ -450,11 +476,17 @@ if [[ -n "$oversized" ]]; then
   exit 1
 fi
 
-matches="$(git grep --cached -n -i -E "$pattern" -- "${grep_pathspecs[@]}" || true)"
+if [[ -n "$secret_files" ]]; then
+  printf '%s\n' "Blocked commit: staged content contains secret-like values."
+  printf '%s\n' "$secret_files" | sort -u
+  exit 1
+fi
+
+matches="$(git grep --cached -l -i -E "$pattern" -- "${grep_pathspecs[@]}" || true)"
 
 if [[ -n "$matches" ]]; then
   printf '%s\n' "Blocked commit: staged content contains private project/local path references."
-  printf '%s\n' "Remove or generalize these before committing:"
+  printf '%s\n' "Remove or generalize these files before committing:"
   printf '%s\n' "$matches"
   exit 1
 fi

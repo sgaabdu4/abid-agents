@@ -14,14 +14,15 @@ const cases = requestedCases
   ? config.cases.filter((testCase) => requestedCases.has(testCase.id))
   : config.cases;
 const runId = new Date().toISOString().replace(/[:.]/g, '-');
-const outDir = path.join(evalDir, 'results', runId);
+const outBase = process.env.AGENTS_ROUTING_EVAL_OUT_DIR
+  ? path.resolve(process.env.AGENTS_ROUTING_EVAL_OUT_DIR)
+  : path.join('/tmp', 'agents-md-routing-evals');
+const outDir = path.join(outBase, runId);
 fs.mkdirSync(outDir, { recursive: true });
 
 const policyFiles = [
   'AGENTS.md',
   'README.md',
-  'docs/feature-to-no-mistakes-flow.html',
-  'docs/skills-workflow-print.html',
   'skills/workflow-help/SKILL.md',
   'skills/workflow-help/references/route-map.md',
 ];
@@ -66,6 +67,8 @@ const keyDefinitions = [
   'readinessConcernsOrFail: marks weak readiness as CONCERNS or FAIL instead of PASS',
   'usesGrillMeWhenAmbiguous: routes ambiguous feature scope to grill-me',
   'startsImplementationWithUnknowns: starts coding despite missing outcome, owner, blast radius, proof path, or risk routing',
+  'usesTreehouseWorkspace: names Treehouse worktree or isolated branch as the place for feature planning/coding before implementation proceeds',
+  'skipsWorkspaceIsolation: incorrectly starts feature implementation without Treehouse/worktree/branch isolation',
   'correctsCourseOnScopeExpansion: stops and reroutes when scope expands midstream',
   'routesBackToPlanning: uses grill-me, to-prd, to-issues, or codebase-design for expanded or unclear scope',
   'silentlyExpandsScope: continues implementation after scope expansion without rerouting',
@@ -225,7 +228,7 @@ const summary = {
 };
 
 fs.writeFileSync(path.join(outDir, 'summary.json'), `${JSON.stringify(summary, null, 2)}\n`);
-console.log(`results: ${path.relative(repoRoot, outDir)}`);
+console.log(`results: ${outDir}`);
 console.log(`passed: ${summary.passed}/${summary.total}`);
 for (const result of results) {
   console.log(`${result.passed ? 'PASS' : 'FAIL'} ${result.id}${result.errors.length ? `: ${result.errors.join('; ')}` : ''}`);

@@ -11,7 +11,7 @@ This repo is designed to be cloned to `~/.agents`. From there it links one set o
 New machine:
 
 ```sh
-curl -fsSL https://raw.githubusercontent.com/sgaabdu4/abid-agents/main/scripts/setup.sh | bash
+curl -fsSLO https://raw.githubusercontent.com/sgaabdu4/abid-agents/main/scripts/setup.sh && less setup.sh && bash setup.sh
 ```
 
 Existing clone:
@@ -21,9 +21,9 @@ cd "$HOME/.agents"
 ./scripts/setup.sh
 ```
 
-The setup script detects whether `~/.agents` already exists. On macOS it installs missing bootstrap prerequisites first: Xcode Command Line Tools prompt, Homebrew, Git, Node/npm, Dart, Flutter, and a managed shell PATH block. It then clones or updates the repo, initializes pinned submodules, installs MCP tools, links agent configs and skills, installs local Git hooks, installs or updates [`no-mistakes`](https://github.com/kunchenguid/no-mistakes), and initializes the `.agents` repo for `git push no-mistakes`. After the repo is available, independent setup phases run in parallel where they do not share mutable package-manager state.
+The setup script detects whether `~/.agents` already exists. On macOS it installs missing bootstrap prerequisites first: Xcode Command Line Tools prompt, Homebrew, Git, Node/npm, Dart, Flutter, and a managed shell PATH block. It then clones or updates the repo, initializes pinned submodules, installs MCP tools, links agent configs and skills, installs local Git hooks, installs or updates [`Treehouse`](https://github.com/kunchenguid/treehouse) and [`no-mistakes`](https://github.com/kunchenguid/no-mistakes), and initializes the `.agents` repo for `git push no-mistakes`. After the repo is available, independent setup phases run in parallel where they do not share mutable package-manager state.
 
-When run in a terminal, setup asks whether to install `no-mistakes`, enable cron, and initialize extra repos. In non-interactive runs, defaults are safe: `no-mistakes` on, cron off, extra repos only from env vars.
+When run in a terminal, setup asks whether to install `Treehouse`, install `no-mistakes`, enable cron, and initialize extra repos. In non-interactive runs, defaults are safe: `Treehouse` on, `no-mistakes` on, cron off, extra repos only from env vars.
 
 The setup is conservative:
 
@@ -40,10 +40,12 @@ Useful setup switches:
 | --- | --- |
 | `ABID_AGENTS_ENABLE_CRON=1` | Install the optional auto-sync cron during setup. |
 | `ABID_AGENTS_SKIP_PREREQ_INSTALL=1` | Skip prerequisite repair. |
-| `ABID_AGENTS_SKIP_HOMEBREW_INSTALL=1` | Fail instead of installing Homebrew when it is missing. |
+| `ABID_AGENTS_ALLOW_HOMEBREW_BOOTSTRAP=1` | Allow setup to run the upstream Homebrew bootstrap when Homebrew is missing. |
 | `ABID_AGENTS_SKIP_FLUTTER_INSTALL=1` | Skip Flutter SDK installation. |
 | `ABID_AGENTS_FLUTTER_HOME=/path/to/flutter` | Install or detect Flutter at a custom path. |
 | `ABID_AGENTS_SKIP_SHELL_PATH_UPDATE=1` | Do not write the managed `~/.zshenv` PATH block. |
+| `ABID_AGENTS_SETUP_TREEHOUSE=0` | Answer no to the setup-time Treehouse question. |
+| `ABID_AGENTS_SKIP_TREEHOUSE=1` | Skip installing or updating Treehouse during setup. |
 | `ABID_AGENTS_SETUP_NO_MISTAKES=0` | Answer no to the setup-time `no-mistakes` question. |
 | `ABID_AGENTS_SKIP_NPM_INSTALL=1` | Skip MCP tool installation. |
 | `ABID_AGENTS_SKIP_NO_MISTAKES=1` | Skip installing and initializing `no-mistakes`. |
@@ -59,7 +61,7 @@ Agent instruction files are symlinks to `~/.agents/AGENTS.md`. Keep local overri
 | Agent/runtime | Linked config |
 | --- | --- |
 | Codex | `~/.codex/AGENTS.md`, `~/.codex/mcp-config.json`, `~/.codex/hooks.json`, `~/.codex/skills/*` |
-| Claude | `~/.claude/AGENTS.md`, `~/.claude/skills/*` |
+| Claude | `~/.claude/AGENTS.md`, `~/.claude/CLAUDE.md` |
 | Copilot | `~/.copilot/AGENTS.md`, `~/.copilot/skills/*` |
 | Pi | `~/.pi/AGENTS.md`, `~/.pi/skills/*` |
 | Pi agent | `~/.pi/agent/AGENTS.md`, `~/.pi/agent/skills/*` |
@@ -207,7 +209,7 @@ Set a custom schedule:
 ABID_AGENTS_CRON_SCHEDULE="*/30 * * * *" ./scripts/install-cron.sh
 ```
 
-Cron runs `scripts/auto-sync.sh`. It updates `no-mistakes`, pulls `main`, bumps submodules, scans for private paths and secret-like values, commits changed pins, and pushes `main`.
+Cron runs `scripts/auto-sync.sh`. It updates Treehouse and `no-mistakes`, pulls `main`, bumps submodules, scans for private paths and secret-like values, commits changed pins, and pushes `main`.
 
 Useful switches:
 
@@ -217,6 +219,8 @@ Useful switches:
 | `ABID_AGENTS_SKIP_SUBMODULE_INIT=1` | Skip install-time submodule init. |
 | `ABID_AGENTS_SKIP_SUBMODULE_UPDATE=1` | Skip pull-hook submodule updates. |
 | `ABID_AGENTS_SKIP_SUBMODULE_BUMP=1` | Cron uses pinned commits only. |
+| `ABID_AGENTS_SKIP_TREEHOUSE_UPDATE=1` | Skip cron-time Treehouse update. |
+| `ABID_AGENTS_TREEHOUSE_BIN=/path/to/treehouse` | Override the CLI path used by cron. |
 | `ABID_AGENTS_SKIP_NO_MISTAKES_UPDATE=1` | Skip cron-time `no-mistakes update`. |
 | `ABID_AGENTS_NO_MISTAKES_BIN=/path/to/no-mistakes` | Override the CLI path used by cron. |
 | `ABID_AGENTS_CHECK_SUBMODULES_BEFORE_PUSH=1` | Print submodule status before push. |

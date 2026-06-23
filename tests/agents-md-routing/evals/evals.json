@@ -3,9 +3,9 @@
   "cases": [
     {
       "id": "workflow_help_front_door",
-      "prompt": "I have a feature idea and I am not sure which workflow or skill to use from idea to PR. What should happen next?",
-      "expectTrue": ["usesWorkflowHelp", "keepsSupportToolsAsTools", "endsAtNoMistakes"],
-      "expectFalse": ["usesBmadMenuCodes", "usesNoMistakesBeforeImplementation"]
+      "prompt": "I have a feature idea and I am not sure which workflow or skill to use. Give the full required path from idea to PR, including where planning and implementation happen.",
+      "expectTrue": ["usesWorkflowHelp", "keepsSupportToolsAsTools", "usesTreehouseWorkspace", "endsAtNoMistakes"],
+      "expectFalse": ["usesBmadMenuCodes", "usesNoMistakesBeforeImplementation", "skipsWorkspaceIsolation"]
     },
     {
       "id": "support_tools_not_stages",

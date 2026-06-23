@@ -39,11 +39,11 @@
 - Appwrite/Auth/TablesDB/Storage/Functions/Realtime -> `appwrite-backend`.
 - Online/current info -> `tavily-cli`.
 - Repeated fixes/project learning -> `repeated-failure-learning`; skill authoring/evals -> `skill-creator`.
-- Workflow/skill/next-step/BMAD comparison -> `workflow-help`.
-- Ambiguous planning/features -> `grill-me`; shipping validation/push/PR -> `no-mistakes`.
+- Workflow/skill/next-step -> `workflow-help`.
+- Features -> Treehouse first, `grill-me`, plan, build/prove; PR -> `no-mistakes`.
 - Hard bugs/failures/flakes/regressions -> `diagnosing-bugs`.
 - Boundaries/interfaces/ownership/wrappers -> `codebase-design`.
-- Resolved context -> PRD/spec -> `to-prd`; accepted plan -> issues -> `to-issues`.
+- Post-`grill-me`: clear skip; brief `to-prd`; slices `to-issues`; big `to-prd` then `to-issues`.
 - React/Next/perf/composition -> `react-doctor` + `fallow` + `vercel-react-best-practices`.
 - Tests/specs/QA/mutation -> `test-quality`.
 - UI/components/design-system/tokens -> `atomic-ui` + `impeccable`.
@@ -54,10 +54,10 @@
 - Scope repo/root, `AGENTS.md`, skills, constraints, owner, blast radius, proof, risk.
 - Non-trivial impl readiness: `PASS`/`CONCERNS`/`FAIL`.
 - Scope expands -> `grill-me`/`to-prd`/`to-issues`/`codebase-design`.
-- Tests -> `test-quality`; run smallest verify; fix root cause, not check.
+- Tests -> `test-quality`; smallest verify; fix root cause.
 - Docs/rules edits: re-read + contract/symlink validation.
 - Report:
 - Why: root cause/evidence.
 - What: files/behavior.
-- Risk: blast radius.
+- Risk: Direct callers; Cross-package; Schema/index; Cache/storage keys; Tests/fixtures; Routes/endpoints; Docs/config/agent assets.
 - Proof: tests/gaps.

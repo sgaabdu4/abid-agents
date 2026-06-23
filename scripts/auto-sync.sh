@@ -57,6 +57,28 @@ update_no_mistakes() {
   fi
 }
 
+update_treehouse() {
+  local binary
+
+  if [[ "${ABID_AGENTS_SKIP_TREEHOUSE_UPDATE:-}" == "1" ]]; then
+    return 0
+  fi
+
+  binary="${ABID_AGENTS_TREEHOUSE_BIN:-}"
+  if [[ -z "$binary" ]]; then
+    if command -v treehouse >/dev/null 2>&1; then
+      binary="$(command -v treehouse)"
+    else
+      echo "Skipping Treehouse update: treehouse not found."
+      return 0
+    fi
+  fi
+
+  if ! "$binary" update; then
+    echo "Treehouse update failed; continuing auto-sync." >&2
+  fi
+}
+
 refresh_local_install() {
   if [[ "${ABID_AGENTS_SKIP_AUTO_INSTALL:-}" == "1" ]]; then
     return 0
@@ -81,6 +103,7 @@ if ! git diff --quiet || ! git diff --cached --quiet; then
 fi
 
 update_no_mistakes
+update_treehouse
 
 git fetch origin main
 
@@ -105,11 +128,11 @@ if git diff --quiet && git diff --cached --quiet; then
 fi
 
 if command -v rg >/dev/null 2>&1; then
-  home_matches="$(rg -n --hidden --glob '!.git/**' --glob '!**/.git/**' -F "$HOME" "$ROOT" || true)"
-  secret_matches="$(rg -n --hidden --glob '!.git/**' --glob '!**/.git/**' '(github_pat_[A-Za-z0-9_]+|gh[pousr]_[A-Za-z0-9_]+|sk-[A-Za-z0-9_-]{20,}|AKIA[0-9A-Z]{16}|-----BEGIN (RSA |DSA |EC |OPENSSH )?PRIVATE KEY-----)' "$ROOT" || true)"
+  home_matches="$(rg -l --hidden --glob '!.git/**' --glob '!**/.git/**' -F "$HOME" "$ROOT" || true)"
+  secret_matches="$(rg -l --hidden --glob '!.git/**' --glob '!**/.git/**' '(github_pat_[A-Za-z0-9_]+|gh[pousr]_[A-Za-z0-9_]+|sk-[A-Za-z0-9_-]{20,}|AKIA[0-9A-Z]{16}|-----BEGIN (RSA |DSA |EC |OPENSSH )?PRIVATE KEY-----)' "$ROOT" || true)"
   matches="${home_matches}${home_matches:+$'\n'}${secret_matches}"
   if [[ -n "$matches" ]]; then
-    printf '%s\n' "$matches"
+    printf '%s\n' "$matches" | sort -u
     echo "Refusing auto-sync: private path or secret-like reference found after submodule update." >&2
     exit 1
   fi

@@ -4,6 +4,7 @@ set -euo pipefail
 REPO_URL="${ABID_AGENTS_REPO_URL:-https://github.com/sgaabdu4/abid-agents.git}"
 ROOT="${ABID_AGENTS_HOME:-$HOME/.agents}"
 NO_MISTAKES_HOME="${NO_MISTAKES_HOME:-$HOME/.no-mistakes}"
+TREEHOUSE_INSTALL_URL="${ABID_AGENTS_TREEHOUSE_INSTALL_URL:-https://kunchenguid.github.io/treehouse/install.sh}"
 
 require_command() {
   local command="$1"
@@ -66,8 +67,8 @@ ensure_homebrew() {
     exit 1
   fi
 
-  if [[ "${ABID_AGENTS_SKIP_HOMEBREW_INSTALL:-0}" == "1" ]]; then
-    echo "Homebrew is missing; install it or unset ABID_AGENTS_SKIP_HOMEBREW_INSTALL." >&2
+  if [[ "${ABID_AGENTS_ALLOW_HOMEBREW_BOOTSTRAP:-0}" != "1" ]]; then
+    echo "Homebrew is missing; install it manually or set ABID_AGENTS_ALLOW_HOMEBREW_BOOTSTRAP=1 to run the upstream bootstrap." >&2
     exit 1
   fi
 
@@ -215,6 +216,22 @@ install_flutter_if_missing() {
   flutter --version >/dev/null
 }
 
+install_python_prerequisites() {
+  require_command python3
+  if python3 - <<'PY' >/dev/null 2>&1
+import tiktoken
+PY
+  then
+    return 0
+  fi
+
+  if [[ "${ABID_AGENTS_SKIP_PYTHON_DEPS:-0}" == "1" ]]; then
+    echo "Python package tiktoken is missing; unset ABID_AGENTS_SKIP_PYTHON_DEPS to install it." >&2
+    exit 1
+  fi
+  python3 -m pip install --user tiktoken
+}
+
 install_prerequisites() {
   if [[ "${ABID_AGENTS_SKIP_PREREQ_INSTALL:-0}" == "1" ]]; then
     prepend_agent_paths
@@ -227,6 +244,7 @@ install_prerequisites() {
     ensure_homebrew
     install_brew_packages
   fi
+  install_python_prerequisites
   install_flutter_if_missing
   install_shell_path_block
   export ABID_AGENTS_PREREQS_READY=1
@@ -315,6 +333,12 @@ choose_setup_options() {
     export ABID_AGENTS_SKIP_NO_MISTAKES=1
   fi
 
+  if ask_yes_no ABID_AGENTS_SETUP_TREEHOUSE "Install or update Treehouse?" yes; then
+    unset ABID_AGENTS_SKIP_TREEHOUSE
+  else
+    export ABID_AGENTS_SKIP_TREEHOUSE=1
+  fi
+
   if ask_yes_no ABID_AGENTS_ENABLE_CRON "Enable auto-sync cron for .agents?" no; then
     export ABID_AGENTS_ENABLE_CRON=1
   else
@@ -364,8 +388,11 @@ install_or_update_no_mistakes() {
   require_command curl
   require_command tar
 
-  version="$(curl -fsSL "https://api.github.com/repos/kunchenguid/no-mistakes/releases/latest" |
-    sed -n 's/.*"tag_name"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/p')"
+  version="${ABID_AGENTS_NO_MISTAKES_VERSION:-v1.30.1}"
+  if [[ "$version" == "latest" ]]; then
+    version="$(curl -fsSL "https://api.github.com/repos/kunchenguid/no-mistakes/releases/latest" |
+      sed -n 's/.*"tag_name"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/p')"
+  fi
   if [[ -z "$version" ]]; then
     echo "Could not determine latest no-mistakes release." >&2
     exit 1
@@ -410,6 +437,28 @@ install_or_update_no_mistakes() {
   NO_MISTAKES_TELEMETRY="${NO_MISTAKES_TELEMETRY:-0}" \
     NO_MISTAKES_NO_UPDATE_CHECK=1 \
     "$install_dir/no-mistakes" daemon restart
+}
+
+install_or_update_treehouse() {
+  if [[ "${ABID_AGENTS_SKIP_TREEHOUSE:-}" == "1" ]]; then
+    return 0
+  fi
+
+  if command -v treehouse >/dev/null 2>&1; then
+    if ! treehouse update; then
+      echo "Treehouse update failed; continuing setup." >&2
+    fi
+    return 0
+  fi
+
+  require_command curl
+  curl -fsSL "$TREEHOUSE_INSTALL_URL" | sh
+  prepend_agent_paths
+
+  if ! command -v treehouse >/dev/null 2>&1; then
+    echo "Treehouse install completed but treehouse is not on PATH." >&2
+    exit 1
+  fi
 }
 
 no_mistakes_binary() {
@@ -483,7 +532,7 @@ wait_for_job() {
 }
 
 run_parallel_install() {
-  local install_pid no_mistakes_pid root_init_pid extra_init_pid
+  local install_pid no_mistakes_pid treehouse_pid root_init_pid extra_init_pid
   local status=0
 
   "$ROOT/scripts/install.sh" &
@@ -492,8 +541,12 @@ run_parallel_install() {
   install_or_update_no_mistakes &
   no_mistakes_pid=$!
 
+  install_or_update_treehouse &
+  treehouse_pid=$!
+
   wait_for_job "$install_pid" "Agent install" || status=1
   wait_for_job "$no_mistakes_pid" "no-mistakes install" || status=1
+  wait_for_job "$treehouse_pid" "Treehouse install" || status=1
 
   if [[ "$status" != "0" ]]; then
     exit 1

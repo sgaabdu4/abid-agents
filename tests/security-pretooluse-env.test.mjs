@@ -6,6 +6,7 @@ import assert from 'node:assert/strict';
 import { spawnSync } from 'node:child_process';
 
 const hook = path.join(process.env.HOME, '.agents', 'hooks', 'security-pretooluse.js');
+const dangerousHook = path.join(process.env.HOME, '.agents', 'hooks', 'claude-code-hooks', 'block-dangerous-commands.js');
 const tempRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'security-pretooluse-env-'));
 const logDir = path.join(tempRoot, 'logs');
 
@@ -40,6 +41,33 @@ assertDenied({
   tool_input: { command: 'node --env-file=.env.local scripts/run.ts' },
   cwd: '/tmp',
 }, 'env-file-loader');
+
+const logFiles = fs.readdirSync(logDir).filter((name) => name.endsWith('.jsonl'));
+assert.ok(logFiles.length > 0, 'security hook must write blocked events to the configured log dir');
+const logText = logFiles.map((name) => fs.readFileSync(path.join(logDir, name), 'utf8')).join('\n');
+assert.doesNotMatch(logText, /node --env-file=/, 'security hook log must not contain raw command text');
+assert.doesNotMatch(logText, /"cwd":"\/tmp"/, 'security hook log must not contain raw cwd');
+assert.match(logText, /"command":\{"redacted":true,"length":/);
+assert.match(logText, /"cwd":\{"redacted":true,"length":/);
+
+const dangerousHome = path.join(tempRoot, 'dangerous-home');
+const dangerous = spawnSync('node', [dangerousHook], {
+  input: JSON.stringify({
+    tool_name: 'Bash',
+    tool_input: { command: 'git reset --hard' },
+    cwd: '/tmp/unsafe-project',
+    session_id: 'session-123',
+  }),
+  encoding: 'utf8',
+  env: { ...process.env, HOME: dangerousHome },
+});
+assert.equal(dangerous.status, 0, dangerous.stderr);
+const dangerousLog = fs.readdirSync(path.join(dangerousHome, '.claude', 'hooks-logs'))
+  .map((name) => fs.readFileSync(path.join(dangerousHome, '.claude', 'hooks-logs', name), 'utf8'))
+  .join('\n');
+assert.doesNotMatch(dangerousLog, /git reset --hard/);
+assert.doesNotMatch(dangerousLog, /unsafe-project/);
+assert.match(dangerousLog, /"cmd":\{"redacted":true,"length":/);
 
 assertAllowed({
   tool_name: 'Bash',

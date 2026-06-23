@@ -45,7 +45,7 @@ ps -axo pid,%cpu,command | awk '/[s]yspolicyd|[t]rustd/ { print }'
 echo
 echo "codex doctor:"
 codex doctor --json 2>/dev/null |
-  python3 -c 'import json,sys; d=json.load(sys.stdin); print("overallStatus="+str(d.get("overallStatus"))); print("codexVersion="+str(d.get("codexVersion"))); print("mcpServers="+str(len(d.get("mcpServers") or []))); checks=d.get("checks") or {}; [print(k+"="+str(v.get("status"))+((": "+str(v.get("message"))) if v.get("message") else "")) for k,v in checks.items() if isinstance(v,dict) and v.get("status")!="ok"]'
+  python3 -c 'import json,sys; d=json.load(sys.stdin); checks=d.get("checks") or {}; details=(checks.get("mcp.config") or {}).get("details") or {}; count=details.get("configured servers"); count=count if count is not None else len(d.get("mcpServers") or []); print("overallStatus="+str(d.get("overallStatus"))); print("codexVersion="+str(d.get("codexVersion"))); print("mcpServers="+str(count)); [print(k+"="+str(v.get("status"))+((": "+str(v.get("message"))) if v.get("message") else "")) for k,v in checks.items() if isinstance(v,dict) and v.get("status")!="ok"]'
 echo
 echo "context-mode no-hooks:"
 if [ -x "$HOME/.codex/bin/codex-context-mode-health" ]; then

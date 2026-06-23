@@ -102,5 +102,3 @@ At the end, include:
 - Pipeline findings and fixes, especially fixes your original change missed.
 - Verification commands and their pass/fail status.
 - Any skipped checks and residual risk.
-
-For local skill-behavior proof, run scenarios serially with `codex exec -m gpt-5.4-mini` and report the pass/fail summary.

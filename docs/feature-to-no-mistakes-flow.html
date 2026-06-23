@@ -1,0 +1,292 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Feature Workflow</title>
+  <style>
+    :root {
+      --bg: oklch(98% 0.006 250);
+      --ink: oklch(18% 0.025 250);
+      --muted: oklch(42% 0.032 250);
+      --line: oklch(84% 0.018 250);
+      --panel: oklch(100% 0 0);
+      --blue: oklch(49% 0.15 250);
+      --green: oklch(48% 0.12 156);
+      --amber: oklch(55% 0.12 78);
+      --rose: oklch(53% 0.13 18);
+      --soft-blue: oklch(95% 0.028 250);
+      --soft-green: oklch(95% 0.032 156);
+      --soft-amber: oklch(95% 0.045 78);
+      --soft-rose: oklch(95% 0.032 18);
+      --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+      --sans: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+
+    * { box-sizing: border-box; }
+    html { background: var(--bg); color: var(--ink); font-family: var(--sans); }
+    body { margin: 0; }
+    main { max-width: 1040px; margin: 0 auto; padding: 32px 22px 46px; }
+    h1, h2, h3, p { margin: 0; }
+    code { font-family: var(--mono); }
+
+    .hero {
+      display: grid;
+      gap: 12px;
+      padding: 28px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--panel);
+    }
+
+    .eyebrow {
+      color: var(--blue);
+      font-size: 12px;
+      font-weight: 800;
+      text-transform: uppercase;
+    }
+
+    h1 { max-width: 760px; font-size: clamp(34px, 5vw, 58px); line-height: 1; letter-spacing: 0; }
+    .hero p { max-width: 780px; color: var(--muted); font-size: 18px; line-height: 1.55; }
+
+    .summary {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 10px;
+      margin-top: 14px;
+    }
+
+    .summary div, .step, .decision, .checklist, .support {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--panel);
+    }
+
+    .summary div { padding: 14px; }
+    .summary strong { display: block; margin-bottom: 4px; }
+    .summary span { color: var(--muted); font-size: 13px; line-height: 1.35; }
+
+    .flow {
+      display: grid;
+      gap: 12px;
+      margin: 18px 0 0;
+      padding: 0;
+      list-style: none;
+      counter-reset: step;
+    }
+
+    .step {
+      display: grid;
+      grid-template-columns: 44px minmax(0, 1fr) minmax(230px, 0.55fr);
+      gap: 16px;
+      padding: 16px;
+      counter-increment: step;
+      break-inside: avoid;
+    }
+
+    .step::before {
+      display: grid;
+      width: 36px;
+      height: 36px;
+      place-items: center;
+      border-radius: 50%;
+      background: var(--ink);
+      color: white;
+      content: counter(step);
+      font-weight: 800;
+    }
+
+    .step h2 { font-size: 22px; line-height: 1.15; }
+    .step p { margin-top: 8px; color: var(--muted); line-height: 1.5; }
+
+    .terminal {
+      align-self: start;
+      margin: 0;
+      overflow: hidden;
+      border: 1px solid oklch(29% 0.04 250);
+      border-radius: 8px;
+      background: oklch(18% 0.025 250);
+      color: oklch(93% 0.018 250);
+      font-family: var(--mono);
+      font-size: 13px;
+      line-height: 1.45;
+    }
+
+    .terminal::before {
+      display: block;
+      padding: 9px 12px;
+      border-bottom: 1px solid oklch(29% 0.04 250);
+      background: oklch(22% 0.03 250);
+      color: oklch(75% 0.035 250);
+      content: "codex";
+      font-size: 10px;
+      font-weight: 800;
+      text-transform: uppercase;
+    }
+
+    .terminal code { display: block; padding: 12px; color: oklch(82% 0.11 156); white-space: pre-wrap; }
+
+    .decision {
+      display: grid;
+      grid-column: 2 / -1;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 10px;
+      padding: 12px;
+      background: var(--soft-green);
+    }
+
+    .decision h3 { grid-column: 1 / -1; font-size: 16px; }
+    .choice { padding: 10px; border: 1px solid oklch(84% 0.032 156); border-radius: 8px; background: white; }
+    .choice strong { display: block; margin-bottom: 4px; font-size: 14px; }
+    .choice span { color: var(--muted); font-size: 13px; line-height: 1.35; }
+
+    .support {
+      display: grid;
+      grid-column: 2 / -1;
+      grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+      gap: 10px;
+      padding: 12px;
+      background: var(--soft-amber);
+    }
+
+    .support div { padding: 10px; border: 1px solid oklch(84% 0.045 78); border-radius: 8px; background: white; }
+    .support strong { display: block; margin-bottom: 4px; }
+    .support span { color: var(--muted); font-size: 13px; line-height: 1.35; }
+
+    .checklist {
+      display: grid;
+      gap: 10px;
+      margin-top: 18px;
+      padding: 18px;
+    }
+
+    .checklist h2 { font-size: 22px; }
+    .checklist ul { display: grid; gap: 8px; margin: 0; padding-left: 22px; color: var(--muted); }
+    .footer { margin-top: 20px; color: var(--muted); font-size: 12px; text-align: center; }
+
+    @media (max-width: 860px) {
+      main { padding: 20px 14px 34px; }
+      .summary { grid-template-columns: 1fr 1fr; }
+      .step { grid-template-columns: 36px minmax(0, 1fr); }
+      .terminal, .decision, .support { grid-column: 1 / -1; }
+      .decision { grid-template-columns: 1fr; }
+    }
+
+    @media (max-width: 560px) {
+      .summary { grid-template-columns: 1fr; }
+      h1 { font-size: 36px; }
+    }
+
+    @page { size: A4; margin: 13mm; }
+
+    @media print {
+      html, body { background: white; }
+      main { max-width: none; padding: 0; }
+      .step, .decision, .support, .checklist { break-inside: avoid; }
+      * { print-color-adjust: exact; -webkit-print-color-adjust: exact; }
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <header class="hero">
+      <div class="eyebrow">Single feature workflow</div>
+      <h1>From Feature Idea to PR</h1>
+      <p>Use this one path for new feature work: create the Treehouse worktree, clarify with Grill Me, choose the lightest planning artifact, implement, prove, review, then finish with no-mistakes.</p>
+    </header>
+
+    <section class="summary" aria-label="Workflow summary">
+      <div><strong>1. Workspace</strong><span>Treehouse first. Work from that isolated worktree.</span></div>
+      <div><strong>2. Clarity</strong><span>Grill Me resolves what is being built and why.</span></div>
+      <div><strong>3. Build</strong><span>Use only the planning and specialist skills the feature needs.</span></div>
+      <div><strong>4. Ship</strong><span>No-mistakes is the final gate and PR path.</span></div>
+    </section>
+
+    <ol class="flow" aria-label="Feature workflow steps">
+      <li class="step">
+        <div>
+          <h2>Create the Treehouse worktree</h2>
+          <p>Every new feature starts in Treehouse. Planning, implementation, verification, commit, and PR handoff stay in that worktree.</p>
+        </div>
+        <pre class="terminal" aria-label="Treehouse command"><code>$ treehouse &lt;feature-name&gt;</code></pre>
+      </li>
+
+      <li class="step">
+        <div>
+          <h2>Use Grill Me</h2>
+          <p>Clarify the user, outcome, acceptance criteria, proof path, and out-of-scope work before planning or coding.</p>
+        </div>
+        <pre class="terminal" aria-label="Grill Me command"><code>/grill-me</code></pre>
+      </li>
+
+      <li class="step">
+        <div>
+          <h2>Choose the planning artifact</h2>
+          <p>This is a decision, not a required sequence. Pick the lightest option that makes the work clear enough to build.</p>
+        </div>
+        <div class="decision" aria-label="Planning decision">
+          <h3>Pick one path</h3>
+          <div class="choice"><strong>Small and clear</strong><span>Skip this step.</span></div>
+          <div class="choice"><strong>Need a brief</strong><span>Use <code>/to-prd</code>.</span></div>
+          <div class="choice"><strong>Need slices</strong><span>Use <code>/to-issues</code>.</span></div>
+          <div class="choice"><strong>Big feature</strong><span>Use <code>/to-prd</code>, then <code>/to-issues</code>.</span></div>
+        </div>
+      </li>
+
+      <li class="step">
+        <div>
+          <h2>Implement in the canonical owner</h2>
+          <p>Change the real owner. Avoid wrappers, temporary modes, hidden fallback paths, and weak validation.</p>
+        </div>
+        <pre class="terminal" aria-label="Codebase design command"><code>/codebase-design</code></pre>
+        <div class="support" aria-label="Specialist skills">
+          <div><strong>UI</strong><span><code>atomic-ui</code> and <code>impeccable</code>.</span></div>
+          <div><strong>React or Next</strong><span><code>react-doctor</code>, <code>fallow</code>, and Vercel best practices.</span></div>
+          <div><strong>Risk</strong><span><code>security-review</code> or <code>performance-rescue</code> only when relevant.</span></div>
+          <div><strong>Platform</strong><span>Use Flutter, Appwrite, Sentry, PDF, video, or research skills only when touched.</span></div>
+        </div>
+      </li>
+
+      <li class="step">
+        <div>
+          <h2>Prove it works</h2>
+          <p>Run behavior tests for code changes. If the user sees or clicks the flow, run E2E and keep the evidence.</p>
+        </div>
+        <pre class="terminal" aria-label="Proof commands"><code>/test-quality
+/e2e</code></pre>
+      </li>
+
+      <li class="step">
+        <div>
+          <h2>Review before shipping</h2>
+          <p>Run the strict maintainability review for meaningful changes. Add specialist reviews only for real risks.</p>
+        </div>
+        <pre class="terminal" aria-label="Review command"><code>/thermo-nuclear-code-quality-review</code></pre>
+      </li>
+
+      <li class="step">
+        <div>
+          <h2>Finish with no-mistakes</h2>
+          <p>After implementation, proof, review, status, secrets, and commit are complete, run no-mistakes. It owns the final check and PR generation.</p>
+        </div>
+        <pre class="terminal" aria-label="No mistakes command"><code>/no-mistakes</code></pre>
+      </li>
+    </ol>
+
+    <section class="checklist" aria-label="Before no-mistakes checklist">
+      <h2>Before no-mistakes</h2>
+      <ul>
+        <li>Treehouse worktree exists.</li>
+        <li>Grill Me resolved the feature outcome and proof path.</li>
+        <li>Planning artifact decision is explicit: skipped, PRD, issues, or both.</li>
+        <li>Canonical owner and blast radius were checked.</li>
+        <li>Tests and E2E evidence match the changed behavior.</li>
+        <li>Review blockers are fixed.</li>
+        <li>Worktree changes are committed with no secrets or unrelated files.</li>
+      </ul>
+    </section>
+
+    <p class="footer">Single source for feature delivery workflow. Updated 2026-06-23.</p>
+  </main>
+</body>
+</html>
