@@ -15,6 +15,7 @@ const text = files.join('\n');
 const requiredCoverage = [
   'Read `references/axi-workflow.md` before starting',
   'Read `references/pr-evidence.md` before finalizing',
+  'GitHub review-thread status',
   'Validate-only',
   'Task-first',
   'committed on a feature branch',
@@ -49,7 +50,9 @@ const requiredCoverage = [
   'Pipeline findings and fixes',
   'hosted screenshots',
   'no local paths',
-  'clear resolved/open issue status',
+  'clear resolved/open no-mistakes and',
+  'GitHub review threads',
+  'unresolved GitHub review thread',
   'github.com/user-attachments',
   'findings: none',
 ];

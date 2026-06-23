@@ -9,6 +9,9 @@ Use this before finalizing any no-mistakes run that opened or updated a PR.
 - Screenshots are GitHub `user-attachments` URLs or another reviewer-openable
   URL, never committed evidence files.
 - no-mistakes findings are shown as resolved or open.
+- GitHub review threads from Copilot or humans are shown as resolved or open.
+- Any unresolved GitHub review thread keeps the evidence table open until it is
+  resolved or explicitly handled.
 - Removed local-only values include `/Users`, `/var/folders`,
   `no-mistakes-evidence`, `localhost`, `127.0.0.1`, `file:`, and `local file`.
 
@@ -40,6 +43,6 @@ After updating the PR body, check:
 
 ```sh
 gh pr view --json body --jq '.body' | rg -n '/Users|/var/folders|local file|no-mistakes-evidence|127\\.0\\.0\\.1|localhost|file:' || true
-gh pr view --json body --jq '.body' | rg -n 'github.com/user-attachments|No-mistakes Evidence|Resolved|Open'
+gh pr view --json body --jq '.body' | rg -n 'github.com/user-attachments|No-mistakes Evidence|GitHub review threads|Resolved|Open'
 git status --short
 ```

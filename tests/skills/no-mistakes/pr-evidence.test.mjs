@@ -8,6 +8,7 @@ import {
   insertEvidenceSection,
   parseNoMistakesFixCommits,
   parseNoMistakesStatus,
+  reviewThreadRowsFromGraphql,
   sanitizeBody,
 } from '../../../skills/no-mistakes/scripts/repair-pr-evidence.mjs';
 
@@ -52,6 +53,30 @@ assert.ok(!sanitized.includes('github.com/user-attachments/assets/old'), 'stale 
 
 const statusRows = [
   ...parseNoMistakesStatus('run:\n  findings: none\n'),
+  ...reviewThreadRowsFromGraphql({
+    data: {
+      repository: {
+        pullRequest: {
+          reviewThreads: {
+            nodes: [
+              {
+                isResolved: false,
+                path: 'views/problems.ejs',
+                line: 114,
+                comments: {
+                  nodes: [{
+                    url: 'https://github.com/a-s-abbas/lmtb/pull/3#discussion_r1',
+                    body: 'External player links should use noopener noreferrer.',
+                    author: { login: 'copilot-pull-request-reviewer' },
+                  }],
+                },
+              },
+            ],
+          },
+        },
+      },
+    },
+  }),
   ...parseNoMistakesFixCommits(
     'a449a540000000000000000000000000000000000\tno-mistakes(review): Allow Problems board past contribution gate\n',
     'a-s-abbas/lmtb',
@@ -67,8 +92,25 @@ const repaired = insertEvidenceSection(sanitized, section);
 assert.ok(repaired.includes('## No-mistakes Evidence'));
 assert.ok(repaired.includes('![Desktop board](https://github.com/user-attachments/assets/abc)'));
 assert.ok(repaired.includes('No open no-mistakes findings'));
+assert.ok(repaired.includes('copilot-pull-request-reviewer: External player links should use noopener noreferrer.'));
+assert.ok(repaired.includes('[views/problems.ejs:114](https://github.com/a-s-abbas/lmtb/pull/3#discussion_r1)'));
 assert.ok(repaired.includes('Allow Problems board past contribution gate'));
 assert.ok(repaired.includes('[a449a54](https://github.com/a-s-abbas/lmtb/commit/a449a540000000000000000000000000000000000)'));
 assert.ok(!hasLocalRefs(repaired), 'repaired body must not contain local refs');
+
+assert.deepEqual(
+  reviewThreadRowsFromGraphql({
+    data: {
+      repository: {
+        pullRequest: {
+          reviewThreads: {
+            nodes: [{ isResolved: true }],
+          },
+        },
+      },
+    },
+  }),
+  [{ status: 'Resolved', issue: 'No open GitHub review threads', evidence: '1 thread(s) checked' }],
+);
 
 console.log('no-mistakes pr evidence: pass');

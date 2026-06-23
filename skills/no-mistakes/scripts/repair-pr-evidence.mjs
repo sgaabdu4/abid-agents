@@ -163,6 +163,50 @@ export function parseNoMistakesStatus(statusOutput) {
   }];
 }
 
+function compactText(value, maxLength = 140) {
+  const text = String(value || '').replace(/\s+/g, ' ').trim();
+  if (text.length <= maxLength) return text;
+  return `${text.slice(0, maxLength - 1)}...`;
+}
+
+function reviewThreadRowsFromNodes(nodes) {
+  if (!Array.isArray(nodes)) {
+    return [{
+      status: 'Open',
+      issue: 'GitHub review thread check could not read reviewThreads',
+      evidence: 'gh api graphql returned an unexpected shape',
+    }];
+  }
+
+  const unresolved = nodes.filter((thread) => !thread.isResolved);
+  if (unresolved.length === 0) {
+    return [{
+      status: 'Resolved',
+      issue: 'No open GitHub review threads',
+      evidence: `${nodes.length} thread(s) checked`,
+    }];
+  }
+
+  return unresolved.map((thread) => {
+    const comment = thread.comments?.nodes?.[0] || {};
+    const author = comment.author?.login || 'reviewer';
+    const location = [thread.path, thread.line].filter(Boolean).join(':') || 'review thread';
+    const summary = compactText(comment.body || thread.id || 'Unresolved review thread');
+    const evidence = comment.url
+      ? `[${location}](${comment.url})`
+      : location;
+    return {
+      status: 'Open',
+      issue: `${author}: ${summary}`,
+      evidence,
+    };
+  });
+}
+
+export function reviewThreadRowsFromGraphql(payload) {
+  return reviewThreadRowsFromNodes(payload?.data?.repository?.pullRequest?.reviewThreads?.nodes);
+}
+
 export function buildEvidenceSection({ screenshots, statusRows, uploadError }) {
   const lines = [managedStart, '## No-mistakes Evidence', ''];
 
@@ -198,6 +242,11 @@ function currentRepoSlug() {
   return match ? match[1] : '';
 }
 
+function repoParts(repoSlug) {
+  const [owner, name] = String(repoSlug || '').split('/');
+  return owner && name ? { owner, name } : null;
+}
+
 function currentPrNumber() {
   const result = run('gh', ['pr', 'view', '--json', 'number', '--jq', '.number']);
   if (!result.ok || !result.stdout.trim()) {
@@ -231,6 +280,108 @@ function noMistakesFixRows(repoSlug) {
 function noMistakesStatusRows() {
   const result = run('no-mistakes', ['axi', 'status']);
   return parseNoMistakesStatus(result.ok ? result.stdout : `${result.stdout}\n${result.stderr}`);
+}
+
+function githubReviewThreadRows(pr, repoSlug) {
+  const parts = repoParts(repoSlug);
+  if (!parts) {
+    return [{
+      status: 'Open',
+      issue: 'GitHub review thread check could not infer repository',
+      evidence: 'pass --repo owner/name',
+    }];
+  }
+
+  const query = `
+    query($owner: String!, $name: String!, $number: Int!, $after: String) {
+      repository(owner: $owner, name: $name) {
+        pullRequest(number: $number) {
+          reviewThreads(first: 100, after: $after) {
+            pageInfo {
+              hasNextPage
+              endCursor
+            }
+            nodes {
+              id
+              isResolved
+              isOutdated
+              path
+              line
+              comments(first: 1) {
+                nodes {
+                  url
+                  body
+                  author {
+                    login
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  `;
+  const nodes = [];
+  let after = '';
+
+  for (let page = 0; page < 20; page += 1) {
+    const args = [
+      'api',
+      'graphql',
+      '-f',
+      `query=${query}`,
+      '-F',
+      `owner=${parts.owner}`,
+      '-F',
+      `name=${parts.name}`,
+      '-F',
+      `number=${Number.parseInt(pr, 10)}`,
+    ];
+    if (after) {
+      args.push('-F', `after=${after}`);
+    }
+
+    const result = run('gh', args);
+    if (!result.ok) {
+      return [{
+        status: 'Open',
+        issue: 'GitHub review thread check failed',
+        evidence: compactText(result.stderr || result.stdout || 'gh api graphql failed'),
+      }];
+    }
+
+    let payload;
+    try {
+      payload = JSON.parse(result.stdout);
+    } catch (error) {
+      return [{
+        status: 'Open',
+        issue: 'GitHub review thread check returned invalid JSON',
+        evidence: compactText(error.message),
+      }];
+    }
+
+    const reviewThreads = payload?.data?.repository?.pullRequest?.reviewThreads;
+    if (!reviewThreads || !Array.isArray(reviewThreads.nodes)) {
+      return reviewThreadRowsFromNodes(null);
+    }
+    nodes.push(...reviewThreads.nodes);
+
+    if (!reviewThreads.pageInfo?.hasNextPage) {
+      return reviewThreadRowsFromNodes(nodes);
+    }
+    after = reviewThreads.pageInfo.endCursor;
+    if (!after) {
+      break;
+    }
+  }
+
+  return [{
+    status: 'Open',
+    issue: 'GitHub review thread check hit pagination safety limit',
+    evidence: `${nodes.length} thread(s) checked before stopping`,
+  }];
 }
 
 function ensureGhImage() {
@@ -291,6 +442,7 @@ async function main() {
 
   const statusRows = [
     ...noMistakesStatusRows(),
+    ...githubReviewThreadRows(pr, repoSlug),
     ...noMistakesFixRows(repoSlug),
   ];
   const section = buildEvidenceSection({
