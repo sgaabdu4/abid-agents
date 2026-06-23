@@ -6,11 +6,16 @@ import {
   extractHostedImageMarkdown,
   hasLocalRefs,
   insertEvidenceSection,
+  parseArgs,
   parseNoMistakesFixCommits,
   parseNoMistakesStatus,
   reviewThreadRowsFromGraphql,
   sanitizeBody,
+  screenshotStatusRows,
 } from '../../../skills/no-mistakes/scripts/repair-pr-evidence.mjs';
+
+assert.equal(parseArgs(['--dry-run']).checkReviewThreads, false);
+assert.equal(parseArgs(['--check-review-threads']).checkReviewThreads, true);
 
 const body = `## Intent
 
@@ -52,6 +57,10 @@ assert.ok(!sanitized.includes('Uploading Screen Recording'), 'upload placeholder
 assert.ok(!sanitized.includes('github.com/user-attachments/assets/old'), 'stale screenshot section must be replaced');
 
 const statusRows = [
+  ...screenshotStatusRows({
+    screenshots: ['![Desktop board](https://github.com/user-attachments/assets/abc)'],
+    uploadError: '',
+  }),
   ...parseNoMistakesStatus('run:\n  findings: none\n'),
   ...reviewThreadRowsFromGraphql({
     data: {
@@ -91,6 +100,7 @@ const repaired = insertEvidenceSection(sanitized, section);
 
 assert.ok(repaired.includes('## No-mistakes Evidence'));
 assert.ok(repaired.includes('![Desktop board](https://github.com/user-attachments/assets/abc)'));
+assert.ok(repaired.includes('PR screenshots attached'));
 assert.ok(repaired.includes('No open no-mistakes findings'));
 assert.ok(repaired.includes('copilot-pull-request-reviewer: External player links should use noopener noreferrer.'));
 assert.ok(repaired.includes('[views/problems.ejs:114](https://github.com/a-s-abbas/lmtb/pull/3#discussion_r1)'));
@@ -111,6 +121,20 @@ assert.deepEqual(
     },
   }),
   [{ status: 'Resolved', issue: 'No open GitHub review threads', evidence: '1 thread(s) checked' }],
+);
+
+assert.deepEqual(
+  screenshotStatusRows({ screenshots: [], uploadError: 'upload denied' }),
+  [{ status: 'Open', issue: 'Screenshot upload failed', evidence: 'upload denied' }],
+);
+
+assert.deepEqual(
+  screenshotStatusRows({ screenshots: [], uploadError: '' }),
+  [{
+    status: 'Open',
+    issue: 'No PR screenshots attached',
+    evidence: 'No screenshot artifacts or hosted screenshot links found',
+  }],
 );
 
 console.log('no-mistakes pr evidence: pass');

@@ -8,10 +8,15 @@ Use this before finalizing any no-mistakes run that opened or updated a PR.
 - UI work has screenshots when the run captured them.
 - Screenshots are GitHub `user-attachments` URLs or another reviewer-openable
   URL, never committed evidence files.
+- Screenshot evidence is tracked in the issue-status table as resolved, missing,
+  or upload-failed.
 - no-mistakes findings are shown as resolved or open.
-- GitHub review threads from Copilot or humans are shown as resolved or open.
-- Any unresolved GitHub review thread keeps the evidence table open until it is
-  resolved or explicitly handled.
+- GitHub review threads are not checked by default because the pipeline creates
+  the PR before external review exists.
+- Only pass `--check-review-threads` after Copilot or human review has run, or
+  when the user asks for comment handling.
+- When `--check-review-threads` is used, any unresolved GitHub review thread
+  keeps the evidence table open until it is resolved or explicitly handled.
 - Removed local-only values include `/Users`, `/var/folders`,
   `no-mistakes-evidence`, `localhost`, `127.0.0.1`, `file:`, and `local file`.
 
@@ -28,8 +33,29 @@ Useful flags:
 ```sh
 node "$HOME/.agents/skills/no-mistakes/scripts/repair-pr-evidence.mjs" --pr 3
 node "$HOME/.agents/skills/no-mistakes/scripts/repair-pr-evidence.mjs" --screenshots /path/to/screenshots
+node "$HOME/.agents/skills/no-mistakes/scripts/repair-pr-evidence.mjs" --check-review-threads
 node "$HOME/.agents/skills/no-mistakes/scripts/repair-pr-evidence.mjs" --dry-run
 ```
+
+## Adding screenshots to a PR
+
+Preferred path: run the repair script from the repository that owns the PR and
+pass the target PR plus screenshot files or a screenshot directory.
+
+```sh
+node "$HOME/.agents/skills/no-mistakes/scripts/repair-pr-evidence.mjs" --pr 3 --screenshots /path/to/screenshots
+```
+
+The script installs `gh-image` if needed, uploads images with `gh image` against
+the target `owner/name` repository, stores them as GitHub `user-attachments`,
+and rewrites the managed PR evidence section.
+
+For a manual fallback, install `gh extension install drogers0/gh-image`, run
+`gh image --repo owner/name <screenshot.png>`, then insert the returned Markdown
+image links into the PR body with `gh pr edit <number> --body`.
+
+Never commit screenshot files for PR evidence.
+Never leave local screenshot paths in the PR body.
 
 ## If upload fails
 

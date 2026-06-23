@@ -27,8 +27,10 @@ Read `references/pr-evidence.md` before finalizing any PR-backed run.
 - On `checks-passed` or `passed`, report what was validated, what was found,
   and every pipeline fix applied.
 - Before finalizing a PR-backed run, repair the PR evidence section so it has
-  hosted screenshots, no local paths, and clear resolved/open no-mistakes and
-  GitHub review-thread status.
+  hosted screenshots, no local paths, and clear screenshot and no-mistakes
+  status.
+- Only check GitHub review threads after external PR review has run or the user
+  explicitly asks for comment handling.
 
 ## Common commands
 

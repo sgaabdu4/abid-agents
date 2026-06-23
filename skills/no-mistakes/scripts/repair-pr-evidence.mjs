@@ -23,11 +23,12 @@ function run(command, args, options = {}) {
   };
 }
 
-function parseArgs(argv) {
+export function parseArgs(argv) {
   const options = {
     pr: null,
     repo: null,
     dryRun: false,
+    checkReviewThreads: false,
     screenshots: [],
   };
 
@@ -37,6 +38,7 @@ function parseArgs(argv) {
     else if (arg === '--repo') options.repo = argv[++index];
     else if (arg === '--screenshots') options.screenshots.push(argv[++index]);
     else if (arg === '--dry-run') options.dryRun = true;
+    else if (arg === '--check-review-threads') options.checkReviewThreads = true;
     else throw new Error(`Unknown argument: ${arg}`);
   }
 
@@ -167,6 +169,30 @@ function compactText(value, maxLength = 140) {
   const text = String(value || '').replace(/\s+/g, ' ').trim();
   if (text.length <= maxLength) return text;
   return `${text.slice(0, maxLength - 1)}...`;
+}
+
+export function screenshotStatusRows({ screenshots, uploadError }) {
+  if (screenshots.length > 0) {
+    return [{
+      status: 'Resolved',
+      issue: 'PR screenshots attached',
+      evidence: `${screenshots.length} screenshot(s) in PR evidence`,
+    }];
+  }
+
+  if (uploadError) {
+    return [{
+      status: 'Open',
+      issue: 'Screenshot upload failed',
+      evidence: compactText(uploadError),
+    }];
+  }
+
+  return [{
+    status: 'Open',
+    issue: 'No PR screenshots attached',
+    evidence: 'No screenshot artifacts or hosted screenshot links found',
+  }];
 }
 
 function reviewThreadRowsFromNodes(nodes) {
@@ -441,8 +467,9 @@ async function main() {
   }
 
   const statusRows = [
+    ...screenshotStatusRows({ screenshots: screenshotMarkdown, uploadError }),
     ...noMistakesStatusRows(),
-    ...githubReviewThreadRows(pr, repoSlug),
+    ...(options.checkReviewThreads ? githubReviewThreadRows(pr, repoSlug) : []),
     ...noMistakesFixRows(repoSlug),
   ];
   const section = buildEvidenceSection({
