@@ -92,6 +92,7 @@ if (fs.existsSync(claudeFile)) {
 
 const installText = fs.readFileSync(path.join(home, '.agents', 'scripts', 'install.sh'), 'utf8');
 const mcpInstallText = fs.readFileSync(path.join(home, '.agents', 'scripts', 'install-mcp-tools.sh'), 'utf8');
+const setupText = fs.readFileSync(path.join(home, '.agents', 'scripts', 'setup.sh'), 'utf8');
 const watchdogText = fs.readFileSync(path.join(home, '.agents', 'codex', 'bin', 'codex-watchdog'), 'utf8');
 const healthText = fs.readFileSync(path.join(home, '.agents', 'codex', 'bin', 'codex-health'), 'utf8');
 const updateStackPath = path.join(home, '.agents', 'codex', 'bin', 'codex-update-stack');
@@ -103,6 +104,16 @@ assert.ok(fs.existsSync(cleanupPath), `${cleanupPath} must exist`);
 assert.ok(fs.statSync(cleanupPath).mode & 0o111, `${cleanupPath} must be executable`);
 assert.ok(fs.existsSync(updateStackPath), `${updateStackPath} must exist`);
 assert.ok(fs.statSync(updateStackPath).mode & 0o111, `${updateStackPath} must be executable`);
+assertIncludes(setupText, '--prereqs-only', 'setup.sh must expose a prerequisite-only mode');
+assertIncludes(setupText, 'NONINTERACTIVE=1', 'setup.sh must install Homebrew noninteractively');
+assertIncludes(setupText, 'brew install "${packages[@]}"', 'setup.sh must install missing brew packages');
+assertIncludes(setupText, 'brew tap dart-lang/dart', 'setup.sh must install Dart from the official Homebrew tap');
+assertIncludes(setupText, 'git clone --depth 1 -b stable https://github.com/flutter/flutter.git', 'setup.sh must install missing Flutter');
+assertIncludes(setupText, 'wait_for_job "$install_pid"', 'setup.sh must wait for the install job');
+assertIncludes(setupText, 'wait_for_job "$no_mistakes_pid"', 'setup.sh must wait for the no-mistakes job');
+assertIncludes(setupText, 'ABID_AGENTS_SKIP_NPM_INSTALL=1 ABID_AGENTS_SKIP_SUBMODULE_INIT=1 "$ROOT/scripts/install.sh"', 'setup.sh final restore must skip package work');
+assertIncludes(setupText, 'ABID_AGENTS_SKIP_FLUTTER_INSTALL', 'setup.sh must allow Flutter install to be skipped');
+assertIncludes(installText, '"$ROOT/scripts/setup.sh" --prereqs-only', 'install.sh must repair missing prerequisites');
 assertIncludes(installText, 'codex-cleanup', 'install.sh must install codex-cleanup');
 assertIncludes(installText, 'codex-update-stack', 'install.sh must install codex-update-stack');
 assertIncludes(watchdogText, 'codex-cleanup', 'codex-watchdog must run codex-cleanup');
@@ -112,6 +123,8 @@ assertIncludes(watchdogText, 'CODEX_WATCHDOG_REPAIR_MIN_INTERVAL_SECONDS', 'code
 assertIncludes(watchdogText, '"$update_stack_bin" --repair', 'codex-watchdog must auto-repair manual update drift');
 assertIncludes(watchdogText, '$HOME_DIR/flutter/bin', 'codex-watchdog PATH must resolve dart MCP');
 assertIncludes(mcpInstallText, 'ln -s "$npm_bin" "$candidate"', 'CBM setup must link to npm binary');
+assertIncludes(mcpInstallText, '"$root/scripts/setup.sh" --prereqs-only', 'MCP install must repair missing npm through setup');
+assertIncludes(mcpInstallText, 'npm not found after prerequisite install', 'MCP install must report prereq repair failure clearly');
 assert.ok(!mcpInstallText.includes('.backup.'), 'CBM setup must not keep backup binaries');
 assertIncludes(updateStackText, '"$ROOT/scripts/install.sh"', 'codex-update-stack must run setup after package updates');
 assertIncludes(updateStackText, '--after-manual-update', 'codex-update-stack must support a manual update repair mode');
@@ -131,5 +144,7 @@ assertIncludes(autoSyncText, 'ABID_AGENTS_SKIP_NPM_INSTALL=1', 'auto-sync refres
 assertIncludes(cronText, 'codex-update-stack', 'cron installer must schedule codex stack updates');
 assertIncludes(cronText, 'ABID_AGENTS_CODEX_STACK_CRON_SCHEDULE', 'codex stack cron schedule must be configurable');
 assertIncludes(cronText, 'ABID_AGENTS_SKIP_CODEX_STACK_CRON', 'codex stack cron must be skippable');
+assertIncludes(cronText, '$HOME/flutter/bin', 'cron PATH must resolve Flutter Dart');
+assertIncludes(cronText, '$HOME/.pub-cache/bin', 'cron PATH must resolve pub cache tools');
 
 console.log('agents-md-contract: pass');

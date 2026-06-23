@@ -21,7 +21,7 @@ cd "$HOME/.agents"
 ./scripts/setup.sh
 ```
 
-The setup script detects whether `~/.agents` already exists. It clones or updates the repo, initializes pinned submodules, installs MCP tools, links agent configs and skills, installs local Git hooks, installs or updates [`no-mistakes`](https://github.com/kunchenguid/no-mistakes), and initializes the `.agents` repo for `git push no-mistakes`.
+The setup script detects whether `~/.agents` already exists. On macOS it installs missing bootstrap prerequisites first: Xcode Command Line Tools prompt, Homebrew, Git, Node/npm, Dart, Flutter, and a managed shell PATH block. It then clones or updates the repo, initializes pinned submodules, installs MCP tools, links agent configs and skills, installs local Git hooks, installs or updates [`no-mistakes`](https://github.com/kunchenguid/no-mistakes), and initializes the `.agents` repo for `git push no-mistakes`. After the repo is available, independent setup phases run in parallel where they do not share mutable package-manager state.
 
 When run in a terminal, setup asks whether to install `no-mistakes`, enable cron, and initialize extra repos. In non-interactive runs, defaults are safe: `no-mistakes` on, cron off, extra repos only from env vars.
 
@@ -39,6 +39,11 @@ Useful setup switches:
 | Variable | Effect |
 | --- | --- |
 | `ABID_AGENTS_ENABLE_CRON=1` | Install the optional auto-sync cron during setup. |
+| `ABID_AGENTS_SKIP_PREREQ_INSTALL=1` | Skip prerequisite repair. |
+| `ABID_AGENTS_SKIP_HOMEBREW_INSTALL=1` | Fail instead of installing Homebrew when it is missing. |
+| `ABID_AGENTS_SKIP_FLUTTER_INSTALL=1` | Skip Flutter SDK installation. |
+| `ABID_AGENTS_FLUTTER_HOME=/path/to/flutter` | Install or detect Flutter at a custom path. |
+| `ABID_AGENTS_SKIP_SHELL_PATH_UPDATE=1` | Do not write the managed `~/.zshenv` PATH block. |
 | `ABID_AGENTS_SETUP_NO_MISTAKES=0` | Answer no to the setup-time `no-mistakes` question. |
 | `ABID_AGENTS_SKIP_NPM_INSTALL=1` | Skip MCP tool installation. |
 | `ABID_AGENTS_SKIP_NO_MISTAKES=1` | Skip installing and initializing `no-mistakes`. |

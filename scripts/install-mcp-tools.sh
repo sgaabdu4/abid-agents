@@ -6,8 +6,24 @@ if [[ "${ABID_AGENTS_SKIP_NPM_INSTALL:-}" == "1" ]]; then
   exit 0
 fi
 
+repair_missing_npm() {
+  local root
+  root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+
+  if [[ "${ABID_AGENTS_SKIP_PREREQ_INSTALL:-0}" == "1" ||
+    ! -x "$root/scripts/setup.sh" ]]; then
+    return 0
+  fi
+
+  "$root/scripts/setup.sh" --prereqs-only
+}
+
 if ! command -v npm >/dev/null 2>&1; then
-  echo "npm not found; cannot install MCP tools." >&2
+  repair_missing_npm
+fi
+
+if ! command -v npm >/dev/null 2>&1; then
+  echo "npm not found after prerequisite install; cannot install MCP tools." >&2
   exit 1
 fi
 

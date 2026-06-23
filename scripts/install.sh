@@ -3,6 +3,12 @@ set -euo pipefail
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 
+if [[ "${ABID_AGENTS_SKIP_PREREQ_INSTALL:-0}" != "1" &&
+  "${ABID_AGENTS_PREREQS_READY:-0}" != "1" &&
+  -x "$ROOT/scripts/setup.sh" ]]; then
+  "$ROOT/scripts/setup.sh" --prereqs-only
+fi
+
 "$ROOT/scripts/install-mcp-tools.sh"
 
 if git -C "$ROOT" rev-parse --git-dir >/dev/null 2>&1; then

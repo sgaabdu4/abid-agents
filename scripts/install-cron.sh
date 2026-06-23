@@ -4,7 +4,7 @@ set -euo pipefail
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 SCHEDULE="${ABID_AGENTS_CRON_SCHEDULE:-*/15 * * * *}"
 CODEX_STACK_SCHEDULE="${ABID_AGENTS_CODEX_STACK_CRON_SCHEDULE:-17 5 * * 1}"
-PATH_VALUE="${ABID_AGENTS_CRON_PATH:-/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin}"
+PATH_VALUE="${ABID_AGENTS_CRON_PATH:-/opt/homebrew/bin:/usr/local/bin:$HOME/.npm-global/bin:$HOME/.local/bin:$HOME/flutter/bin:$HOME/Workspaces/flutter/bin:$HOME/.pub-cache/bin:/usr/bin:/bin:/usr/sbin:/sbin}"
 LOG="$ROOT/.git/auto-sync.log"
 CODEX_STACK_LOG="$HOME/.codex/logs/codex-update-stack.log"
 BEGIN_MARK="# BEGIN agent-config auto-sync"
@@ -15,7 +15,7 @@ LEGACY_NAME="abid""-agents"
 LEGACY_BEGIN_MARK="# BEGIN ${LEGACY_NAME} auto-sync"
 LEGACY_END_MARK="# END ${LEGACY_NAME} auto-sync"
 JOB="$SCHEDULE cd \"$ROOT\" && PATH=\"$PATH_VALUE\" \"$ROOT/scripts/auto-sync.sh\" >> \"$LOG\" 2>&1"
-CODEX_STACK_JOB="$CODEX_STACK_SCHEDULE mkdir -p \"$HOME/.codex/logs\" && cd \"$ROOT\" && PATH=\"$PATH_VALUE:$HOME/.npm-global/bin:$HOME/.local/bin\" \"$ROOT/codex/bin/codex-update-stack\" >> \"$CODEX_STACK_LOG\" 2>&1"
+CODEX_STACK_JOB="$CODEX_STACK_SCHEDULE mkdir -p \"$HOME/.codex/logs\" && cd \"$ROOT\" && PATH=\"$PATH_VALUE\" \"$ROOT/codex/bin/codex-update-stack\" >> \"$CODEX_STACK_LOG\" 2>&1"
 TMP_CRON="$(mktemp)"
 trap 'rm -f "$TMP_CRON"' EXIT
 
