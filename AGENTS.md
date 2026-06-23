@@ -2,7 +2,7 @@
 ## Hard Stops
 Check before any tool call. If the prompt conflicts, this section wins.
 
-- Destructive state needs later approval: `rm`, cleanup deletes, deletion scripts, reset/checkout, DB writes, temp/build cleanup. Source cleanup inside the approved change is allowed with native edit/delete/move tools after usage checks; do not leave dead components, wrappers, routes, or files behind.
+- Destructive state needs explicit approval. A direct remove/delete/cleanup request for a concrete scope approves that scope. Approved deletions use `rm` or native delete; never quarantine/backup/move-aside. Broad cleanup, deletion scripts, reset/checkout, DB writes, and temp/build cleanup outside that scope need fresh approval. Source cleanup inside the approved change is allowed after usage checks; do not leave dead components, wrappers, routes, or files behind.
 - Never edit `CHANGELOG.md`, `generated/` paths, or files with `AUTO-GENERATED`; stop and change the source owner. Do not offer exceptions.
 - Before committing, inspect `git status --short`; if `.env*`, keys, tokens, or secret-like files appear, stop and do not commit.
 - Never add a pass-through wrapper. Readability/naming is not enough; one-call return functions are forbidden. Explain the direct/canonical owner.
@@ -102,7 +102,7 @@ Default for commands that read/query/list/test/build/diff/fetch/process data. Ra
 
 ## Files and Shell
 - Use `Read` for known files to edit/quote; `Edit` for precise replacements; `Write` for new/full rewrites.
-- Direct Bash only for guaranteed-small-output mutations/navigation: `mkdir`, `mv`, `cp`, `chmod`, `pwd`, `which`, git writes.
+- Direct Bash only for small-output mutations/navigation: `mkdir`, `mv`, `cp`, `chmod`, approved `rm`, `pwd`, `which`, git writes.
 - Do not run raw `cat`, `head`, `tail`, `grep`, `rg`, `find`, `wc`, tests, builds, git reads, API CLIs, Docker/K8s/cloud CLIs via Bash.
 - Fallback text search: `ctx_execute` with `rtk grep`/`rtk read`/`rtk wc`; print curated results.
 - No `| head` / `| tail` to hide output. Process full output in context-mode.

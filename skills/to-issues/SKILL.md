@@ -18,6 +18,5 @@ Coordinate with nearby skills:
 
 - Use `codebase-design` when slices depend on ownership or interface choices.
 - Use `test-quality` for acceptance and verification wording.
-- Use `ship` when accepted issues should become worktree dispatch waves.
 
 Do not create external tracker issues unless the user explicitly asks to publish.
