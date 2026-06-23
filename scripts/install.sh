@@ -38,6 +38,20 @@ preserve_or_link_file() {
   ln -s "$source" "$target"
 }
 
+install_codex_hooks_config() {
+  local source="$ROOT/codex/hooks.json"
+  local target="$HOME/.codex/hooks.json"
+  mkdir -p "$(dirname "$target")"
+  node "$ROOT/scripts/strip-context-mode-hooks.mjs" >/dev/null
+  if [[ -L "$target" ]] && [[ "$(readlink "$target")" == "$source" ]]; then
+    return 0
+  fi
+  if [[ -e "$target" || -L "$target" ]]; then
+    rm -f "$target"
+  fi
+  ln -s "$source" "$target"
+}
+
 replace_with_link_file() {
   local source="$1"
   local target="$2"
@@ -249,9 +263,10 @@ PY
 
 replace_with_link_file "$ROOT/AGENTS.md" "$HOME/.codex/AGENTS.md"
 preserve_or_link_file "$ROOT/mcp-config.json" "$HOME/.codex/mcp-config.json"
-preserve_or_link_file "$ROOT/codex/hooks.json" "$HOME/.codex/hooks.json"
+install_codex_hooks_config
 ensure_codex_mcp_config
 ensure_context_mode_read_permissions
+node "$ROOT/scripts/strip-context-mode-hooks.mjs" >/dev/null
 install_codex_watchdog
 replace_with_link_file "$ROOT/AGENTS.md" "$HOME/.claude/AGENTS.md"
 replace_with_link_file "$ROOT/AGENTS.md" "$HOME/.copilot/AGENTS.md"

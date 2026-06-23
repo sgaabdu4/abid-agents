@@ -91,9 +91,10 @@ Use before raw text search for definitions/callers/callees/data flow/architectur
 ## context-mode
 Default for commands that read/query/list/test/build/diff/fetch/process data. Raw output floods context. Parent may call context-mode MCP.
 
-- Tool map: ctx_batch_execute batches; ctx_execute command/API/data; ctx_execute_file large files/logs/JSON/CSV/source; ctx_fetch_and_index -> ctx_search web/docs; ctx_index(path) -> ctx_search local docs; ctx_search(sort="timeline") after resume; ctx_stats, ctx_doctor, ctx_upgrade, ctx_purge, ctx_insight admin.
+- Tool map: ctx_batch_execute batches; ctx_execute command/API/data; ctx_execute_file large files/logs/JSON/CSV/source; ctx_fetch_and_index -> ctx_search web/docs; ctx_index(path) -> ctx_search local docs; ctx_search(sort="timeline") after resume; ctx_stats/doctor/upgrade/purge/insight admin.
 - Think in code: analyze/count/filter in sandbox; print answer, not raw data; batch related ctx_search queries.
 - File edits use Read/Edit/Write, not context-mode. Playwright/browser snapshots: save to file, then ctx_index(path) or ctx_execute_file(path). After /clear or /compact, context-mode persists; ctx purge only on explicit request.
+- context-mode hooks are forbidden in any agent hook/settings file; hooks add context rot. After setup, ctx_doctor, or ctx_upgrade, run `scripts/strip-context-mode-hooks.mjs`; no `context-mode hook` command may remain.
 
 ## Map -> Process
 - Map with CBM: `get_architecture`, `search_graph` incl `semantic_query`, `trace_path`, `search_code`.
