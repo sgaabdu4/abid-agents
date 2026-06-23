@@ -12,6 +12,12 @@ It should include:
 - a seeded failure mode to verify issue capture and rerun behavior;
 - no external network writes.
 
+When Playwright is available, create a real local artifact run with:
+
+```bash
+node <skill-dir>/scripts/dogfood-playwright-smoke.mjs --root <repo>
+```
+
 ## Artifact Checker
 
 Run:

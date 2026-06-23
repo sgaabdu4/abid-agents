@@ -11,6 +11,7 @@ const docsDir = path.join(repoRoot, 'docs/e2e');
 const required = [
   'project.json',
   'auth.md',
+  'automation.md',
   'logging.md',
   'regression.md',
   'issues.md',
@@ -32,6 +33,12 @@ if (!missing.includes('project.json')) {
     if (!project.logging || !Array.isArray(project.logging.commands)) unknowns.push('logging commands');
     if (!project.regression || !Array.isArray(project.regression.commands)) unknowns.push('regression commands');
     if (!Array.isArray(project.flows) || !project.flows.length) unknowns.push('flows');
+    if (!project.automation || !Array.isArray(project.automation.commands) || !project.automation.commands.length) {
+      unknowns.push('automated E2E commands');
+    }
+    if (Array.isArray(project.flows) && project.flows.some((flow) => !flow.automationCommand)) {
+      unknowns.push('flow automation commands');
+    }
   } catch (error) {
     missing.push(`project.json parseable (${error.message})`);
   }

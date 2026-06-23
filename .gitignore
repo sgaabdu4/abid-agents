@@ -13,5 +13,10 @@ backups/
 __pycache__/
 *.pyc
 
+# E2E run artifacts may contain screenshots, videos, logs, or local paths.
+docs/e2e/*/
+!docs/e2e/flows/
+!docs/e2e/flows/**
+
 # Nested generated state inside bundled skills.
 skills/*/.codebase/

@@ -31,6 +31,15 @@
             "command": "node \"$HOME/.agents/hooks/codex-sessionstart-quiet.js\""
           }
         ]
+      },
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "context-mode hook codex sessionstart"
+          }
+        ]
       }
     ],
     "PreCompact": [
@@ -62,6 +71,17 @@
           {
             "type": "command",
             "command": "context-mode hook codex stop"
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "context-mode hook codex posttooluse"
           }
         ]
       }

@@ -9,6 +9,7 @@ Use this when the prompt says to make E2E easy, asks for a full/default flow, or
 - infer the app target from repo files, scripts, open servers, and user prompt;
 - run the broadest non-destructive UI coverage the current tools can support;
 - capture each meaningful click, input, navigation, assertion, error, and fallback;
+- leave or reuse a runnable automated E2E command for every checked flow;
 - ask only when auth, target, data mode, seeded data, or risky side effects cannot be inferred;
 - patch only after evidence identifies a cause and the user allowed patches;
 - finish with impacted E2E reruns plus the smallest existing regression checks.
@@ -18,6 +19,7 @@ Default data mode is mock or seeded test data.
 Production data requires explicit approval and stays read-only unless exact writes are separately approved.
 Default risk limit is no prod mutation, no deletes, no payment, no email/SMS, no external sharing, and no DB writes.
 Default evidence is video plus `events.jsonl` when a driver supports it, step screenshots, console/network logs when available, and traces only on retry/failure unless audit mode is requested.
+Manual UI operation can help discover a flow, but a passing E2E result needs an automated UI command that an AI can rerun.
 
 ## Onboarding Questions
 

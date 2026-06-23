@@ -8,7 +8,27 @@ Use this before selecting UI automation.
 - Signed-in browser state, cookies, extensions, or existing user profile: use the Chrome extension/browser plugin when available.
 - Existing project E2E runner: use it as regression proof after exploratory Browser/device evidence, or as the primary runner when Browser is unavailable.
 - Flutter/mobile/native dialogs: use the repo's Flutter device tooling, `integration_test`, Patrol, or configured device runner.
-- Standalone Playwright: use only when Browser is unavailable, the repo already owns Playwright tests, or the user asks for durable CI tests.
+- Standalone Playwright: use when Browser is unavailable, the repo already owns Playwright tests, or the user asks for durable CI tests.
+- Computer Use: use as an E2E-owned fallback when Browser/Playwright are unavailable or the target is desktop/native; keep it target-app scoped and non-destructive unless exact side effects are approved.
+
+## Browser Availability
+
+Before saying Browser is unavailable, read the Browser skill if it is listed and bootstrap its `browser-client` through `node_repl`.
+If the Browser plugin or `browser-client` path is missing, record that exact missing capability in the run report and continue to Playwright or Computer Use.
+
+## Playwright Availability
+
+Before saying Playwright is unavailable, run:
+
+```bash
+node <skill-dir>/scripts/ensure-playwright.mjs
+```
+
+If Browser is unavailable and Playwright is justified but missing, provision it into the user cache unless the prompt forbids installs:
+
+```bash
+node <skill-dir>/scripts/ensure-playwright.mjs --install --with-browser chromium
+```
 
 ## Profile Lock Recovery
 
@@ -25,7 +45,8 @@ If the isolated retry fails or is denied, stop UI automation probing and fall ba
 ## Failure Handling
 
 If Browser, Playwright, or `node_repl` probing fails or is denied after any allowed profile-lock recovery, stop UI automation probing for that run.
-Do not open desktop apps or try unrelated UI channels.
+Do not use `open -a`, `osascript`, or unrelated UI channels.
+Use Computer Use as the desktop UI fallback when it is exposed and target-app scoped; keep it non-destructive and record screenshots or fallback limits.
 Use local scripts, existing tests, static inspection, and artifact checks, then report exactly which UI proof could not be collected.
 
 ## Playwright Last Resort Shape

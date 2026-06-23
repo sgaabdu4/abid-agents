@@ -25,9 +25,14 @@
     {
       "id": "login",
       "path": "docs/e2e/flows/README.md",
+      "automationCommand": "",
       "status": "bootstrap"
     }
   ],
+  "automation": {
+    "commands": [],
+    "notes": "Add runnable E2E commands that an AI can execute without rediscovering the flow."
+  },
   "logging": {
     "browserConsole": true,
     "commands": [],

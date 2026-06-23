@@ -12,6 +12,7 @@ const docsDir = path.join(repoRoot, 'docs/e2e');
 const files = [
   ['project.json', 'project.json'],
   ['auth.md', 'auth.md'],
+  ['automation.md', 'automation.md'],
   ['logging.md', 'logging.md'],
   ['regression.md', 'regression.md'],
   ['issues.md', 'issues.md'],

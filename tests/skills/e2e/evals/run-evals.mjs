@@ -24,7 +24,7 @@ const policyFiles = [
   'skills/e2e/references/runbook.md',
   'skills/e2e/references/dogfood.md',
 ];
-const policyDigestPattern = /auto-full-safe|ask only|Browser first|Chrome|signed-in|saved auth|auth state|cookies|tokens|Flutter|device|native|Playwright|existing project|runner|last resort|probe|local scripts|events\\.jsonl|artifact ledger|artifact check|check-e2e-run-artifacts|video|unsupported|fallback|click|cursor|2x|recap|project\\.json|project-pack|scaffold|check-e2e-project|data mode|mock|seeded-test|prod-read-only|prod-approved-write|production data|audit|diff|dirty|logs|logging|regression|approval|prod|payment|delete|report-only|dogfood|Artifact Checker|zero UI|zero UI calls|No prod|No writes|No destructive/i;
+const policyDigestPattern = /auto-full-safe|ask only|automated|automation|Automation Rule|runnable automated E2E command|automated UI command|Browser first|Browser Availability|browser-client|Chrome|signed-in|saved auth|auth state|cookies|tokens|Flutter|device|native|Playwright|ensure-playwright|provision|install|computer-use|Computer Use|desktop fallback|target-app|existing project|runner|last resort|probe|local scripts|events\\.jsonl|artifact ledger|artifact check|check-e2e-run-artifacts|video|unsupported|fallback|click|cursor|2x|recap|project\\.json|project-pack|scaffold|check-e2e-project|data mode|mock|seeded-test|prod-read-only|prod-approved-write|production data|audit|diff|dirty|logs|logging|regression|approval|prod|payment|delete|report-only|dogfood|Artifact Checker|zero UI|zero UI calls|No prod|No writes|No destructive/i;
 const policyText = policyFiles
   .map((rel) => {
     const lines = fs.readFileSync(path.join(repoRoot, rel), 'utf8')
@@ -41,17 +41,20 @@ const allKeys = Array.from(new Set(config.cases.flatMap((testCase) => [
 const keyDefinitions = [
   'usesSkill: this request should use the E2E skill policy',
   'requiresRealUiOnly: require real UI actions and reject unit tests, typechecks, static scans, or curl as standalone E2E proof',
+  'requiresAutomatedE2E: require a runnable automated UI E2E command for every checked flow; first-run setup and saved auth reuse must persist or use automation commands; manual-only runs are incomplete',
   'autoFullSafe: default to the full safe run without a long intake',
   'browserFirst: choose Codex Browser as the primary driver for this specific request',
   'chromeForSignedIn: choose Chrome/profile tooling for signed-in browser state',
   'flutterDeviceForMobile: choose Flutter/device/native tooling for this request',
   'playwrightFirst: choose standalone Playwright before Browser/device tooling',
   'playwrightLast: keep standalone Playwright as fallback or CI artifact work',
+  'bootstrapsPlaywright: check for Playwright and provision it when Browser is unavailable and Playwright is missing',
+  'usesComputerUseFallback: use desktop Computer Use as a valid target-app-scoped fallback when Browser/Playwright are unavailable or the target is desktop/native',
   'requiresEventsJsonl: require an events.jsonl action ledger for checked clicks, inputs, navigation, assertions, issues, and fallbacks',
   'capturesClickVideo: require click/action ledger plus video or fallback artifact',
   'creates2xCursorRecap: require a final 2x speed recap video with visible cursor and click bloom when video is supported',
   'createsProjectPack: scaffold or update docs/e2e project pack files for first-run repo knowledge',
-  'runsProjectPackCheck: check docs/e2e project pack before asking questions or running flows',
+  'runsProjectPackCheck: check docs/e2e project pack before asking questions or running flows, and always before saved auth or saved flow reuse',
   'capturesLogs: capture browser console, server, device, test runner, or app logs when available',
   'persistsLogCommands: persist verified console, server, device, network, or app log commands for later E2E runs',
   'persistsRegressionCommands: persist lint, test, typecheck, build, existing E2E, or other regression commands for later E2E runs',
@@ -84,11 +87,15 @@ if (requestedCases && cases.length !== requestedCases.size) {
   throw new Error(`Unknown eval case(s): ${missing.join(', ')}`);
 }
 
-function promptFor(testCase) {
+function promptFor(testCase, retryNote = '') {
   return `You are evaluating this Codex E2E skill policy.
 Do not use tools. Use only the policy text below.
 Return JSON only, with every key below as a boolean and a short "reason" string.
+Return one JSON object with every key exactly once.
+For each key, use this exact shape: "<key>": {"value": true_or_false, "reason": "short reason"}.
 Set each key for this user request, not merely because the policy mentions the concept.
+Classify what the policy requires the agent to do for the request; do not set a key false just because this eval prompt is not executing tools.
+${retryNote}
 Keys: ${allKeys.join(', ')}
 Definitions:
 ${keyDefinitions}
@@ -136,45 +143,61 @@ function boolValue(parsed, key) {
   if (typeof value === 'boolean') return value;
   if (value && typeof value === 'object' && typeof value.value === 'boolean') return value.value;
   if (value && typeof value === 'object' && typeof value.boolean === 'boolean') return value.boolean;
+  if (value && typeof value === 'object' && typeof value.required === 'boolean') return value.required;
   return value;
 }
 
 function runCase(testCase) {
-  const prompt = promptFor(testCase);
   const caseDir = path.join(outDir, testCase.id);
   fs.mkdirSync(caseDir, { recursive: true });
-  fs.writeFileSync(path.join(caseDir, 'prompt.txt'), prompt);
 
-  const result = spawnSync('codex', [
-    'exec',
-    '-m',
-    config.model,
-    '--sandbox',
-    'read-only',
-    '--skip-git-repo-check',
-    '--ignore-user-config',
-    '--color',
-    'never',
-    '-',
-  ], {
-    cwd: process.env.TMPDIR || '/tmp',
-    input: prompt,
-    encoding: 'utf8',
-    timeout: caseTimeoutMs,
-    maxBuffer: 1024 * 1024 * 4,
-  });
-
-  fs.writeFileSync(path.join(caseDir, 'stdout.txt'), result.stdout || '');
-  fs.writeFileSync(path.join(caseDir, 'stderr.txt'), result.stderr || '');
-
-  const errors = [];
+  let errors = [];
   let parsed = {};
-  if (result.error) errors.push(result.error.message);
-  if (result.status !== 0) errors.push(`codex exit status ${result.status}`);
-  try {
-    parsed = extractJson(result.stdout || '');
-  } catch (error) {
-    errors.push(error.message);
+  let attempts = [];
+
+  for (let attempt = 1; attempt <= 2; attempt += 1) {
+    const retryNote = attempt === 1
+      ? ''
+      : 'Retry note: your previous answer omitted required keys. Return every key in the requested object shape.';
+    const prompt = promptFor(testCase, retryNote);
+    fs.writeFileSync(path.join(caseDir, attempt === 1 ? 'prompt.txt' : `prompt-attempt-${attempt}.txt`), prompt);
+
+    const result = spawnSync('codex', [
+      'exec',
+      '-m',
+      config.model,
+      '--sandbox',
+      'read-only',
+      '--skip-git-repo-check',
+      '--ignore-user-config',
+      '--color',
+      'never',
+      '-',
+    ], {
+      cwd: process.env.TMPDIR || '/tmp',
+      input: prompt,
+      encoding: 'utf8',
+      timeout: caseTimeoutMs,
+      maxBuffer: 1024 * 1024 * 4,
+    });
+
+    fs.writeFileSync(path.join(caseDir, attempt === 1 ? 'stdout.txt' : `stdout-attempt-${attempt}.txt`), result.stdout || '');
+    fs.writeFileSync(path.join(caseDir, attempt === 1 ? 'stderr.txt' : `stderr-attempt-${attempt}.txt`), result.stderr || '');
+
+    errors = [];
+    parsed = {};
+    if (result.error) errors.push(result.error.message);
+    if (result.status !== 0) errors.push(`codex exit status ${result.status}`);
+    try {
+      parsed = extractJson(result.stdout || '');
+    } catch (error) {
+      errors.push(error.message);
+    }
+
+    const missingKeys = allKeys.filter((key) => boolValue(parsed, key) === undefined);
+    attempts.push({ attempt, missingKeys });
+    if (missingKeys.length && attempt === 1) continue;
+    break;
   }
 
   for (const key of testCase.expectTrue) {
@@ -188,6 +211,7 @@ function runCase(testCase) {
     id: testCase.id,
     passed: errors.length === 0,
     errors,
+    attempts,
     parsed,
   };
   fs.writeFileSync(path.join(caseDir, 'result.json'), `${JSON.stringify(summary, null, 2)}\n`);

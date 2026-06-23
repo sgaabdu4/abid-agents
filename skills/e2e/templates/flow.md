@@ -5,6 +5,7 @@
 - Target: unknown
 - Preconditions: unknown
 - Steps: unknown
+- Automation command: unknown
 - Expected result: unknown
 - Evidence needed: events row, screenshot/video timestamp, logs
 
@@ -13,6 +14,7 @@
 - Target: unknown
 - Preconditions: unknown
 - Steps: unknown
+- Automation command: unknown
 - Expected result: unknown
 - Evidence needed: events row, screenshot/video timestamp, logs
 

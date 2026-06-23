@@ -32,6 +32,7 @@ test('scaffold creates the first-run project pack without secrets', () => {
   for (const rel of [
     'docs/e2e/project.json',
     'docs/e2e/auth.md',
+    'docs/e2e/automation.md',
     'docs/e2e/logging.md',
     'docs/e2e/regression.md',
     'docs/e2e/issues.md',
@@ -44,15 +45,19 @@ test('scaffold creates the first-run project pack without secrets', () => {
   assert.equal(project.dataMode.mode, 'unknown');
   assert.equal(project.dataMode.default, 'seeded-test');
   assert.match(project.auth.secretsPolicy, /Do not commit credentials/);
+  assert.deepEqual(project.automation.commands, []);
+  assert.equal(project.flows[0].automationCommand, '');
 });
 
-test('project checker reports unknown data mode until verified facts are persisted', () => {
+test('project checker reports unknown data mode and automation until verified facts are persisted', () => {
   const root = makeRepo();
   parseJson(runNode(scaffold, ['--root', root]));
 
   const needsInput = parseJson(runNode(checker, ['--root', root]));
   assert.equal(needsInput.status, 'needs-input');
   assert.equal(needsInput.unknowns.includes('data mode'), true);
+  assert.equal(needsInput.unknowns.includes('automated E2E commands'), true);
+  assert.equal(needsInput.unknowns.includes('flow automation commands'), true);
 
   const projectPath = path.join(root, 'docs/e2e/project.json');
   const project = JSON.parse(fs.readFileSync(projectPath, 'utf8'));
@@ -61,6 +66,8 @@ test('project checker reports unknown data mode until verified facts are persist
   project.dataMode.mode = 'seeded-test';
   project.logging.commands = ['npm run dev'];
   project.regression.commands = ['npm test'];
+  project.automation.commands = ['npm run e2e:smoke'];
+  project.flows[0].automationCommand = 'npm run e2e:smoke -- --flow login';
   fs.writeFileSync(projectPath, `${JSON.stringify(project, null, 2)}\n`);
 
   const ready = parseJson(runNode(checker, ['--root', root]));

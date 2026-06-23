@@ -12,6 +12,7 @@ Persist the boring first-run knowledge in the project so future E2E checks start
 docs/e2e/
   project.json
   auth.md
+  automation.md
   logging.md
   regression.md
   issues.md
@@ -22,7 +23,17 @@ docs/e2e/
 Markdown files hold human-readable setup, safe test data, flow notes, and commands.
 Do not store passwords, tokens, cookies, private session dumps, or real customer data.
 
+## Automation Rule
+
+Every E2E flow should be automated before the run is called complete.
+Manual Browser, Chrome, Playwright, device, or Computer Use exploration can discover selectors and validate the first run, but the verified flow must be persisted as a runnable command in the repo's E2E runner or in `docs/e2e/project.json`.
+If automation cannot be created in the current environment, mark the E2E result incomplete, record the blocker, and do not count it as a passing automated E2E test.
+The project pack check must confirm `automation.commands` and each flow's `automationCommand` before reusing saved auth, flows, or regression commands.
+
 ## First Run
+
+First-run setup is itself part of E2E.
+It is incomplete until the initial login and any persisted main flows have runnable automated commands.
 
 Run:
 
@@ -38,6 +49,7 @@ Then fill only what the current run can verify:
 - login method and test account owner, without secrets;
 - reusable authenticated-state path when safe and intentionally saved;
 - critical flows, especially login, primary happy path, settings/account, and write-heavy areas;
+- runnable automated E2E commands for every persisted flow;
 - console/server/network log commands;
 - regression commands that should run after E2E fixes.
 
@@ -46,11 +58,13 @@ Then fill only what the current run can verify:
 Every later E2E run checks `docs/e2e/project.json` first.
 If the pack exists, reuse known target, auth notes, flows, log commands, and regression commands before asking the user.
 If the pack is incomplete, update it from verified facts only and mark unknowns plainly.
+Before reusing saved auth state, the project pack check is mandatory.
 
 ## Auth State
 
 Saved auth state is allowed only as a path reference to a safe local artifact.
 The repo pack may say where state is expected, but it must not commit raw cookies, tokens, or credentials.
+Reusing saved auth state still requires a runnable automated E2E command; it is a setup input for automation, not manual proof.
 
 ## Data Mode
 

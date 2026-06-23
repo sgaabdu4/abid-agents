@@ -164,7 +164,7 @@ install_codex_watchdog
 install_managed_block "$ROOT/AGENTS.md" "$HOME/.claude/AGENTS.md" "AGENTS.md"
 install_managed_block "$ROOT/AGENTS.md" "$HOME/.copilot/AGENTS.md" "AGENTS.md"
 install_managed_block "$ROOT/AGENTS.md" "$HOME/.pi/AGENTS.md" "AGENTS.md"
-install_managed_block "$ROOT/AGENTS.md" "$HOME/.pi/agent/AGENTS.md" "AGENTS.md"
+preserve_or_link_file "$ROOT/AGENTS.md" "$HOME/.pi/agent/AGENTS.md"
 
 for skill in "$ROOT"/skills/*; do
   [[ -d "$skill" ]] || continue
