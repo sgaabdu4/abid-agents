@@ -29,7 +29,7 @@ For non-trivial implementation/reviews. Quality, simplicity, robustness, scale, 
 - Reviews prioritize structural regressions, missed simplifications, spaghetti growth, boundary/type leaks, file size, then legibility nits. Approval blocks on those, missed simpler framing, unjustified file growth, busy-flow ad-hoc branching, or hacky/magical helper.
 
 ## Tool Routing
-- Structure/callers/deps/impact/routes/symbols -> CBM index first. Cmd output/logs/tests/diffs/APIs/data processing -> context-mode first.
+- Structure/callers/deps/impact/routes/symbols -> CBM first. Cmd output/logs/tests/diffs/APIs/data -> context-mode first.
 - File edits: native file tools only. `Read` before `Edit`; `Write` for new/full rewrites. Never use `ctx_execute`, `ctx_execute_file`, or Bash to create/modify files.
 - Subagents: use exposed subagent/multi-agent tools only; if absent and `tool_search` exists, discover first. Do not invent tool names/params.
 - MCP: parent may call CBM/context-mode directly; delegate other MCP only through exposed subagent/multi-agent tools.
@@ -89,17 +89,17 @@ Use before raw text search for definitions/callers/callees/data flow/architectur
 - Fallback only when MCP transport is closed: cbm cli <tool> '<json>'. CLI output is raw JSON and may include level=...; do not expect Claude-style .content[0].text.
 
 ## context-mode
-Default for commands that read/query/list/test/build/diff/fetch/process data. Raw output floods context. Parent may call context-mode MCP.
+Default for read/query/list/test/build/diff/fetch/process commands; raw output floods context. Parent may call context-mode.
 
 - Tool map: ctx_batch_execute, ctx_execute, ctx_execute_file, ctx_fetch_and_index -> ctx_search, ctx_index -> ctx_search, ctx_search(sort="timeline"), ctx_stats/doctor/upgrade/purge/insight.
 - Think in code: analyze/count/filter in sandbox; print answer, not raw data; batch related ctx_search queries.
-- File edits use Read/Edit/Write, not context-mode. Playwright/browser snapshots: save to file, then ctx_index(path) or ctx_execute_file(path). After /clear or /compact, context-mode persists; ctx purge only on explicit request.
-- No context-mode hooks anywhere; hooks add context rot. After setup/doctor/upgrade, run `scripts/strip-context-mode-hooks.mjs`.
+- File edits use Read/Edit/Write, not context-mode. Playwright snapshots: save to file, then ctx_index(path) or ctx_execute_file(path). After /clear or /compact, context-mode persists; ctx purge only on explicit request.
+- No context-mode hooks; hooks add context rot. After setup/doctor/upgrade, run `scripts/strip-context-mode-hooks.mjs`.
 
 ## Map -> Process
 - Map with CBM: `get_architecture`, `search_graph` incl `semantic_query`, `trace_path`, `search_code`.
 - Output exact target files, symbols, routes, callers; do not dump dirs/raw code into context.
-- Process with context-mode: feed target paths/symbols into `ctx_execute`, `ctx_batch_execute`, or `ctx_execute_file`; parse/count/filter/summarize in sandbox; print curated findings.
+- Process with context-mode: feed targets into `ctx_execute`, `ctx_batch_execute`, or `ctx_execute_file`; parse/count/filter/summarize in sandbox; print curated findings.
 
 ## Files and Shell
 - Use `Read` for known files to edit/quote; `Edit` for precise replacements; `Write` for new/full rewrites.
