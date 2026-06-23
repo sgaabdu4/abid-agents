@@ -29,7 +29,8 @@ For non-trivial implementation/reviews. Quality, simplicity, robustness, scale, 
 - Reviews prioritize structural regressions, missed simplifications, spaghetti growth, boundary/type leaks, file size, then legibility nits. Approval blocks on those, missed simpler framing, unjustified file growth, busy-flow ad-hoc branching, or hacky/magical helper.
 
 ## Tool Routing
-- Structure/callers/deps/impact/routes/symbols -> CBM first. Cmd output/logs/tests/diffs/APIs/data -> context-mode.
+- Structure/callers/deps/impact/routes/symbols -> CBM first. Do not raw-search code first.
+- Cmd output/logs/tests/diffs/APIs/data -> context-mode. Do not stream raw command output into context.
 - File edits: native file tools only. `Read` before `Edit`; `Write` for new/full rewrites. Never use `ctx_execute`, `ctx_execute_file`, or Bash to create/modify files.
 - Subagents: use exposed subagent/multi-agent tools only; if absent and `tool_search` exists, discover first. Do not invent tool names/params.
 - MCP: parent may call CBM/context-mode directly; delegate other MCP only through exposed subagent/multi-agent tools.
@@ -70,10 +71,10 @@ Report:
 Use the exact row labels.
 
 ## CBM
-Use before raw text search for definitions/callers/callees/data flow/architecture/impact/dead code/routes. Parent may call CBM. Required order: `index_repository(repo_path, mode="moderate")` -> list matching project -> `detect_changes` as needed. Explore with `get_architecture`, `search_graph`, `get_code_snippet`, `trace_path`, then `search_code` for dynamic/string refs. Fallback only when MCP transport is closed: `cbm cli <tool> '<json>'`.
+Use before raw text search for definitions/callers/callees/data flow/architecture/impact/dead code/routes. Parent may call CBM. Required order: `index_repository(repo_path, mode="moderate")` before index/status/search/trace -> list matching project -> `detect_changes` as needed. Explore with `get_architecture`, `search_graph`, `get_code_snippet`, `trace_path`, then `search_code` for dynamic/string refs. Fallback only when MCP transport is closed: `cbm cli <tool> '<json>'`.
 
 ## context-mode
-Default for read/query/list/test/build/diff/fetch/process; raw output floods context. Use `ctx_batch_execute`, `ctx_execute`, `ctx_execute_file`, indexing/search, and stats/admin tools. Think in code: analyze/filter in sandbox; print answer, not raw output. File edits use Read/Edit/Write, not context-mode. Playwright snapshots: save to file, then index/read via context-mode. After /clear or /compact, context-mode persists; ctx purge only on explicit request.
+Default for read/query/list/test/build/diff/fetch/process; raw output floods context. Use `ctx_batch_execute`, `ctx_execute`, `ctx_execute_file`, indexing/search, and stats/admin tools before shell for commands you will parse, filter, count, summarize, or search. Think in code: print answer, not raw output. File edits use Read/Edit/Write, not context-mode. Playwright snapshots: save to file, then index/read via context-mode. After /clear or /compact, context-mode persists; ctx purge only on explicit request.
 
 ## Map -> Process
 - Map with CBM: `get_architecture`, `search_graph` incl `semantic_query`, `trace_path`, `search_code`.
@@ -82,7 +83,7 @@ Default for read/query/list/test/build/diff/fetch/process; raw output floods con
 
 ## Files and Shell
 - Use `Read` for known files to edit/quote; `Edit` for precise replacements; `Write` for new/full rewrites.
-- Direct Bash only for small-output mutations/navigation: `mkdir`, `mv`, `cp`, `chmod`, approved `rm`, `pwd`, `which`, git writes.
+- Direct Bash only for small fixed-output observation, mutations/navigation: `mkdir`, `mv`, `cp`, `chmod`, approved `rm`, `pwd`, `which`, git writes.
 - Do not run raw `cat`, `head`, `tail`, `grep`, `rg`, `find`, `wc`, tests, builds, git reads, API CLIs, Docker/K8s/cloud CLIs via Bash.
 - Fallback text search: `ctx_execute` with `rtk grep`/`rtk read`/`rtk wc`; print curated results.
 - No `| head` / `| tail` to hide output. Process full output in context-mode.
