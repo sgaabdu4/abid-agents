@@ -37,14 +37,7 @@ For non-trivial implementation/reviews. Quality, simplicity, robustness, scale, 
 - Parallel work: use subagents for bounded independent evidence/review; synthesize in parent.
 
 ## Gate 1: Understand
-Use for code, diffs, PRs, commits, logs, docs, reviews, summaries, walkthroughs.
-
-- Code: CBM index before claims/search.
-- Diff/commit: read full patch via context-mode: `git show <sha>`. `--stat`, `--name-only`, subjects, and `log --oneline` do not suffice.
-- Read whole hunks and touched functions/classes. Truncated output = unread.
-- Claims require exact evidence: `path:L120-L135`, `qualified_name`, or commit hunk.
-- Avoid vague claims like "better", "cleaner", "improved", "more maintainable" unless code proves the fact.
-- Missing/wrong evidence: re-read source, rebuild answer, then reply.
+Use for code, diffs, PRs, commits, logs, docs, reviews, summaries, walkthroughs. Read full evidence before claims: code via CBM, diffs via context-mode `git show <sha>`, whole touched hunks/functions/classes. `--stat`, `--name-only`, subjects, `log --oneline`, and truncated output are unread. Claims need exact evidence: `path:L120-L135`, `qualified_name`, or commit hunk. Missing/wrong evidence -> re-read, rebuild answer, then reply.
 
 For summaries longer than 1 paragraph:
 ```md
@@ -60,11 +53,8 @@ Start with that template. Do not put prose before it.
 ## Gate 2: Blast Radius
 Use before/after semantic code changes and PR/commit impact summaries: functions, types, routes, constants, schemas, cache/storage keys, enums, API payloads, Appwrite attrs, shared/cross-package code.
 
-- Start with CBM: `trace_path(direction="inbound", depth=4)` for callers.
-- `search_code`: string keys, routes, schema attrs, dynamic dispatch, JSON fields; cross-lang/shared TS/Dart/all relevant packages.
-- Schema/Appwrite: `Query.select`, `Query.equal`, `Query.order*`, attr names, config JSON. Storage/cache: localStorage/SWR/Hive/IndexedDB/FCM/draft keys.
-- Tests/fixtures: trace/search tests when available. Routes/endpoints: Route nodes and endpoint callers.
-- Docs-only edits: no runtime call graph; state docs/config touched and code trace skipped.
+- Start with CBM inbound trace depth 4, then search string keys/routes/schema attrs/dynamic dispatch/JSON fields across relevant packages.
+- Check schemas/Appwrite query attrs, storage/cache keys, tests/fixtures, and routes/endpoints when touched. Docs-only edits: no runtime call graph; state docs/config touched and code trace skipped.
 - Never write `none` without trace/search evidence or explicit `not applicable`.
 
 Report:
@@ -80,20 +70,10 @@ Report:
 Use the exact row labels.
 
 ## CBM
-Use before raw text search for definitions/callers/callees/data flow/architecture/impact/dead code/routes. Parent may call CBM.
-
-- Required order: index_repository(repo_path, mode="moderate") first (before it: no index_status, search, trace) -> list_projects and matching root_path -> detect_changes(project) as needed; use mode="full" for deep impact.
-- Explore/trace: get_architecture -> search_graph -> get_code_snippet; exact-name search_graph -> trace_path -> search_code for dynamic/string refs.
-- Tool purpose: search_graph symbols/routes/structure; trace_path callers/callees/data flow/cross-service; get_code_snippet exact source; search_code graph-enriched text; get_architecture package/service; query_graph custom Cypher/multi-hop.
-- Tools: index_repository, index_status, list_projects, delete_project, search_graph, search_code, trace_path, detect_changes, query_graph, get_graph_schema, get_code_snippet, get_architecture, manage_adr, ingest_traces.
-- Fallback only when MCP transport is closed: cbm cli <tool> '<json>'. CLI output is raw JSON and may include level=...; do not expect Claude-style .content[0].text.
+Use before raw text search for definitions/callers/callees/data flow/architecture/impact/dead code/routes. Parent may call CBM. Required order: `index_repository(repo_path, mode="moderate")` -> list matching project -> `detect_changes` as needed. Explore with `get_architecture`, `search_graph`, `get_code_snippet`, `trace_path`, then `search_code` for dynamic/string refs. Fallback only when MCP transport is closed: `cbm cli <tool> '<json>'`.
 
 ## context-mode
-Default for read/query/list/test/build/diff/fetch/process; raw output floods context.
-
-- Tool map: ctx_batch_execute; ctx_execute; ctx_execute_file; ctx_fetch_and_index/ctx_index -> ctx_search; ctx_search(sort="timeline"); ctx_stats/doctor/upgrade/purge/insight.
-- Think in code: analyze/filter in sandbox; print answer, not raw output; batch ctx_search.
-- File edits use Read/Edit/Write, not context-mode. Playwright snapshots: save to file, then ctx_index(path) or ctx_execute_file(path). After /clear or /compact, context-mode persists; ctx purge only on explicit request.
+Default for read/query/list/test/build/diff/fetch/process; raw output floods context. Use `ctx_batch_execute`, `ctx_execute`, `ctx_execute_file`, indexing/search, and stats/admin tools. Think in code: analyze/filter in sandbox; print answer, not raw output. File edits use Read/Edit/Write, not context-mode. Playwright snapshots: save to file, then index/read via context-mode. After /clear or /compact, context-mode persists; ctx purge only on explicit request.
 
 ## Map -> Process
 - Map with CBM: `get_architecture`, `search_graph` incl `semantic_query`, `trace_path`, `search_code`.
@@ -108,10 +88,7 @@ Default for read/query/list/test/build/diff/fetch/process; raw output floods con
 - No `| head` / `| tail` to hide output. Process full output in context-mode.
 
 ## Online Research
-When user asks to browse/search/web/google/latest/current/research/extract a URL:
-1. Load `tavily-cli`.
-2. Use `tvly search` for discovery, `tvly extract` for URLs, `tvly research` for multi-source synthesis.
-3. Require `--json` where useful; process with context-mode; cite URLs for web-backed claims.
+When user asks to browse/search/web/google/latest/current/research/extract a URL: load `tavily-cli`; use `tvly search`/`extract`/`research`; require `--json` where useful; process with context-mode; cite URLs for web-backed claims.
 
 ## Skill Gates
 Load matching skill before answering/editing:
@@ -145,27 +122,18 @@ Load matching skill before answering/editing:
 ## Implementation Flow
 For non-trivial code tasks:
 1. Scope repo/root, relevant `AGENTS.md`, skills, constraints.
-2. CBM: `index_repository(repo_path, mode="moderate")` first.
-3. Explore: CBM architecture/search/snippets; read exact files before edits.
-4. Fix root/fundamental issues found in reviews/changes; owner, not symptom.
-5. Plan risky/multi-file edits; do full owner migration.
-6. Ripple: Gate 2 blast-radius search/trace.
-7. TDD where practical: failing test -> minimal code -> green -> refactor.
-8. Verify with smallest relevant lint/typecheck/test via context-mode; state skipped checks.
-9. For committed shipping work, use `/no-mistakes` or `git push no-mistakes`; direct `origin` push only on explicit request or when the gate is unavailable.
-10. Review changed code/docs, touched-file lengths, and uncited claims.
+2. Index/map with CBM, then read exact files before edits.
+3. Fix root owner, not symptom; plan risky or multi-file edits.
+4. Run Gate 2 blast-radius search/trace.
+5. Use `test-quality` for TDD/tests where practical; verify through context-mode.
+6. For committed shipping work, use `/no-mistakes` or `git push no-mistakes`; direct `origin` push only on explicit request or when the gate is unavailable.
+7. Review changed code/docs, touched-file lengths, and uncited claims.
 
 ## Subagents
-- Use exposed subagent/multi-agent tools only; discover with `tool_search` if needed.
-- Use subagents for bounded independent work: multi-area exploration, audits, log triage, test clusters, refactors over 2+ files, browser/MCP work, online research.
-- Split by ownership boundary: file/package/feature/flow/test group/source type; give focused task, scope limits, evidence format, stop condition.
-- Run independent subagent tasks in parallel when supported; keep dependent sequencing in parent. Parent owns synthesis, final judgment, edits, and user-facing claims; verify subagent output as evidence, not authority.
-- For MCP-backed actions except CBM/context-mode, delegate only through exposed subagent/multi-agent tools. Online/current research/URL extraction: `tvly` single lane; subagents bounded parallel lanes.
-- Wait once for each subagent batch; synthesize partial results plus direct fallback instead of repeated waits.
-- No subagent/multi-agent tool after discovery: work directly.
+Use exposed subagent/multi-agent tools only; discover with `tool_search` if needed. Use bounded independent lanes for exploration, audits, log triage, test clusters, multi-file refactors, browser/MCP work, or online research. Split by ownership boundary and give scope, evidence format, and stop condition. Parent owns synthesis, final judgment, edits, and user-facing claims. If no subagent tool exists after discovery, work directly.
 
 ## TDD and Verification
-- Bugs: reproduce first in user-like flow when feasible; prefer tests first for behavior changes.
+- Bugs: reproduce first in user-like flow when feasible; load `diagnosing-bugs` when not isolated.
 - Load `test-quality`; it owns scenarios, real implementation, boundaries, red/mutation proof, and gap audit.
 - Run smallest relevant verification through context-mode. If it fails, fix root cause; never mask, skip, or weaken checks.
 - E2E/product checks: load `e2e`; inspect pixels when a driver works; otherwise use local script/tests. Do not install tooling unless asked.
@@ -205,7 +173,7 @@ Use after any code/config/doc edit or debug/fix. Include every row in this exact
 - Never claim `none`, `not applicable`, or `pass` without evidence.
 
 ## Writing
-- Load `terse`; it owns brevity, answer-first shape, filler removal, exact symbols, arrows when useful, and uncited claims.
+- Load `terse`; it owns brevity, answer-first shape, filler removal, exact symbols, arrows, and uncited claims.
 - Before final, remove em dash characters and dash punctuation from prose; use commas, periods, colons, parentheses, or arrows. Long Markdown: one sentence per physical line.
 - Artifacts/plans/specs/config/code: write files; return path + one-line description.
 - All repo changes: durable product/runtime content only. No process notes unless requested.
