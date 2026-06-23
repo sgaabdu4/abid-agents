@@ -385,18 +385,19 @@ repo="$(git rev-parse --show-toplevel)"
 if [[ "$(basename "$repo")" != ".agents" ]]; then
   exit 0
 fi
+history_pathspecs=(. ':!scripts/install.sh' ':!tests/markdown-hygiene.test.mjs')
 
 scan_history_fixed() {
   local needle="$1"
   git -C "$repo" rev-list --all | while read -r rev; do
-    git -C "$repo" grep -n -F "$needle" "$rev" -- . 2>/dev/null || true
+    git -C "$repo" grep -n -F "$needle" "$rev" -- "${history_pathspecs[@]}" 2>/dev/null || true
   done
 }
 
 scan_history_regex() {
   local pattern="$1"
   git -C "$repo" rev-list --all | while read -r rev; do
-    git -C "$repo" grep -n -i -E "$pattern" "$rev" -- . 2>/dev/null || true
+    git -C "$repo" grep -n -i -E "$pattern" "$rev" -- "${history_pathspecs[@]}" 2>/dev/null || true
   done
 }
 

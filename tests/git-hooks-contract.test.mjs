@@ -64,6 +64,8 @@ assert.ok(
   installScript.includes('Blocked push: reachable git history contains private path or secret-like references.'),
   'pre-push hook must block private path or secret-like history matches'
 );
+assert.ok(installScript.includes("':!scripts/install.sh'"), 'pre-push history scan must ignore installer policy literals');
+assert.ok(installScript.includes("':!tests/markdown-hygiene.test.mjs'"), 'pre-push history scan must ignore hygiene leak fixture');
 assert.ok(installScript.includes("awk -F: '{ print $1 \":\" $2 \":\" $3 }'"), 'pre-push hook must avoid printing matched secret content');
 assert.ok(installScript.includes('scan_history_fixed'), 'pre-push history scan must avoid giant revision argv');
 assert.ok(autoSyncScript.includes('git rev-parse --git-path agent-config-auto-sync.lock'), 'auto-sync lock must be repo-local');
@@ -121,6 +123,8 @@ if (fs.existsSync(prePushHook)) {
   assert.ok((stat.mode & 0o111) !== 0, 'installed pre-push hook must be executable');
   assert.ok(text.includes('ABID_AGENTS_CHECK_SUBMODULES_BEFORE_PUSH'), 'installed pre-push hook must keep submodule status opt-in');
   assert.ok(text.includes('Blocked push: reachable git history contains private path or secret-like references.'));
+  assert.ok(text.includes("':!scripts/install.sh'"), 'installed pre-push hook must ignore installer policy literals');
+  assert.ok(text.includes("':!tests/markdown-hygiene.test.mjs'"), 'installed pre-push hook must ignore hygiene leak fixture');
 }
 
 const preCommitHook = path.join(repo, '.git', 'hooks', 'pre-commit');
