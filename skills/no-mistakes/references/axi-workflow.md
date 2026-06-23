@@ -1,0 +1,102 @@
+# no-mistakes Axi Workflow
+
+`no-mistakes axi` is the agent-facing interface. It prints machine-readable
+TOON to stdout and progress to stderr.
+
+## Modes
+
+- Validate-only: bare `/no-mistakes`, optionally with skip flags. The user's
+  changes are already committed, so validate and report.
+- Task-first: do the requested work, commit only that scope on a feature branch,
+  then validate the committed branch.
+- Translate user flag requests into `axi run` flags yourself. Example: "skip
+  lint" means pass `--skip=lint`. Use `no-mistakes axi run --help` when unsure.
+
+## Preconditions
+
+- Start with `no-mistakes axi`.
+- If the current branch already has an active run, resume it or abort only when
+  the user has approved aborting.
+- If another branch has an active run, leave it alone.
+- If the repo is not initialized, follow the tool's `no-mistakes init` guidance.
+- If the command is missing or unhealthy, run `no-mistakes doctor`.
+- Never run the pipeline from the default branch for new shipping work.
+
+## Intent
+
+Pass `--intent` every time you start a run.
+The intent is the user's objective, not a diff summary.
+Include constraints, tradeoffs, and decisions the review step cannot infer from
+code alone.
+
+```sh
+no-mistakes axi run --intent "<what the user set out to accomplish>"
+```
+
+## Gates
+
+When output contains `gate:`, the pipeline is waiting for a decision.
+Read the actual `findings` table columns.
+`axi run` and `axi respond` can take several minutes.
+Do not cancel or restart because they look quiet.
+Check progress from another call with `no-mistakes axi status`.
+Common actions:
+
+- `auto-fix`: safe for the agent to send to the pipeline with `--action fix`.
+- `no-op`: informational, approve when no action is needed.
+- `ask-user`: stop and relay the finding verbatim unless the user gave clear
+  unattended consent.
+
+Use the pipeline to apply fixes:
+
+```sh
+no-mistakes axi respond --action fix --findings <id1,id2>
+no-mistakes axi respond --action approve
+no-mistakes axi respond --action skip
+```
+
+Do not manually edit code while the active gate is waiting.
+If you spot an extra issue during a gate, fold it in with `--add-finding` and
+`--action fix`.
+Use `--step <name>` only when you need to respond to a specific non-current
+step.
+If the user gave clear unattended consent, `--yes` may drive actionable gates
+without stopping for each `ask-user` finding.
+
+## Outcomes
+
+- `checks-passed`: validation and checks are green, PR is ready for human review.
+- `passed`: the pipeline completed after merge or close.
+- `failed` or `cancelled`: inspect the failing step, fix root cause, commit the
+  fix, and rerun or explain the blocker.
+
+The CI step stops at `checks-passed`; do not wait for human merge.
+
+## Inspecting state
+
+```sh
+no-mistakes axi
+no-mistakes axi status
+no-mistakes axi logs --step <name> --full
+no-mistakes axi abort
+no-mistakes rerun
+```
+
+Abort only when the user has approved cancelling the current-branch active run.
+
+## Reading output
+
+- Output is TOON: `key: value` pairs, tables, and `help` lines.
+- Follow `help` lines instead of guessing the next command.
+- Errors are printed as `error: ...` with recovery guidance.
+- Exit codes: `0` success or normal gate, `1` failed or cancelled final
+  outcome, `2` bad usage.
+
+## Reporting
+
+At the end, include:
+
+- PR link when one exists.
+- Pipeline findings and fixes, especially fixes your original change missed.
+- Verification commands and their pass/fail status.
+- Any skipped checks and residual risk.

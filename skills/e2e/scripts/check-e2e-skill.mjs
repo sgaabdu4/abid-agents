@@ -42,6 +42,7 @@ const requiredTemplates = [
 const requiredScripts = [
   'scripts/check-e2e-project.mjs',
   'scripts/check-e2e-run-artifacts.mjs',
+  'scripts/check-ui-runtime.mjs',
   'scripts/dogfood-playwright-smoke.mjs',
   'scripts/ensure-playwright.mjs',
   'scripts/make-2x-recap.mjs',
@@ -81,9 +82,10 @@ assert(projectPack.includes('Every E2E flow should be automated'), 'project pack
 assert(projectPack.includes('automation.commands'), 'project pack must require automation commands');
 assert(projectPack.includes('prod-read-only'), 'project pack must persist prod-read-only data mode');
 assert(browser.indexOf('Codex Browser first') < browser.indexOf('Standalone Playwright'), 'browser-first policy must list Browser before Playwright');
-assert(browser.includes('stop UI automation probing'), 'browser-first policy must stop after failed probes');
+assert(/stop (that driver|UI automation probing)/.test(browser), 'browser-first policy must stop after failed probes');
 assert(browser.includes('ensure-playwright.mjs'), 'browser-first policy must check/provision Playwright before declaring it unavailable');
 assert(browser.includes('Computer Use'), 'browser-first policy must include Computer Use fallback');
+assert(browser.includes('check-ui-runtime.mjs'), 'browser-first policy must include runtime preflight');
 assert(capture.includes('events.jsonl'), 'capture policy must require events.jsonl');
 assert(capture.includes('videos/<flow>.mp4'), 'capture policy must define video artifacts');
 assert(capture.includes('2x speed recap video'), 'capture policy must require 2x recap video');
