@@ -13,7 +13,6 @@ case "${1:-}" in
     ;;
   --repair|--manual|--after-manual-update)
     mode="repair"
-    export ABID_AGENTS_SKIP_NPM_INSTALL="${ABID_AGENTS_SKIP_NPM_INSTALL:-1}"
     export ABID_AGENTS_SKIP_SUBMODULE_INIT="${ABID_AGENTS_SKIP_SUBMODULE_INIT:-1}"
     ;;
   -h|--help)

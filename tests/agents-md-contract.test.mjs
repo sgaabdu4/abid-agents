@@ -110,7 +110,7 @@ assertIncludes(mcpInstallText, 'ln -s "$npm_bin" "$candidate"', 'CBM setup must 
 assert.ok(!mcpInstallText.includes('.backup.'), 'CBM setup must not keep backup binaries');
 assertIncludes(updateStackText, '"$ROOT/scripts/install.sh"', 'codex-update-stack must run setup after package updates');
 assertIncludes(updateStackText, '--after-manual-update', 'codex-update-stack must support a manual update repair mode');
-assertIncludes(updateStackText, 'ABID_AGENTS_SKIP_NPM_INSTALL="${ABID_AGENTS_SKIP_NPM_INSTALL:-1}"');
+assertIncludes(updateStackText, 'ABID_AGENTS_SKIP_SUBMODULE_INIT="${ABID_AGENTS_SKIP_SUBMODULE_INIT:-1}"');
 assertIncludes(updateStackText, 'Repairing Codex stack after manual update');
 assertIncludes(updateStackText, 'codex doctor ok: filesystem sandbox=unrestricted approval=Never');
 assertIncludes(updateStackText, 'context-mode doctor');
