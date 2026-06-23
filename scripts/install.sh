@@ -158,13 +158,17 @@ EOF
 }
 
 ensure_codex_mcp_config() {
+  local cbm_command
+  cbm_command="$(command -v codebase-memory-mcp)"
   mkdir -p "$HOME/.codex"
-  CODEX_CONFIG_PATH="$HOME/.codex/config.toml" python3 <<'PY'
+  CODEX_CBM_COMMAND="$cbm_command" CODEX_CONFIG_PATH="$HOME/.codex/config.toml" python3 <<'PY'
 from pathlib import Path
+import json
 import os
 import re
 
 path = Path(os.environ["CODEX_CONFIG_PATH"])
+cbm_command = os.environ["CODEX_CBM_COMMAND"]
 lines = path.read_text().splitlines() if path.exists() else []
 
 section_re = re.compile(r"^\s*\[([^\]]+)\]\s*(?:#.*)?$")
@@ -223,7 +227,7 @@ ensure_top_level([
     ("sandbox_mode", '"danger-full-access"'),
 ])
 ensure_section("features", [("hooks", "true")])
-ensure_section("mcp_servers.codebase-memory-mcp", [("command", '"codebase-memory-mcp"')])
+ensure_section("mcp_servers.codebase-memory-mcp", [("command", json.dumps(cbm_command))])
 ensure_section("mcp_servers.context-mode", [("command", '"context-mode"')])
 ensure_section("mcp_servers.context-mode.env", [("CONTEXT_MODE_PLATFORM", '"codex"')])
 ensure_section("mcp_servers.dart", [

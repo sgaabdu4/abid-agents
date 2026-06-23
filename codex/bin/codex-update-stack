@@ -135,7 +135,21 @@ if overall == "warning":
     ]
     print("codex doctor warnings: " + ", ".join(warnings))
 print(f"CBM shadow ok: {shadow_cbm} -> {expected_cbm}")
+
+hooks_path = Path.home() / ".codex" / "hooks.json"
+try:
+    hooks = json.loads(hooks_path.read_text())
+except Exception as exc:
+    fail(f"Failed to read Codex hooks config: {exc}")
+hook_events = hooks.get("hooks") or {}
+if "SessionStart" in hook_events:
+    fail("Codex SessionStart hook must stay disabled.")
+if "context-mode hook" in json.dumps(hook_events):
+    fail("Codex context-mode hooks must stay stripped.")
+print("codex hooks ok: SessionStart disabled context-mode hooks absent")
 PY
+
+node "$ROOT/scripts/probe-codebase-memory-mcp.mjs" "$(command -v codebase-memory-mcp)"
 
 python3 <<'PY'
 import os
