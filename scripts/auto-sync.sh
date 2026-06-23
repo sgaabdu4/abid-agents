@@ -57,6 +57,19 @@ update_no_mistakes() {
   fi
 }
 
+refresh_local_install() {
+  if [[ "${ABID_AGENTS_SKIP_AUTO_INSTALL:-}" == "1" ]]; then
+    return 0
+  fi
+
+  if ! ABID_AGENTS_SKIP_NPM_INSTALL=1 \
+    ABID_AGENTS_SKIP_SUBMODULE_INIT=1 \
+    ABID_AGENTS_SKIP_CRON=1 \
+    "$ROOT/scripts/install.sh"; then
+    echo "Agent-config local install refresh failed; run $ROOT/scripts/install.sh manually." >&2
+  fi
+}
+
 if [[ "$(git branch --show-current)" != "main" ]]; then
   echo "Refusing auto-sync: current branch is not main." >&2
   exit 1
@@ -73,6 +86,9 @@ git fetch origin main
 
 if [[ "$MODE" == "--pull" ]]; then
   ABID_AGENTS_SKIP_AUTO_SYNC=1 git pull --ff-only origin main
+  refresh_local_install
+elif [[ "$MODE" == "--after-pull" ]]; then
+  refresh_local_install
 fi
 
 if [[ "${ABID_AGENTS_SKIP_SUBMODULE_BUMP:-}" == "1" ]]; then

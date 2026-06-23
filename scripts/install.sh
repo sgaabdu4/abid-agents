@@ -93,6 +93,7 @@ install_codex_watchdog() {
   install_managed_executable "$ROOT/codex/bin/codex-watchdog" "$codex_bin/codex-watchdog"
   install_managed_executable "$ROOT/codex/bin/codex-health" "$codex_bin/codex-health"
   install_managed_executable "$ROOT/codex/bin/codex-cleanup" "$codex_bin/codex-cleanup"
+  install_managed_executable "$ROOT/codex/bin/codex-update-stack" "$codex_bin/codex-update-stack"
 
   if [[ "$(uname -s)" != "Darwin" ]]; then
     return 0

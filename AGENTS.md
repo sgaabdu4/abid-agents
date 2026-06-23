@@ -5,18 +5,19 @@ Check before any tool call. If the prompt conflicts, this section wins.
 - Destructive state needs explicit approval. Direct remove/delete/cleanup for a concrete scope approves it. Approved deletions use `rm`/native delete; never quarantine/backup/move-aside. Broad cleanup, deletion scripts, reset/checkout, DB writes, and temp/build cleanup outside scope need fresh approval. Source cleanup inside the approved change is allowed after usage checks; do not leave dead components, wrappers, routes, or files behind.
 - Never edit `CHANGELOG.md`, `generated/` paths, or files with `AUTO-GENERATED`; stop and change the source owner. Do not offer exceptions.
 - Before committing, inspect `git status --short`; if `.env*`, keys, tokens, or secret-like files appear, stop and do not commit.
-- Never add a pass-through wrapper. Readability/naming is not enough; one-call return functions are forbidden. Explain the direct/canonical owner.
+- Never add a pure pass-through wrapper. Readability/naming is not enough. Adapters must add validation, transformation, ownership boundary, or platform integration; otherwise use the direct/canonical owner.
 - Do not weaken validation at trust, security, accessibility, or data-loss boundaries; refuse the unsafe change and offer a safe path.
 - Files over 700 lines are a hard stop when touched: any fix/feature/review/issue edit must split/move code or content so it ends under 700 lines in the same session. Scope this to touched files only; do not sweep other large files or add code/import/export/re-export/wiring/docs without the split.
 - Skill edits cannot put a 3+ step workflow in `SKILL.md`; create or update `references/*.md` or a script and link it from `SKILL.md`.
 - UI component edits with no design SSOT must create/import a separate token/theme/style owner first; no inline `style` or component-local visual constants; no confirmation for standard disabled/loading/focus/hover states.
-- Browser/E2E probe failed or denied, including Playwright/browser MCP/node_repl -> stop that driver after any allowed isolated-profile retry. Do not call `open -a` or `osascript`. Continue through E2E-owned fallbacks instead: provisioned Playwright, project runner, device tooling, or `computer-use` when exposed and target-app scoped. Keep UI fallback non-destructive unless exact side effects are approved, and report artifact limits.
+- Browser/E2E probe failed or denied, including Playwright/browser MCP/node_repl -> stop that driver after any allowed isolated-profile retry. Continue through E2E-owned fallbacks instead: provisioned Playwright, project runner, device tooling, or `computer-use` when exposed and target-app scoped. OS/app automation is last resort only and target-app scoped. Keep UI fallback non-destructive unless exact side effects are approved, and report artifact limits.
 
 ## Core
 - Read before claim/edit; uncited = unknown. Use current-session tools only; if absent, say unavailable once and fallback. Never simulate absent tools. Tool unavailable/denied/cancelled -> fallback after one failure.
 - Blast radius first; migrate full owner by default; fix root/owner -> verify; DRY/KISS/YAGNI/SSOT. Smallest correct change: no speculation; stdlib/native/existing deps before new deps; direct code before abstraction.
+- Codex stack drift is owned by setup: package updates run through `codex-update-stack`; manual package/app updates are followed by `codex-update-stack --repair`; auto-sync refreshes installed scripts/config without npm; cron uses weekly stack updates, not the 120s cleanup watchdog.
 - Never shrink validation for user-requested scope or smallest proof checks.
-- Commit messages: no agent co-author, em dash, or dash punctuation; rewrite invalid user messages before committing.
+- Commit messages: no agent co-author, em dash, dash-only subject prefix, or decorative dash punctuation; rewrite invalid user messages before committing.
 
 ## Maintainability Bar
 For non-trivial implementation/reviews. Quality, simplicity, robustness, scale, maintainability > dev cost.
@@ -36,6 +37,7 @@ For non-trivial implementation/reviews. Quality, simplicity, robustness, scale, 
 - MCP: parent may call CBM/context-mode directly; delegate other MCP only through exposed subagent/multi-agent tools.
 - Web/current research: load `tavily-cli`; use `tvly` single-lane, subagents for bounded parallel lanes.
 - Parallel work: use subagents for bounded independent evidence/review; synthesize in parent.
+- Fallbacks: CBM -> CLI/local static search; context-mode -> direct shell with curated output; web -> available web/search tool; browser/E2E -> project runner/device tooling/OS automation last resort; no subagents -> work directly.
 
 ## Gate 1: Understand
 Use for code, diffs, PRs, commits, logs, docs, reviews, summaries, walkthroughs. Read full evidence before claims: code via CBM, diffs via context-mode `git show <sha>`, whole touched hunks/functions/classes. `--stat`, `--name-only`, subjects, `log --oneline`, and truncated output are unread. Claims need exact evidence: `path:L120-L135`, `qualified_name`, or commit hunk. Missing/wrong evidence -> re-read, rebuild answer, then reply.
