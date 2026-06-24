@@ -86,6 +86,13 @@ fs.mkdirSync(plain);
 run('git', ['init', '-q', '-b', 'main'], { cwd: plain });
 assert.equal(run(script, ['--check', plain]).status, 0, 'non-Husky repos should pass without mutation');
 
+const multiRoot = path.join(tmp, 'multi');
+fs.mkdirSync(path.join(multiRoot, 'a'), { recursive: true });
+fs.mkdirSync(path.join(multiRoot, 'b'), { recursive: true });
+run('git', ['init', '-q', '-b', 'main'], { cwd: path.join(multiRoot, 'a') });
+run('git', ['init', '-q', '-b', 'main'], { cwd: path.join(multiRoot, 'b') });
+assert.equal(run(script, ['--check', 'a', 'b'], { cwd: multiRoot }).status, 0, 'multiple relative targets must resolve from the invocation directory');
+
 const generic = path.join(tmp, 'generic');
 fs.mkdirSync(generic);
 run('git', ['init', '-q', '-b', 'main'], { cwd: generic });

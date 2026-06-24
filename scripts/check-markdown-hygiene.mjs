@@ -5,6 +5,7 @@ import { spawnSync } from 'node:child_process';
 
 const root = path.resolve(process.env.AGENTS_HYGIENE_ROOT || process.cwd());
 const errors = [];
+const tokenChecks = [];
 
 const ignoredDirs = new Set(['.git', 'backups', 'node_modules', 'vendor']);
 const allowedAgentsSections = [
@@ -49,17 +50,39 @@ function lineCount(text) {
   return text.split(/\r?\n/).length - (text.endsWith('\n') ? 1 : 0);
 }
 
-function tokenCount(text) {
+function addTokenCheck(file, text, maxTokens, label) {
+  tokenChecks.push({ file, text, maxTokens, label });
+}
+
+function flushTokenChecks() {
+  if (tokenChecks.length === 0) return;
   const check = spawnSync('python3', ['-c', `
+import json
 import sys
 import tiktoken
-print(len(tiktoken.get_encoding("o200k_base").encode(sys.stdin.read())))
-`], { input: text, encoding: 'utf8' });
+enc = tiktoken.get_encoding("o200k_base")
+print(json.dumps([len(enc.encode(text)) for text in json.load(sys.stdin)]))
+`], {
+    input: JSON.stringify(tokenChecks.map((item) => item.text)),
+    encoding: 'utf8',
+  });
   if (check.status !== 0) {
     errors.push(`token check failed: ${check.stderr.trim()}`);
-    return 0;
+    return;
   }
-  return Number.parseInt(check.stdout.trim(), 10);
+  let counts;
+  try {
+    counts = JSON.parse(check.stdout);
+  } catch (error) {
+    errors.push(`token check failed: ${error.message}`);
+    return;
+  }
+  tokenChecks.forEach((item, index) => {
+    const count = counts[index];
+    if (count > item.maxTokens) {
+      fail(item.file, `${item.label}; got ${count}`);
+    }
+  });
 }
 
 function walk(dir, files = []) {
@@ -97,8 +120,7 @@ function checkAgents(file, text) {
   }
   const lines = lineCount(text);
   if (lines > maxAgentsLines) fail(file, `must stay at or under ${maxAgentsLines} lines; got ${lines}`);
-  const tokens = tokenCount(text);
-  if (tokens > maxAgentsTokens) fail(file, `must stay at or under ${maxAgentsTokens} tokens; got ${tokens}`);
+  addTokenCheck(file, text, maxAgentsTokens, `must stay at or under ${maxAgentsTokens} tokens`);
 
   let inFence = false;
   for (const [index, line] of text.split('\n').entries()) {
@@ -144,10 +166,7 @@ function checkSkill(file, text) {
     fail(file, 'description must stay one line to control prompt tokens');
     return;
   }
-  const descriptionTokens = tokenCount(description);
-  if (descriptionTokens > maxSkillDescriptionTokens) {
-    fail(file, `description must stay at or under ${maxSkillDescriptionTokens} tokens; got ${descriptionTokens}`);
-  }
+  addTokenCheck(file, description, maxSkillDescriptionTokens, `description must stay at or under ${maxSkillDescriptionTokens} tokens`);
 }
 
 for (const absolutePath of walk(root)) {
@@ -157,6 +176,8 @@ for (const absolutePath of walk(root)) {
   if (file === 'AGENTS.md') checkAgents(file, text);
   if (isRepoSkillEntrypoint(file)) checkSkill(file, text);
 }
+
+flushTokenChecks();
 
 if (errors.length > 0) {
   console.error(`markdown-hygiene: ${errors.length} failure(s)`);

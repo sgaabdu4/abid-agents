@@ -79,6 +79,7 @@ done
 if [[ "${#targets[@]}" -eq 0 ]]; then
   targets=(".")
 fi
+initial_cwd="$(pwd)"
 
 detect_hook_owner() {
   if [[ -f ".husky/pre-push" || -f ".husky/pre-commit" ]]; then
@@ -256,7 +257,15 @@ check_or_repair_repo() {
 
 status=0
 for target in "${targets[@]}"; do
-  if ! check_or_repair_repo "$target"; then
+  case "$target" in
+    /*)
+      resolved_target="$target"
+      ;;
+    *)
+      resolved_target="$initial_cwd/$target"
+      ;;
+  esac
+  if ! check_or_repair_repo "$resolved_target"; then
     status=1
   fi
 done
