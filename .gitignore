@@ -3,6 +3,7 @@
 # Local agent/runtime state
 .codebase/
 .codebase-memory/
+.lavish-axi/
 .skill-lock.json
 hooks/logs/
 

@@ -19,6 +19,7 @@ const outBase = process.env.AGENTS_ROUTING_EVAL_OUT_DIR
   : path.join('/tmp', 'agents-md-routing-evals');
 const outDir = path.join(outBase, runId);
 fs.mkdirSync(outDir, { recursive: true });
+const schemaPath = path.join(outDir, 'routing-output-schema.json');
 
 const policyFiles = [
   'AGENTS.md',
@@ -27,7 +28,7 @@ const policyFiles = [
   'skills/workflow-help/references/route-map.md',
 ];
 
-const policyDigestPattern = /workflow-help|grill-me|to-prd|to-issues|readiness|PASS|CONCERNS|FAIL|correct course|scope expands|codebase-memory|context-mode|support tools|not stages|react-doctor|fallow|vercel-react-best-practices|sentry-workflow|sentry-cli|sentry-sdk-setup|sentry-feature-setup|security-review|performance-rescue|e2e|real UI|screenshots|events|regression command|thermo-nuclear-code-quality-review|maintainability|no-mistakes|committed|BMAD|menu codes|Treehouse|700|blast radius|surrounding issues|Report:|Why:|What:|Risk:|Proof:/i;
+const policyDigestPattern = /workflow-help|grill-me|to-prd|to-issues|readiness|PASS|CONCERNS|FAIL|correct course|scope expands|codebase-memory|context-mode|support tools|not stages|lavish|visual review|UI choices|react-doctor|fallow|vercel-react-best-practices|sentry-workflow|sentry-cli|sentry-sdk-setup|sentry-feature-setup|security-review|performance-rescue|e2e|real UI|screenshots|events|regression command|thermo-nuclear-code-quality-review|maintainability|no-mistakes|committed|BMAD|menu codes|Treehouse|700|blast radius|surrounding issues|Report:|Why:|What:|Risk:|Proof:/i;
 
 const policyText = policyFiles
   .map((rel) => {
@@ -44,12 +45,36 @@ const allKeys = Array.from(new Set(config.cases.flatMap((testCase) => [
   ...testCase.expectFalse,
 ])));
 
+fs.writeFileSync(schemaPath, `${JSON.stringify({
+  type: 'object',
+  additionalProperties: false,
+  required: allKeys,
+  properties: Object.fromEntries(allKeys.map((key) => [key, {
+    type: 'object',
+    additionalProperties: false,
+    required: ['value', 'reason'],
+    properties: {
+      value: { type: 'boolean' },
+      reason: { type: 'string' },
+    },
+  }])),
+}, null, 2)}\n`);
+
 const keyDefinitions = [
   'usesWorkflowHelp: route unclear workflow or next-step questions to workflow-help',
   'keepsSupportToolsAsTools: treats codebase-memory, context-mode, and terse as support tools, not workflow stages',
   'treatsSupportToolsAsStages: incorrectly presents support tools as standalone workflow stages',
   'usesCodebaseMemoryAsSupport: uses codebase-memory for owners, callers, routes, structure, or blast radius',
   'usesContextModeAsSupport: uses context-mode for logs, diffs, tests, commands, APIs, or data processing',
+  'usesExistingAcceptedSlices: recognizes that accepted vertical slices or task waves in plan.md are enough to move toward readiness and implementation',
+  'avoidsRedundantToIssues: does not require to-issues when an accepted plan already contains agent-ready slices',
+  'requiresToIssuesForExistingSlices: incorrectly treats to-issues as mandatory after grill-me even though plan.md already has accepted slices',
+  'usesToIssuesForMissingSlices: routes to-issues when the post-grill-me plan lacks vertical slices, task waves, or agent-ready issue breakdown',
+  'usesToIssuesForRequestedIssueCards: routes to-issues when the user explicitly asks to turn accepted slices into separate issue or tracker cards',
+  'usesToPrdAndToIssuesForBigWork: routes broad unsliced work through to-prd and then to-issues before build',
+  'usesLavishForVisualUiDecisions: uses Lavish or lavish-axi for UI flow or visual choices that cannot be judged from text',
+  'keepsLavishAsSupportTool: treats Lavish as a support tool inside grill-me, not as its own Plan/Implement/Verify stage',
+  'treatsLavishAsRequiredStage: incorrectly requires Lavish for every feature or makes it a standalone workflow stage',
   'usesReactDoctor: includes react-doctor for React or Next.js implementation/review',
   'usesFallow: includes fallow for JS/TS code health, cleanup, risk, or architecture checks',
   'usesVercelReactBestPractices: includes Vercel React best-practices for React/Next performance guidance',
@@ -171,6 +196,7 @@ function runCase(testCase) {
       ? ''
       : 'Retry note: your previous answer omitted required keys. Return every key in the requested object shape.';
     const prompt = promptFor(testCase, retryNote);
+    const outputPath = path.join(caseDir, attempt === 1 ? 'output.json' : `output-attempt-${attempt}.json`);
     fs.writeFileSync(path.join(caseDir, attempt === 1 ? 'prompt.txt' : `prompt-attempt-${attempt}.txt`), prompt);
 
     const result = spawnSync('codex', [
@@ -183,6 +209,10 @@ function runCase(testCase) {
       '--ignore-user-config',
       '--color',
       'never',
+      '--output-schema',
+      schemaPath,
+      '-o',
+      outputPath,
       '-',
     ], {
       cwd: process.env.TMPDIR || '/tmp',
@@ -200,7 +230,9 @@ function runCase(testCase) {
     if (result.error) errors.push(result.error.message);
     if (result.status !== 0) errors.push(`codex exit status ${result.status}`);
     try {
-      parsed = extractJson(result.stdout || '');
+      parsed = fs.existsSync(outputPath)
+        ? JSON.parse(fs.readFileSync(outputPath, 'utf8'))
+        : extractJson(result.stdout || '');
     } catch (error) {
       errors.push(error.message);
     }

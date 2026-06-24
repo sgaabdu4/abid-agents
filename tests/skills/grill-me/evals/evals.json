@@ -149,8 +149,7 @@
       "id": 13,
       "prompt": "We need to redesign the dashboard, but use the existing design system. Do not invent a new brand direction unless the code proves we need it.",
       "expected_output": "Routes to brownfield UI/design work, reuses existing design system evidence, and asks one dashboard flow/density/state question before any new style direction.",
-      "files": [
-        {
+      "files": [{
           "path": "src/design/tokens.ts",
           "content": "export const spacing = { xs: 4, sm: 8, md: 12, lg: 16 };\nexport const colors = { surface: '#f8fafc', text: '#0f172a', accent: '#2563eb' };\n"
         },
@@ -182,8 +181,7 @@
       "id": 15,
       "prompt": "Stress test this spec: docs/planning/reminders/plan.md. Find gaps and ask me the most important question first.",
       "expected_output": "Routes to review, reads the supplied spec first, produces evidence-backed gap context internally, and asks one focused Q.",
-      "files": [
-        {
+      "files": [{
           "path": "docs/planning/reminders/plan.md",
           "content": "# Reminder Plan\n\n## Goal\nSend a reminder before each booked session.\n\n## Current assumptions\n- Reminders are sent by a background worker.\n- Users can have multiple active bookings.\n- The app stores booking start time and client timezone.\n\n## Draft behavior\n- Send one reminder 24 hours before the session.\n- Do not send reminders for cancelled bookings.\n- Mark each reminder as sent after the push provider accepts it.\n\n## Open notes\n- The retry strategy is undecided.\n- The product owner has not chosen the failure mode that matters most.\n"
         }
@@ -282,13 +280,13 @@
     {
       "id": 23,
       "prompt": "We are in final synthesis for a build-plan session. session_state.md has Product and Backend accepted, UI n/a, Visual n/a, Prototype n/a, Vertical slices accepted. Write the plan.",
-      "expected_output": "Reads session state and draft, writes plan.md as canonical artifact, includes only relevant sections, and cleans temp state only after verification.",
+      "expected_output": "Reads session state and draft, writes plan.md as canonical artifact, includes only relevant sections, and removes absorbed temp state only after verification.",
       "files": [],
       "expectations": [
         "session_state.md is read before final synthesis.",
         "plan.md includes decisions, acceptance checks, verification/evals, risks/unknowns where relevant.",
         "Irrelevant visual/prototype sections are omitted or not boilerplated.",
-        "Temp state is listed for cleanup only after plan.md is verified to contain needed content."
+        "Temp state is removed only after plan.md is verified to contain needed content, while non-temp artifacts are preserved."
       ]
     },
     {
@@ -606,6 +604,94 @@
         "The visible final response includes the plan path and cleanup status.",
         "The visible final response offers clear next-step choices, such as implement now, review or edit the plan, or stop with the plan.",
         "The response does not end with only a generic docs/config change report."
+      ]
+    },
+    {
+      "id": 45,
+      "prompt": "Continue a grill-me UI-flow session. We know the onboarding goal and the two candidate routes, but the user says they cannot choose without seeing the flow. Decide the next move.",
+      "expected_output": "Uses a low-fidelity Lavish wireflow/state-map review before asking the route choice, keeps visual design/prototype out of UI flow, and references the vendored Lavish skill.",
+      "files": [
+        {
+          "path": "docs/planning/onboarding/session_state.md",
+          "content": "# Onboarding Session State\nUpdated: synthetic\nMode: build-plan\nProfile: brownfield-feature\nRepo: existing\nTarget artifact: implementation plan\n\n## Stage Map\n- Intake: brief - target known\n- Product plan: accepted - activation problem known\n- UI flow: run - route choice unresolved and user needs visual review\n- Visual design: brief - existing design system\n- Prototype tech stack: n/a - no prototype requested yet\n- Prototype: n/a - no prototype requested yet\n- Backend/infra tech stack: brief - event tracking may matter\n- Vertical slices/evals: run - implementation planned\n\n## Position\n- Active stage: ui-flow\n- Stage status: interviewing\n- Last question id: 8\n- Last answer: recorded\n- Next action: ask\n\n## Decisions\n- Compare two onboarding routes: checklist-first vs guided wizard.\n- User cannot choose from text alone.\n\n## Evidence / Artifacts\n- user quote: I cannot choose without seeing the flow.\n"
+        },
+        {
+          "path": "docs/planning/onboarding/plan_draft.md",
+          "content": "# Onboarding Draft\n\n## Decisions\n- Goal: improve first-run activation.\n- Candidate routes: checklist-first and guided wizard.\n- User needs to see the flow before choosing.\n"
+        },
+        {
+          "path": "vendor/skill-upstreams/lavish-axi/skills/lavish/SKILL.md",
+          "content": "# Lavish Editor\n\nUse `npx -y lavish-axi <html-file>` for reviewable HTML artifacts. Read matching playbooks before writing HTML. Fix `layout_warnings` before asking the user to review.\n"
+        }
+      ],
+      "expectations": [
+        "The response treats Lavish as a UI-flow visual review surface, not a new workflow stage.",
+        "The response references `vendor/skill-upstreams/lavish-axi/skills/lavish/SKILL.md` or equivalent vendored Lavish guidance before using Lavish.",
+        "The artifact is described as a low-fidelity wireflow/state map, not visual design or a prototype.",
+        "The next visible decision remains one route/state question after the visual artifact or review status."
+      ]
+    },
+    {
+      "id": 46,
+      "prompt": "Continue after final synthesis. `docs/planning/sales-leakage-analytics/plan.md` exists, its Stage Map says vertical slices are accepted, and the user asks what comes next.",
+      "expected_output": "Reads the final plan and routes to implementation readiness in Treehouse/worktree/branch, starting the first ready slice, not to-issues; no-mistakes waits for clean local verification and committed work.",
+      "files": [
+        {
+          "path": "docs/planning/sales-leakage-analytics/session_state.md",
+          "content": "# Sales Leakage Session State\nUpdated: synthetic\nMode: build-plan\nProfile: brownfield-feature\nRepo: existing\nTarget artifact: implementation plan\n\n## Stage Map\n- Product plan: accepted\n- UI flow: accepted\n- Backend/infra tech stack: accepted\n- Vertical slices/evals: accepted\n\n## Position\n- Active stage: final\n- Stage status: accepted\n- Next action: handoff\n"
+        },
+        {
+          "path": "docs/planning/sales-leakage-analytics/plan.md",
+          "content": "# Sales Leakage Analytics Plan\n\n## Stage Map\n- Vertical slices: accepted in `docs/planning/sales-leakage-analytics/stages/07-vertical-slices.md`.\n\n## Vertical Slices and Task Waves\n1. S1 - Schema and constants foundation.\n2. S2 - Single-lead flow.\n3. S3 - Batch entry.\n\n## Acceptance Criteria\n- S1-S3 have behavior checks.\n\n## Verification Plan\n- Run tests, lint, check:ssot, manual admin walkthrough, then git push --dry-run.\n"
+        }
+      ],
+      "expectations": [
+        "The response reads or uses `plan.md` rather than assuming slices are missing.",
+        "The response says `to-issues` is not required because accepted slices already exist.",
+        "The next build step is readiness plus Treehouse/worktree/branch, then S1 or the first ready slice.",
+        "`no-mistakes` is deferred until local verification is clean and work is committed."
+      ]
+    },
+    {
+      "id": 47,
+      "prompt": "Continue after final synthesis. `docs/planning/referral-metrics/plan.md` exists, but it has only product decisions and verification notes. The user asks what comes next.",
+      "expected_output": "Reads the final plan, notices slices are missing, and routes to to-issues before implementation; it does not start building or run no-mistakes.",
+      "files": [
+        {
+          "path": "docs/planning/referral-metrics/session_state.md",
+          "content": "# Referral Metrics Session State\nUpdated: synthetic\nMode: build-plan\nProfile: brownfield-feature\nRepo: existing\nTarget artifact: implementation plan\n\n## Stage Map\n- Product plan: accepted\n- UI flow: brief - accepted\n- Backend/infra tech stack: brief - accepted\n- Vertical slices/evals: brief - missing final issue breakdown\n\n## Position\n- Active stage: final\n- Stage status: accepted\n- Next action: handoff\n"
+        },
+        {
+          "path": "docs/planning/referral-metrics/plan.md",
+          "content": "# Referral Metrics Plan\n\n## Summary\nAdd admin reporting for referral source quality.\n\n## Decisions\n- Track referral source on lead create and edit.\n- Show admin totals by referral source.\n\n## Verification Plan\n- Run focused tests and manual admin walkthrough.\n\n## Unknowns\n- Exact implementation slices are not written yet.\n"
+        }
+      ],
+      "expectations": [
+        "The response reads or uses `plan.md` before choosing the handoff.",
+        "The response says slices or issue breakdown are missing.",
+        "The next step is `to-issues` before implementation.",
+        "The response does not start implementation or `no-mistakes`."
+      ]
+    },
+    {
+      "id": 48,
+      "prompt": "Continue after final synthesis. `docs/planning/sales-leakage-analytics/plan.md` already has accepted S1-S6 slices, and the user explicitly asks to turn them into separate issue cards.",
+      "expected_output": "Reads the final plan and routes to to-issues because the user requested issue cards, while making clear this is publishing/splitting work items rather than a required post-grill-me gate.",
+      "files": [
+        {
+          "path": "docs/planning/sales-leakage-analytics/session_state.md",
+          "content": "# Sales Leakage Session State\nUpdated: synthetic\nMode: build-plan\nProfile: brownfield-feature\nRepo: existing\nTarget artifact: implementation plan\n\n## Stage Map\n- Product plan: accepted\n- UI flow: accepted\n- Backend/infra tech stack: accepted\n- Vertical slices/evals: accepted\n\n## Position\n- Active stage: final\n- Stage status: accepted\n- Next action: handoff\n"
+        },
+        {
+          "path": "docs/planning/sales-leakage-analytics/plan.md",
+          "content": "# Sales Leakage Analytics Plan\n\n## Vertical Slices and Task Waves\n1. S1 - Schema and constants foundation.\n2. S2 - Single-lead flow.\n3. S3 - Batch entry.\n4. S4 - Analytics API.\n5. S5 - Admin dashboard.\n6. S6 - Migration, verification, and launch gate.\n\n## Traceability\n| Requirement | Slice/task | Acceptance criteria | Verification |\n|---|---|---|---|\n| Dashboard leakage metrics | S4, S5 | Counts render | API tests and walkthrough |\n"
+        }
+      ],
+      "expectations": [
+        "The response recognizes accepted slices already exist.",
+        "The response routes to `to-issues` only because the user requested separate issue cards.",
+        "The response does not describe `to-issues` as mandatory before build for this already-sliced plan.",
+        "`no-mistakes` is deferred until implementation is locally verified and committed."
       ]
     }
   ]

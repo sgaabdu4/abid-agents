@@ -42,6 +42,7 @@ assert.ok(installScript.includes('scripts/check-markdown-hygiene.mjs'), 'pre-com
 assert.ok(installScript.includes('Blocked commit: staged forbidden files must not be edited.'), 'pre-commit hook must block forbidden edited files');
 assert.ok(installScript.includes('Blocked commit: staged files over 700 lines must be split below 700.'), 'pre-commit hook must block staged files over 700 lines');
 assert.ok(installScript.includes('Blocked commit: staged content contains secret-like values.'), 'pre-commit hook must block secret-like staged values');
+assert.ok(installScript.includes('generated_marker="AUTO""-GENERATED"'), 'pre-commit hook must define generated marker under set -u');
 assert.ok(installScript.includes('[[ "$mode" == "160000" ]]'), 'pre-commit hook must skip staged submodule gitlinks');
 assert.ok(installScript.includes("':!scripts/check-markdown-hygiene.mjs'"), 'pre-commit private-path scan must not flag the checker pattern');
 assert.ok(installScript.includes("':!tests/markdown-hygiene.test.mjs'"), 'pre-commit private-path scan must not flag the hygiene test fixture');
@@ -136,6 +137,7 @@ if (fs.existsSync(preCommitHook)) {
   assert.ok(text.includes('Blocked commit: staged forbidden files must not be edited.'), 'installed pre-commit hook must block forbidden files');
   assert.ok(text.includes('Blocked commit: staged files over 700 lines must be split below 700.'), 'installed pre-commit hook must block staged files over 700 lines');
   assert.ok(text.includes('Blocked commit: staged content contains secret-like values.'), 'installed pre-commit hook must block secret-like values');
+  assert.ok(text.includes('generated_marker="AUTO""-GENERATED"'), 'installed pre-commit hook must define generated marker under set -u');
   assert.ok(text.includes('[[ "$mode" == "160000" ]]'), 'installed pre-commit hook must skip staged submodule gitlinks');
   assert.ok(text.includes("':!scripts/check-markdown-hygiene.mjs'"), 'installed pre-commit hook must ignore checker pattern file');
   assert.ok(text.includes("':!tests/markdown-hygiene.test.mjs'"), 'installed pre-commit hook must ignore test fixture pattern file');

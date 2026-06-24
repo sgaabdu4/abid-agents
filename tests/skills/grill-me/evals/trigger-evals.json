@@ -24,6 +24,10 @@
     "should_trigger": true
   },
   {
+    "query": "Grill me for this UI flow, but I need to actually see the options and annotate them before choosing.",
+    "should_trigger": true
+  },
+  {
     "query": "I need to decide build-vs-buy for search. Ask me questions until the tradeoffs and risks are clear, then summarize the decision.",
     "should_trigger": true
   },

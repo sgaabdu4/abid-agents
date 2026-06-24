@@ -5,19 +5,14 @@ smallest useful artifact; ask one clarification only if output shape is unclear.
 
 ## Inputs
 
-Read fully:
-- Durable session state: `docs/planning/<slug>/session_state.md`.
-- Orchestrator draft answer ledger: `docs/planning/<slug>/plan_draft.md`.
-- Existing temp stage handoffs only if they were created at stage close/artifact/final synthesis.
-- Artifact files/paths that were created during visual-design/prototype stages.
-- Relevant `CONTEXT.md`, `CONTEXT-MAP.md`, ADRs, and captured domain doc notes.
+Read `session_state.md`, `plan_draft.md`, stage handoffs/artifacts, and
+relevant `CONTEXT.md`, `CONTEXT-MAP.md`, ADRs, or domain notes.
 
 Do not expect a Stage Map in `plan_draft.md`; the draft is an answer ledger.
 Do not create/read handoff files for skipped or n/a stages.
 
-Include only goal-relevant decisions, needed Q&A, paths, acceptance checks,
-verification, implementation traceability, high-risk controls, material
-risks, domain/ADR changes, and parked unknowns.
+Include only goal-relevant decisions, Q&A, paths, checks, proof, traceability,
+controls, risks, domain/ADR changes, and parked unknowns.
 
 ## Synthesis flow
 
@@ -31,21 +26,20 @@ risks, domain/ADR changes, and parked unknowns.
 7. Write `docs/planning/<slug>/plan.md` as the canonical artifact, sized to need.
 8. If requested or needed, update confirmed `CONTEXT.md` glossary terms or ADRs
    using `modules/domain-docs.md`.
-9. Re-read `plan.md`; verify it contains the needed decisions, artifact refs, acceptance checks, verification, domain docs, risks, unknowns, and traceability only where relevant.
-10. List temp planning state for cleanup after verification:
-   `session_state.md`, `plan_draft.md`, temp stage handoffs, empty `stages/`.
-11. Preserve non-temp artifacts: designs, prototypes, mock data, fixtures,
-    screenshots, diagrams, code, and user-created docs.
-12. End with a plain handoff: what was produced, cleanup status, and the next
-    likely user choices. For build-plan, include implement now, review/edit
-    plan, or stop with the plan.
+9. Re-read `plan.md`; verify needed decisions, artifacts, checks, proof, docs, risks, unknowns, and traceability.
+10. Remove absorbed temp state after verification: `session_state.md`,
+    `plan_draft.md`, temp handoffs, empty `stages/`.
+11. Preserve artifacts: designs, prototypes, mock data, fixtures, screenshots,
+    diagrams, code, and user-created docs.
+12. End with artifact, cleanup, choices. Build-plan: implement, review/edit, or
+    stop. Sliced plan -> readiness + Treehouse/worktree/branch + first slice.
+    `to-issues` only for missing/tracker cards.
 
 ## Final plan requirements
 
-`plan.md` includes only what the inferred artifact needs:
-summary, assumptions, decisions, needed Q&A, artifact paths/status, relevant
-domain or ADR updates, acceptance checks, verification, implementation
-traceability, high-risk controls, material risks, parked unknowns, owner/next.
+`plan.md` includes only what the artifact needs: summary, assumptions,
+decisions, Q&A, artifacts, domain/ADR notes, checks, proof, traceability,
+controls, risks, parked unknowns, and owner/next.
 
 Do not write `99-final-plan.md`; final synthesis lives in `plan.md`.
 
@@ -79,7 +73,7 @@ Do not write `99-final-plan.md`; final synthesis lives in `plan.md`.
 ## Cleanup
 ```
 
-Omit irrelevant stage sections unless they explain an important decision. Do not include boilerplate skipped/n/a sections.
+Omit irrelevant sections; no skipped/n/a boilerplate.
 
 ## Rules
 
@@ -88,14 +82,20 @@ Omit irrelevant stage sections unless they explain an important decision. Do not
 - Use `modules/domain-docs.md` before writing glossary or ADR updates.
 - Do not put implementation decisions in `CONTEXT.md`.
 - Do not finish while a relevant handoff/artifact is `draft` or `blocked`.
-- Do not finish until each active stage has acceptance checks + verification where relevant, or an explicitly user-parked blocker/unknown.
+- Do not finish until active stages have needed checks/proof, or a parked
+  blocker/unknown.
 - Trace requirements -> slices/tasks -> acceptance criteria -> verification.
-- High-risk schema/data/auth/security/deploy/stateful work needs human review, rollback/migration notes, telemetry/audit expectations.
+- High-risk schema/data/auth/security/deploy/stateful work needs human review,
+  rollback/migration notes, telemetry/audit expectations.
 - Keep evidence labels: code/docs/user quote/unknown.
 - Do not invent certainty.
 - Include file paths + localhost/device refs for artifacts.
-- Do not clean up temp planning files without separate approval. If content is
-  not copied or ownership is unclear, keep it and list why under `## Cleanup`.
+- After re-reading `plan.md`, remove absorbed temp docs: `session_state.md`,
+  `plan_draft.md`, temp handoffs, empty `stages/`. Native deletion only; this
+  is narrow Grill Me cleanup, not broad cleanup.
+- Keep unclear/unabsorbed temp files and list why under `## Cleanup`.
+- Preserve artifacts: designs, prototypes, mock data, fixtures, screenshots,
+  diagrams, code, and user-created docs.
 - Final reply: `plan.md` path + cleanup status + next-step handoff.
 - Do not end with only a generic docs/config change report after writing
   `plan.md`; the user should know what can happen next.

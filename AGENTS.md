@@ -43,7 +43,7 @@
 - Features -> Treehouse/`grill-me`, plan, build/verify loop; PR -> `no-mistakes`.
 - Hard bugs/failures/flakes/regressions -> `diagnosing-bugs`.
 - Boundaries/interfaces/ownership/wrappers -> `codebase-design`.
-- Post-`grill-me`: clear skip; brief `to-prd`; slices `to-issues`; big `to-prd` then `to-issues`.
+- Post-`grill-me`: clear skip; brief `to-prd`; missing -> `to-issues`; sliced -> build; big -> both.
 - React/Next/perf/composition -> `react-doctor` + `fallow` + `vercel-react-best-practices`.
 - Tests/specs/QA/mutation -> `test-quality`.
 - UI/components/design-system/tokens -> `atomic-ui` + `impeccable`.

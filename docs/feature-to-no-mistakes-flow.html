@@ -129,7 +129,7 @@
     .decision {
       display: grid;
       grid-column: 2 / -1;
-      grid-template-columns: repeat(4, minmax(0, 1fr));
+      grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
       gap: 10px;
       padding: 12px;
       background: var(--soft-green);
@@ -302,7 +302,7 @@
     </header>
 
     <section class="summary" aria-label="Workflow summary">
-      <div><strong>1. Plan</strong><span>Treehouse and Grill Me gate non-trivial feature work.</span></div>
+      <div><strong>1. Plan</strong><span>Treehouse and Grill Me gate non-trivial work; Lavish helps UI choices when text is not enough.</span></div>
       <div><strong>2. Implement</strong><span>Change the real owner with only needed specialist skills.</span></div>
       <div><strong>3. Verify Loop</strong><span>Test, review, fix, then run E2E last when needed.</span></div>
       <div><strong>4. Final Gate</strong><span>No-mistakes runs after the local loop is clean and committed.</span></div>
@@ -312,7 +312,7 @@
       <li class="step">
         <div>
           <h2>Plan the work</h2>
-          <p>For non-trivial feature work, start in Treehouse and use Grill Me when outcome, scope, proof, or risk is unclear. Pick the lightest planning artifact that makes the work buildable.</p>
+          <p>For non-trivial feature work, start in Treehouse and use Grill Me when outcome, scope, proof, or risk is unclear. For UI flow or visual choices that need to be seen, use Lavish inside Grill Me. Pick the lightest planning artifact that makes the work buildable.</p>
         </div>
         <pre class="terminal" aria-label="Plan commands"><code>$ treehouse &lt;feature-name&gt;
 /grill-me</code></pre>
@@ -320,8 +320,10 @@
           <h3>Pick one planning path</h3>
           <div class="choice"><strong>Small and clear</strong><span>Skip this step.</span></div>
           <div class="choice"><strong>Need a brief</strong><span>Use <code>/to-prd</code>.</span></div>
-          <div class="choice"><strong>Need slices</strong><span>Use <code>/to-issues</code>.</span></div>
+          <div class="choice"><strong>Need missing slices</strong><span>Use <code>/to-issues</code>.</span></div>
+          <div class="choice"><strong>Plan has slices</strong><span>Go to readiness, then implement the first slice.</span></div>
           <div class="choice"><strong>Big feature</strong><span>Use <code>/to-prd</code>, then <code>/to-issues</code>.</span></div>
+          <div class="choice"><strong>Need UI review</strong><span>Use Lavish inside <code>/grill-me</code>.</span></div>
         </div>
       </li>
 
@@ -379,7 +381,8 @@
       <h2>Before no-mistakes</h2>
       <ul>
         <li>Treehouse and Grill Me gate was used or explicitly skipped for small clear work.</li>
-        <li>Planning artifact decision is explicit: skipped, PRD, issues, or both.</li>
+        <li>Planning artifact decision is explicit: skipped, PRD, issues, Lavish UI review, or a combination.</li>
+        <li>If the plan already has accepted slices, do not rerun <code>/to-issues</code> unless publishing issue cards.</li>
         <li>Canonical owner and blast radius were checked.</li>
         <li>Tests, review, and required E2E are clean after the latest fix.</li>
         <li>E2E evidence exists for changed user-visible flows.</li>

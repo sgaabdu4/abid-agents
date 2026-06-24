@@ -113,7 +113,7 @@ Planning and engineering helpers:
 - `workflow-help`: choose the next stage, skill, proof path, and what not to run.
 - `codebase-design`: decide module ownership, public interfaces, and abstraction shape.
 - `to-prd`: turn resolved context into a PRD or implementation brief.
-- `to-issues`: split an accepted plan into vertical-slice issues.
+- `to-issues`: split an accepted plan into vertical-slice issues when slices are missing or should be published as work items.
 
 Quick routing:
 
@@ -124,7 +124,7 @@ Quick routing:
 | Diagnose hard bugs, flakes, regressions | `diagnosing-bugs` |
 | Decide module ownership or abstraction shape | `codebase-design` |
 | Turn resolved context into a spec | `to-prd` |
-| Split a plan into agent-ready slices | `to-issues` |
+| Split a plan into missing agent-ready slices | `to-issues` |
 | Design or repair tests | `test-quality` |
 | UI systems, tokens, or product polish | `atomic-ui` + `impeccable` |
 | React or Next.js implementation/review | `react-doctor` + `fallow` + `vercel-react-best-practices` |

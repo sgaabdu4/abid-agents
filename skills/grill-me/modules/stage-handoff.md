@@ -83,5 +83,5 @@ controls, gate criteria.
 - `run`/`brief` stages need acceptance criteria + verification, or an explicitly user-parked blocker/unknown.
 - High-risk schema/data/auth/security/deploy/stateful work needs controls before final plan.
 - Final plan must copy needed content into `plan.md`; no required info may live only here.
-- After verified final plan, list temp handoffs for cleanup; do not clean them
-  up without separate approval.
+- After verified final plan, remove absorbed temp handoffs. Keep only if content
+  was not copied or ownership is unclear.

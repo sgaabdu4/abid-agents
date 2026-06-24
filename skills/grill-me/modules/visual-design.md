@@ -6,11 +6,13 @@ close, user request, or final synthesis.
 
 ## Scope
 
-Choose the product's visual direction before any full-flow UI prototype, then show styled key-screen or flow concepts so the user can judge the real experience.
+Choose visual direction before any full-flow UI prototype. Show styled key
+screens/flow moments so the user can judge the experience.
 
 Owns:
 - Impeccable project context setup.
 - 2-4 distinct visual directions.
+- Lavish direction boards when visual choice needs annotation.
 - Register: brand or product.
 - Physical scene/theme choice.
 - Color strategy and OKLCH palette tokens.
@@ -26,38 +28,26 @@ Out of scope:
 
 ## Impeccable setup gate
 
-Before producing visual directions or styled artifacts:
-
-1. Load `impeccable/SKILL.md` and follow its setup rules.
-2. Run the impeccable context loader when available (`load-context.mjs`). Consume the full output.
-3. If `PRODUCT.md` is missing, empty, placeholder, or lacks register:
-   - Pause visual design.
-   - Run the substance of `impeccable teach` from `reference/teach.md`.
-   - Preserve grill-me cadence: one user-facing Q at a time.
-   - Never silently overwrite existing files.
-   - Re-run the loader after writing/updating context.
-4. If `DESIGN.md` is missing:
-   - For existing UI/code: offer `impeccable document` scan mode.
-   - For greenfield/pre-implementation: offer `impeccable document` seed mode.
-   - If the user skips, continue with `PRODUCT.md` + task answers, and record `DESIGN.md skipped` in `03-visual-design.md`.
-5. If `PRODUCT.md` and `DESIGN.md` exist:
-   - Use them as project anchors.
-   - Do not ask questions already answered there.
-6. Identify register (`brand` or `product`) and load the matching impeccable reference:
-   - Brand -> `reference/brand.md`.
-   - Product -> `reference/product.md`.
+Before directions/artifacts, load `impeccable/SKILL.md`, run
+`load-context.mjs` when available, and consume the output. If `PRODUCT.md` is
+missing/empty/placeholder/lacks register, pause and run the substance of
+`impeccable teach` one Q at a time; never overwrite silently, then rerun the
+loader. If `DESIGN.md` is missing, offer `impeccable document` scan mode for
+existing UI/code or seed mode for greenfield; if skipped, continue and record
+`DESIGN.md skipped`. Existing PRODUCT/DESIGN answers are anchors; do not re-ask.
+Identify register and load `reference/brand.md` or `reference/product.md`.
 
 ## Required references
 
-Load the relevant impeccable references before creating directions:
-- Always: `reference/shape.md`, `reference/spatial-design.md`, `reference/typography.md`.
-- Color/theming: `reference/color-and-contrast.md`.
-- Forms, navigation, task flows, permissions: `reference/interaction-design.md`.
-- Motion or transitions: `reference/motion-design.md`.
-- Responsive surfaces: `reference/responsive-design.md`.
-- Copy-heavy states/errors/onboarding: `reference/ux-writing.md`.
-- Native image generation available: `reference/codex.md`, then follow its palette/mock approval gates.
-- Flutter/Dart artifacts: also load `building-flutter-apps`.
+Load relevant impeccable refs:
+- Always: `shape`, `spatial-design`, `typography`.
+- Color/theming: `color-and-contrast`.
+- Forms/nav/flows/permissions: `interaction-design`.
+- Motion: `motion-design`.
+- Responsive: `responsive-design`.
+- Copy/errors/onboarding: `ux-writing`.
+- Native image generation: `codex`, then palette/mock gates.
+- Flutter/Dart: also load `building-flutter-apps`.
 
 If a reference is unavailable, state it in the handoff and continue with available evidence.
 
@@ -111,6 +101,12 @@ Each direction must include:
 - Accessibility notes.
 - What carries into prototype if chosen.
 
+Lavish: for annotated side-by-side choice, read
+`vendor/skill-upstreams/lavish-axi/skills/lavish/SKILL.md` plus playbooks
+`comparison`, `input`, sometimes `plan`/`diagram`. It does not inject a design
+system: match user request, then subject-project tokens/components/CSS vars,
+brand assets, or styled pages. Fallback only when absent.
+
 If native image generation exists:
 - Follow `reference/codex.md` Steps A-D.
 - Ask Step A direction questions first.
@@ -126,15 +122,18 @@ If native image generation does not exist:
 
 ## Preview rules
 
-- First visual-design turn: create/update the actual concept artifact only if useful before asking the Q; show localhost preview in the same reply.
+- First visual-design turn: create/update concept artifact only if useful; show preview in same reply.
+- Prefer Lavish over bare localhost when the user must pick/merge/annotate/reject.
 - Before showing any localhost URL, verify port is not serving something else: `lsof -iTCP:4173 -sTCP:LISTEN -n -P`.
 - If `4173` is occupied by unrelated/unknown process, use next free port (`4174+`) or stop only a server you started for this visual-design artifact.
 - Serve only artifact dir, never repo root: `python3 -m http.server <port> --directory docs/planning/visual-design/<slug>`.
-- Web/unknown -> static HTML/CSS + direct verified URL to actual HTML: `http://localhost:<port>/<file>.html`; use `/` only when `index.html` is the actual concept.
+- Web/unknown -> static HTML/CSS + verified URL to actual HTML: `http://localhost:<port>/<file>.html`; use `/` only for actual `index.html`.
 - Verify URL before replying by fetching it and confirming path/title/unique marker.
+- Lavish: run `npx -y lavish-axi <html-file>`, then poll. Fix `layout_warnings`
+  before review.
 - Label `Visual design preview:` only after verification; otherwise label `Run preview:` + exact command + expected URL.
 - Flutter -> Flutter-native styled concept; verify/free port; run `flutter run -d chrome --web-port <port> -t lib/main_visual_design.dart` or target device.
-- Existing code -> reuse real routes, copy constraints, components, and design tokens when they exist; if they conflict with the chosen direction, name the conflict.
+- Existing code -> reuse real routes, copy, components, and tokens; if they conflict with the direction, name it.
 
 ## Stage handoff plan
 
@@ -149,6 +148,7 @@ At artifact creation/stage close/final synthesis, `03-visual-design.md` includes
 - Accessibility notes.
 - Artifact paths.
 - Preview URLs/devices + verification status.
+- Lavish path/status and resolved `layout_warnings` when used.
 - Native image generation status and palette/mock gates, if used.
 - Prototype handoff: what the prototype must preserve from the chosen direction, including token names and initial atomic component vocabulary.
 - Deferred flow or prototype details only if they affect next stage.
@@ -160,6 +160,7 @@ Clarity gate:
 - Required palette/type/density/component decisions and initial token/component vocabulary are captured enough for a prototype.
 - Accessibility constraints are named or explicitly parked.
 - Preview points to the actual artifact when shown.
+- Lavish feedback applied or parked when used.
 
 ## Q pattern
 
@@ -178,4 +179,4 @@ notes, stage close, or final synthesis.
 - Do not proceed to a full-flow UI prototype until visual direction is chosen, merged, customized, or explicitly accepted as the default.
 - If the user cannot choose, ask what to preserve/change or generate a tighter second set of directions; do not silently pick.
 - The next-stage handoff must name the chosen direction and what the prototype must reuse from it.
-- Do not update `03-visual-design.md` per question; record answers in `plan_draft.md` and summarize here only at artifact creation/stage close/final synthesis.
+- Do not update `03-visual-design.md` per Q; record answers in `plan_draft.md` and summarize only at artifact creation/stage close/final synthesis.

@@ -3,8 +3,9 @@ name: grill-me
 description: >-
   Interview one clear Q at a time before planning or building ideas, greenfield
   apps, brownfield features, simple changes, codebase maps, specs, stress tests,
-  UI flows, mockups, prototypes, or final plans. Uses code/domain docs as
-  evidence, routes depth, persists state, resumes after compaction.
+  UI flows, visual review artifacts, mockups, prototypes, or final plans. Uses
+  code/domain docs as evidence, routes depth, persists state, resumes after
+  compaction.
 ---
 
 # Grill Me
@@ -93,7 +94,7 @@ Stages:
 - Update `session_state.md` before asking each Q and after recording each answer.
 - `plan_draft.md` is an answer ledger, not a plan.
 - Final plan lives in `docs/planning/<slug>/plan.md`; no `99-final-plan.md`.
-- Final plan must absorb required handoff/draft content before approved cleanup.
+- Final plan absorbs temp docs, then removes them after verification.
 - Domain docs are lazy: read docs, capture terms/ADRs, write on request/synthesis.
 - Schema/data/auth/security/deploy/stateful changes need human review,
   rollback/migration notes, and telemetry/audit expectations.

@@ -64,7 +64,7 @@ artifact, acceptance checks, verification, and domain-doc impact.
 - Visual/prototype modules own artifact paths and mock-data placement.
 - Domain docs module owns proposed `CONTEXT.md` terms and ADR candidates.
 - If old draft/handoff paths exist, read and absorb needed content into current
-  state or `plan.md`; list temp duplicates for later approved cleanup.
+  state or `plan.md`; remove temp duplicates after verified final synthesis.
 - File edits use native file tools; shell/context-mode only run or verify.
 
 ## Handoff model

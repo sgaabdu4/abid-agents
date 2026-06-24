@@ -63,4 +63,5 @@ Target artifact: <explanation | decision summary | implementation plan | visual 
 - If state says `unanswered` and the latest user message is not an answer,
   re-ask `Last Question` exactly.
 - Keep under 100 lines. Summarize old detail into decisions.
-- Cleanup only after verified final `plan.md` absorbs needed state and approval exists.
+- Final synthesis removes this temp file after verified `plan.md` absorbs it.
+  Keep only if content was not copied or ownership is unclear.

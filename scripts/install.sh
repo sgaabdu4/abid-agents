@@ -434,6 +434,7 @@ fi
 pattern='frontline|frontline-fitness|repem|jabal[ -_]?sina|jabal|afenso|/Users/abid|Workspaces/afenso|/Users/abid/Workspaces'
 grep_pathspecs=(. ':!scripts/install.sh' ':!scripts/check-markdown-hygiene.mjs' ':!tests/markdown-hygiene.test.mjs')
 secret_pattern='(github_pat_[A-Za-z0-9_]{20,}|gh[pousr]_[A-Za-z0-9_]{20,}|sk-[A-Za-z0-9_-]{20,}|AKIA[0-9A-Z]{16}|-----BEGIN [A-Z ]*PRIVATE KEY-----)'
+generated_marker="AUTO""-GENERATED"
 
 if git diff --cached --quiet --exit-code; then
   exit 0
