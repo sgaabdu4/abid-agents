@@ -77,7 +77,10 @@ without stopping for each `ask-user` finding.
 - `failed` or `cancelled`: inspect the failing step, fix root cause, commit the
   fix, and rerun or explain the blocker.
 
-The CI step stops at `checks-passed`; do not wait for human merge.
+If the CI log says `all CI checks passed - still monitoring until merged or
+closed` while GitHub PR checks are green and findings are empty, treat the run
+as PR-ready. Do not wait for a human merge, and do not abort solely because the
+status still says `ci,running`.
 
 ## Inspecting state
 
