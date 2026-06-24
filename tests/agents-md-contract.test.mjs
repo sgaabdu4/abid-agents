@@ -22,6 +22,7 @@ assert.ok(text.startsWith('# Agent Rules\n\n## Stops\n'), 'AGENTS.md must start 
 assertIncludes(text, 'Touched/connected files >700 lines must end <700');
 assertIncludes(text, '`SKILL.md`: no 3+ step workflows');
 assertIncludes(text, '`codebase-memory`, `context-mode`, `terse` are support tools, not stages.');
+assertIncludes(text, 'repeated deterministic work -> run/add script, test, hook, or eval.');
 assertIncludes(text, "codebase-memory-mcp cli <tool> '<json>'");
 assertIncludes(text, 'Logs/output/docs/data -> sandbox/index; no raw dumps.');
 assertIncludes(text, 'Semantic edits: blast radius + surrounding issues');
@@ -109,6 +110,8 @@ const contextProbeText = fs.readFileSync(contextProbePath, 'utf8');
 const routingEvalText = fs.readFileSync(path.join(repo, 'tests', 'agents-md-routing', 'evals', 'run-evals.mjs'), 'utf8');
 const markdownHygienePath = path.join(repo, 'scripts', 'check-markdown-hygiene.mjs');
 const markdownHygieneText = fs.readFileSync(markdownHygienePath, 'utf8');
+const deterministicOwnerPath = path.join(repo, 'scripts', 'find-deterministic-owner.mjs');
+const deterministicOwnerText = fs.readFileSync(deterministicOwnerPath, 'utf8');
 const worktreeReadyPath = path.join(repo, 'scripts', 'ensure-worktree-ready.sh');
 const worktreeReadyText = fs.readFileSync(worktreeReadyPath, 'utf8');
 const autoSyncText = fs.readFileSync(path.join(repo, 'scripts', 'auto-sync.sh'), 'utf8');
@@ -117,7 +120,7 @@ const treehouseSkillText = fs.readFileSync(path.join(repo, 'skills', 'treehouse'
 const noMistakesSkillText = fs.readFileSync(path.join(repo, 'skills', 'no-mistakes', 'SKILL.md'), 'utf8');
 const noMistakesAxiText = fs.readFileSync(path.join(repo, 'skills', 'no-mistakes', 'references', 'axi-workflow.md'), 'utf8');
 
-for (const executable of [cleanupPath, updateStackPath, contextHealthPath, cbmProbePath, contextProbePath, markdownHygienePath, worktreeReadyPath]) {
+for (const executable of [cleanupPath, updateStackPath, contextHealthPath, cbmProbePath, contextProbePath, markdownHygienePath, deterministicOwnerPath, worktreeReadyPath]) {
   assert.ok(fs.existsSync(executable), `${executable} must exist`);
   assert.ok(fs.statSync(executable).mode & 0o111, `${executable} must be executable`);
 }
@@ -132,6 +135,9 @@ assertIncludes(readmeText, 'when slices are missing or should be published as wo
 assertIncludes(readmeText, 'React app or Next.js implementation/review');
 assertIncludes(readmeText, 'include `fallow dupes` / clone-group checks for duplication');
 assertIncludes(routeMapText, 'Create a Treehouse worktree before planning/coding, then run');
+assertIncludes(routeMapText, 'Repeat work runs its deterministic owner first');
+assertIncludes(routeMapText, 'if recurring and missing, add script/test/hook/eval');
+assertIncludes(routeMapText, 'known repeat work skips an existing deterministic owner');
 assertIncludes(routeMapText, 'ensure-worktree-ready.sh');
 assertIncludes(routeMapText, 'Dry-run push only counts after project hooks are active.');
 assertIncludes(routeMapText, 'For UI choices that cannot be judged from text, use Lavish inside Grill Me as a visual review surface.');
@@ -248,6 +254,9 @@ assertIncludes(markdownHygieneText, 'requires explicit markdown-hygiene:');
 assertIncludes(markdownHygieneText, 'allow-local-machine-paths');
 assertIncludes(markdownHygieneText, 'allow-conversation-state');
 assertIncludes(markdownHygieneText, 'allow-setup-internals');
+assertIncludes(deterministicOwnerText, 'package scripts, scripts, tests, hooks');
+assertIncludes(deterministicOwnerText, 'Run matching owners before fresh LLM reasoning.');
+assertIncludes(deterministicOwnerText, 'package.json');
 assertIncludes(worktreeReadyText, 'detect_hook_owner');
 assertIncludes(worktreeReadyText, '.husky/_');
 assertIncludes(worktreeReadyText, '.githooks');

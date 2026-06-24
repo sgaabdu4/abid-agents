@@ -44,6 +44,18 @@
       "expectFalse": ["treatsSupportToolsAsStages"]
     },
     {
+      "id": "deterministic_owner_reused",
+      "prompt": "We have debugged this exact MCP health check before and there is already a reusable probe script for it. Should the agent reason from scratch again or run the existing deterministic process first?",
+      "expectTrue": ["usesDeterministicOwner"],
+      "expectFalse": ["skipsDeterministicOwner", "createsPassThroughWrapper"]
+    },
+    {
+      "id": "deterministic_owner_added_for_recurring_work",
+      "prompt": "This is the third time the same markdown policy check has come up. There is no script, test, hook, or eval owner yet, but it can be checked deterministically. What should the implementation leave behind?",
+      "expectTrue": ["createsDeterministicOwnerForRecurringWork"],
+      "expectFalse": ["skipsDeterministicOwner", "createsPassThroughWrapper"]
+    },
+    {
       "id": "react_route_stack",
       "prompt": "This is a React/Next.js performance cleanup with TS code health concerns before PR.",
       "expectTrue": ["usesReactDoctor", "usesFallow", "usesVercelReactBestPractices"],

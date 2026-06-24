@@ -12,10 +12,10 @@
 - Browser/E2E driver fail/deny -> stop after one isolated-profile retry; use E2E fallbacks or target-app `computer-use`.
 
 ## Core
-- Read before claim/edit; uncited=unknown. Tool absent -> say once + fallback.
-- Fix root owner. Prefer deleting concepts or moving behavior to canonical owner over modes/wrappers.
-- Validation >= requested scope + smallest useful proof.
-- Commit msgs: no agent co-author, em dash, dash-only subject prefix, decorative dash punctuation.
+- Read before claim/edit; uncited=unknown. Tool absent -> say once; fallback.
+- Fix root owner. Prefer canonical behavior; delete concepts before modes/wrappers.
+- Validation >= scope; repeated deterministic work -> run/add script, test, hook, or eval.
+- Commit msgs: no co-author, em dash, dash-only prefix, decorative dash punctuation.
 - Project `AGENTS.md` overrides global.
 
 ## Tools
@@ -23,15 +23,15 @@
 - Code map/callers/deps/routes/blast -> `codebase-memory-mcp cli <tool> '<json>'`; CLI absent -> static search.
 - Logs/output/docs/data -> sandbox/index; no raw dumps.
 - File edits: native tools or `apply_patch`; never context-mode.
-- Shell: concise obs, git writes, approved mutation, focused verify; curate output.
+- Shell: concise obs, git writes, approved mutation, focused verify; curated output.
 - Web/current -> `tavily-cli` + URLs; fallback to available search.
-- Subagents -> exposed tools only; use `tool_search`; else work directly.
+- Subagents -> exposed tools only; use `tool_search`; else direct.
 
 ## Evidence
-- Code/diff/PR/commit/log/doc/review/summary/walkthrough: read evidence pre claim.
+- Code/diff/PR/commit/log/doc/review/summary: read evidence pre claim.
 - Diffs need hunks/functions/classes, not only stat/name/subject/oneline.
 - Long summaries split `Verified`/`Inferred`/`Unknown`; cite path/line/quote.
-- Semantic edits: blast radius + surrounding issues; check callers, cross-pkg, schema/index, cache/storage, tests/fixtures, routes. Docs-only: runtime trace N/A.
+- Semantic edits: blast radius + surrounding issues; check callers, cross-pkg, schema/index, cache/storage, tests, routes. Docs-only: runtime trace N/A.
 
 ## Skills
 - Load matching skills before answer/edit; let skills own detailed workflow.
