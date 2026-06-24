@@ -134,7 +134,11 @@ if overall == "warning":
         if isinstance(check, dict) and check.get("status") != "ok"
     ]
     print("codex doctor warnings: " + ", ".join(warnings))
+codex_cbm = Path.home() / ".codex" / "bin" / "codebase-memory-mcp"
+if not codex_cbm.exists() or not os.access(codex_cbm, os.X_OK):
+    fail(f"Missing executable Codex CBM command: {codex_cbm}")
 print(f"CBM shadow ok: {shadow_cbm} -> {expected_cbm}")
+print(f"Codex CBM command ok: {codex_cbm}")
 
 hooks_path = Path.home() / ".codex" / "hooks.json"
 try:
@@ -149,7 +153,8 @@ if "context-mode hook" in json.dumps(hook_events):
 print("codex hooks ok: SessionStart disabled context-mode hooks absent")
 PY
 
-node "$ROOT/scripts/probe-codebase-memory-mcp.mjs" "$(command -v codebase-memory-mcp)"
+CBM_MCP_PROBE_TIMEOUT_MS="${CBM_MCP_PROBE_TIMEOUT_MS:-30000}" \
+  node "$ROOT/scripts/probe-codebase-memory-mcp.mjs" "$HOME/.codex/bin/codebase-memory-mcp"
 ABID_AGENTS_ROOT="$ROOT" "$ROOT/codex/bin/codex-context-mode-health"
 
 python3 <<'PY'

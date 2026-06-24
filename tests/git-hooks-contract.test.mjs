@@ -88,6 +88,8 @@ assert.ok(autoSyncScript.includes('ABID_AGENTS_SKIP_TREEHOUSE_UPDATE'), 'auto-sy
 assert.ok(autoSyncScript.includes('ABID_AGENTS_TREEHOUSE_BIN'), 'auto-sync must allow overriding the Treehouse binary path');
 assert.ok(autoSyncScript.includes('NO_MISTAKES_NO_UPDATE_CHECK=1'), 'auto-sync must avoid nested no-mistakes update checks');
 assert.ok(autoSyncScript.includes('update --yes'), 'auto-sync must update no-mistakes non-interactively');
+assert.ok(autoSyncScript.includes('ABID_AGENTS_SKIP_PREREQ_INSTALL=1'), 'auto-sync local refresh must not run prerequisite installers from cron');
+assert.ok(autoSyncScript.includes('git diff --name-only -- .gitmodules vendor/skill-upstreams'), 'auto-sync private-path scan must be scoped to submodule update outputs');
 assert.ok(autoSyncScript.includes('git commit -m "Auto-update skill submodules"'), 'auto-sync must commit changed submodule pins');
 assert.ok(autoSyncScript.includes('git push --recurse-submodules=check origin main'), 'auto-sync must push bumped submodule pins safely');
 assert.ok(
@@ -119,7 +121,11 @@ assert.ok(codexWatchdog.includes('CODEX_WATCHDOG_KILL_ORPHANS:-0'), 'watchdog mu
 assert.ok(codexWatchdog.includes('CODEX_WATCHDOG_KILL_CODEX_APP_ON_STORM:-0'), 'watchdog must not kill Codex.app by default');
 assert.ok(installScript.includes('<key>CODEX_WATCHDOG_KILL_ORPHANS</key>\n    <string>0</string>'), 'installed watchdog must keep orphan killing opt-in');
 assert.ok(installScript.includes('<key>CODEX_WATCHDOG_KILL_CODEX_APP_ON_STORM</key>\n    <string>0</string>'), 'installed watchdog must keep Codex.app killing opt-in');
+assert.ok(installScript.includes('<integer>60</integer>'), 'installed watchdog must run every minute');
+assert.ok(installScript.includes('<key>CODEX_CLEANUP_STALE_CLI_CWDS</key>'), 'installed watchdog must configure stale CLI cwd scope');
+assert.ok(installScript.includes('<key>CODEX_CLEANUP_STALE_CLI_MAX_AGE_SECONDS</key>'), 'installed watchdog must configure stale CLI age gating');
 assert.ok(codexWatchdog.includes('policy_cpu'), 'watchdog must use syspolicyd/trustd as storm evidence');
+assert.ok(codexWatchdog.includes("tr '\\n' ' '"), 'watchdog must pass Codex root pids to awk without embedded newlines');
 assert.ok(codexHealth.includes('mcp counts:'), 'codex-health must report MCP counts');
 assert.ok(codexHealth.includes('mcp.config'), 'codex-health must read MCP count from doctor check details');
 assert.ok(securityHook.includes('sanitizeLogData(data)'), 'security hook logs must be sanitized before writing');

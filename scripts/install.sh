@@ -123,7 +123,7 @@ install_codex_watchdog() {
   <key>RunAtLoad</key>
   <true/>
   <key>StartInterval</key>
-  <integer>120</integer>
+  <integer>60</integer>
   <key>EnvironmentVariables</key>
   <dict>
     <key>CODEX_WATCHDOG_KILL_ORPHANS</key>
@@ -134,6 +134,10 @@ install_codex_watchdog() {
     <string>12</string>
     <key>CODEX_WATCHDOG_KILL_CODEX_APP_ON_STORM</key>
     <string>0</string>
+    <key>CODEX_CLEANUP_STALE_CLI_CWDS</key>
+    <string>$ROOT</string>
+    <key>CODEX_CLEANUP_STALE_CLI_MAX_AGE_SECONDS</key>
+    <string>21600</string>
   </dict>
   <key>StandardOutPath</key>
   <string>$HOME/.codex/logs/codex-watchdog.out.log</string>
@@ -158,9 +162,30 @@ EOF
   fi
 }
 
+resolve_codebase_memory_mcp_command() {
+  local codex_command native_command npm_root
+  codex_command="$HOME/.codex/bin/codebase-memory-mcp"
+  if npm_root="$(npm root -g 2>/dev/null)"; then
+    native_command="$npm_root/codebase-memory-mcp/bin/codebase-memory-mcp"
+    if [[ -x "$native_command" ]]; then
+      mkdir -p "$(dirname "$codex_command")"
+      if [[ ! -x "$codex_command" ]] || ! cmp -s "$native_command" "$codex_command"; then
+        install -m 0755 "$native_command" "$codex_command"
+      fi
+      printf '%s\n' "$codex_command"
+      return 0
+    fi
+  fi
+  if [[ -x "$codex_command" ]]; then
+    printf '%s\n' "$codex_command"
+    return 0
+  fi
+  command -v codebase-memory-mcp
+}
+
 ensure_codex_mcp_config() {
   local cbm_command
-  cbm_command="$(command -v codebase-memory-mcp)"
+  cbm_command="$(resolve_codebase_memory_mcp_command)"
   mkdir -p "$HOME/.codex"
   CODEX_CBM_COMMAND="$cbm_command" CODEX_CONFIG_PATH="$HOME/.codex/config.toml" python3 <<'PY'
 from pathlib import Path

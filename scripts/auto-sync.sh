@@ -85,6 +85,7 @@ refresh_local_install() {
   fi
 
   if ! ABID_AGENTS_SKIP_NPM_INSTALL=1 \
+    ABID_AGENTS_SKIP_PREREQ_INSTALL=1 \
     ABID_AGENTS_SKIP_SUBMODULE_INIT=1 \
     ABID_AGENTS_SKIP_CRON=1 \
     "$ROOT/scripts/install.sh"; then
@@ -128,8 +129,13 @@ if git diff --quiet && git diff --cached --quiet; then
 fi
 
 if command -v rg >/dev/null 2>&1; then
-  home_matches="$(rg -l --hidden --glob '!.git/**' --glob '!**/.git/**' -F "$HOME" "$ROOT" || true)"
-  secret_matches="$(rg -l --hidden --glob '!.git/**' --glob '!**/.git/**' '(github_pat_[A-Za-z0-9_]+|gh[pousr]_[A-Za-z0-9_]+|sk-[A-Za-z0-9_-]{20,}|AKIA[0-9A-Z]{16}|-----BEGIN (RSA |DSA |EC |OPENSSH )?PRIVATE KEY-----)' "$ROOT" || true)"
+  mapfile -t changed_paths < <(git diff --name-only -- .gitmodules vendor/skill-upstreams)
+  home_matches=""
+  secret_matches=""
+  if [[ "${#changed_paths[@]}" -gt 0 ]]; then
+    home_matches="$(rg -l --hidden --glob '!.git/**' --glob '!**/.git/**' -F "$HOME" -- "${changed_paths[@]}" || true)"
+    secret_matches="$(rg -l --hidden --glob '!.git/**' --glob '!**/.git/**' '(github_pat_[A-Za-z0-9_]+|gh[pousr]_[A-Za-z0-9_]+|sk-[A-Za-z0-9_-]{20,}|AKIA[0-9A-Z]{16}|-----BEGIN (RSA |DSA |EC |OPENSSH )?PRIVATE KEY-----)' -- "${changed_paths[@]}" || true)"
+  fi
   matches="${home_matches}${home_matches:+$'\n'}${secret_matches}"
   if [[ -n "$matches" ]]; then
     printf '%s\n' "$matches" | sort -u

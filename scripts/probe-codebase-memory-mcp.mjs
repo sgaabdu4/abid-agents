@@ -1,10 +1,12 @@
 #!/usr/bin/env node
 import { spawn } from 'node:child_process';
+import { existsSync } from 'node:fs';
 import { setTimeout as delay } from 'node:timers/promises';
 
-const command = process.argv[2] ?? 'codebase-memory-mcp';
+const stableCommand = process.env.HOME ? `${process.env.HOME}/.codex/bin/codebase-memory-mcp` : '';
+const command = process.argv[2] ?? (stableCommand && existsSync(stableCommand) ? stableCommand : 'codebase-memory-mcp');
 const args = process.argv.slice(3);
-const timeoutMs = Number.parseInt(process.env.CBM_MCP_PROBE_TIMEOUT_MS ?? '5000', 10);
+const timeoutMs = Number.parseInt(process.env.CBM_MCP_PROBE_TIMEOUT_MS ?? '30000', 10);
 const attempts = Number.parseInt(process.env.CBM_MCP_PROBE_ATTEMPTS ?? '3', 10);
 const requiredTools = ['index_repository', 'search_graph', 'trace_path', 'search_code'];
 

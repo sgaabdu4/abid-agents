@@ -205,6 +205,24 @@ def ps_rows():
     return rows
 
 
+def ps_group_rows():
+    out = subprocess.run(
+        ["ps", "-axo", "pid=,ppid=,pgid=,etime=,command="],
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+    rows = []
+    for line in out.stdout.splitlines():
+        parts = line.strip().split(None, 4)
+        if len(parts) != 5:
+            continue
+        pid, ppid, pgid, etime, command = parts
+        if pid.isdigit() and ppid.isdigit() and pgid.isdigit():
+            rows.append((int(pid), int(ppid), int(pgid), etime, command))
+    return rows
+
+
 def is_codex_app_server(command):
     return (
         "/Applications/Codex.app/Contents/Resources/codex app-server" in command
@@ -213,24 +231,31 @@ def is_codex_app_server(command):
     )
 
 
-def is_duplicate_safe_mcp(command):
-    return (
-        command == "codebase-memory-mcp"
-        or command.endswith("/codebase-memory-mcp")
-        or (command.startswith("node ") and "/context-mode" in command)
-    )
+def duplicate_mcp_kind(command):
+    if command == "codebase-memory-mcp" or command.endswith("/codebase-memory-mcp"):
+        return "codebase-memory-mcp"
+    if command.startswith("node ") and "/context-mode" in command:
+        return "context-mode"
+    if command.endswith("/node_repl"):
+        return "node_repl"
+    if "SkyComputerUseClient" in command and " mcp" in command:
+        return "computer-use"
+    return None
 
 
-def trim_duplicate_mcp_children(limit=4):
+def trim_duplicate_mcp_children(limit=None):
+    if limit is None:
+        limit = int(os.environ.get("CODEX_CLEANUP_MCP_CHILD_LIMIT", "4"))
     rows = ps_rows()
     app_servers = {pid for pid, _, command in rows if is_codex_app_server(command)}
     children = {}
     for pid, ppid, command in rows:
-        if ppid in app_servers and is_duplicate_safe_mcp(command):
-            children.setdefault(ppid, []).append((pid, command))
+        kind = duplicate_mcp_kind(command)
+        if ppid in app_servers and kind:
+            children.setdefault((ppid, kind), []).append((pid, command))
 
     killed = []
-    for ppid, items in children.items():
+    for _, items in children.items():
         if len(items) <= limit:
             continue
         for pid, _ in sorted(items, key=lambda item: item[0])[: len(items) - limit]:
@@ -241,6 +266,114 @@ def trim_duplicate_mcp_children(limit=4):
                 except OSError:
                     pass
     emit("duplicate_mcp_children", killed=len(killed), pids=",".join(map(str, killed)) or "none", check=CHECK_ONLY)
+
+
+def parse_etime_seconds(value):
+    days = 0
+    time_value = value
+    if "-" in value:
+        day_text, time_value = value.split("-", 1)
+        if not day_text.isdigit():
+            return None
+        days = int(day_text)
+    fields = time_value.split(":")
+    if len(fields) == 3:
+        hours, minutes, seconds = fields
+    elif len(fields) == 2:
+        hours = "0"
+        minutes, seconds = fields
+    else:
+        return None
+    if not (hours.isdigit() and minutes.isdigit() and seconds.isdigit()):
+        return None
+    return (((days * 24) + int(hours)) * 60 + int(minutes)) * 60 + int(seconds)
+
+
+def configured_stale_cli_roots():
+    raw = os.environ.get("CODEX_CLEANUP_STALE_CLI_CWDS", "").strip()
+    if not raw:
+        return []
+    roots = []
+    for item in raw.replace(",", os.pathsep).split(os.pathsep):
+        item = item.strip()
+        if not item:
+            continue
+        roots.append(Path(item).expanduser().resolve(strict=False))
+    return roots
+
+
+def cwd_for_pid(pid):
+    try:
+        out = subprocess.run(
+            ["lsof", "-a", "-p", str(pid), "-d", "cwd", "-Fn"],
+            capture_output=True,
+            text=True,
+            check=False,
+            timeout=5,
+        )
+    except Exception:
+        return None
+    for line in out.stdout.splitlines():
+        if line.startswith("n"):
+            return Path(line[1:]).expanduser().resolve(strict=False)
+    return None
+
+
+def path_is_under(path, roots):
+    for root in roots:
+        try:
+            path.relative_to(root)
+            return True
+        except ValueError:
+            continue
+    return False
+
+
+def is_codex_cli_root(command):
+    if " app-server" in command or "/Codex (Service).app/" in command or "/Codex (Renderer).app/" in command:
+        return False
+    return (
+        (command.startswith("node ") and "/bin/codex" in command)
+        or ("/node_modules/@openai/codex/" in command and "/bin/codex " in command)
+        or "/Applications/Codex.app/Contents/Resources/codex exec " in command
+    )
+
+
+def cleanup_stale_codex_cli_groups():
+    roots = configured_stale_cli_roots()
+    if not roots:
+        emit("stale_codex_cli_groups", status="skip_unconfigured", check=CHECK_ONLY)
+        return
+    max_age = int(os.environ.get("CODEX_CLEANUP_STALE_CLI_MAX_AGE_SECONDS", "21600"))
+    current_pgid = os.getpgrp()
+    candidates = []
+    for pid, _, pgid, etime, command in ps_group_rows():
+        if pid != pgid or pgid == current_pgid or not is_codex_cli_root(command):
+            continue
+        age = parse_etime_seconds(etime)
+        if age is None or age < max_age:
+            continue
+        cwd = cwd_for_pid(pid)
+        if cwd is None or not path_is_under(cwd, roots):
+            continue
+        candidates.append((pgid, age, str(cwd)))
+
+    killed = []
+    if not CHECK_ONLY:
+        for pgid, _, _ in candidates:
+            try:
+                os.killpg(pgid, signal.SIGTERM)
+                killed.append(pgid)
+            except OSError:
+                pass
+    emit(
+        "stale_codex_cli_groups",
+        candidates=len(candidates),
+        killed=len(killed),
+        pgids=",".join(str(item[0]) for item in candidates) or "none",
+        max_age_seconds=max_age,
+        check=CHECK_ONLY,
+    )
 
 
 def cbm_bin():
@@ -377,6 +510,7 @@ def main():
     repair_plugin_manifests()
     repair_cbm_shadow_binary()
     trim_duplicate_mcp_children()
+    cleanup_stale_codex_cli_groups()
     clean_cbm_temp_projects()
 
 

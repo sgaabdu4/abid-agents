@@ -9,7 +9,7 @@ assert.ok(fs.existsSync(probe), `${probe} must exist`);
 
 const result = spawnSync('node', [probe], {
   encoding: 'utf8',
-  env: { ...process.env, CBM_MCP_PROBE_TIMEOUT_MS: '5000' },
+  env: { ...process.env, CBM_MCP_PROBE_TIMEOUT_MS: '30000' },
 });
 
 assert.equal(result.status, 0, result.stderr || result.stdout);

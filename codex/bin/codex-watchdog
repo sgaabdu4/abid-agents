@@ -69,7 +69,8 @@ fi
 
 if [ "$kill_codex_app_on_storm" = "1" ] && [ "$storm" -eq 1 ]; then
   roots="$(ps -axo pid=,command= |
-    awk '/\/Applications\/Codex\.app\/Contents\/MacOS\/Codex/ || /codex app-server/ { print $1 }')"
+    awk '/\/Applications\/Codex\.app\/Contents\/MacOS\/Codex/ || /codex app-server/ { print $1 }' |
+    tr '\n' ' ')"
   if [ -n "$roots" ]; then
     targets="$(ps -axo pid=,ppid= |
       awk -v roots="$roots" '
