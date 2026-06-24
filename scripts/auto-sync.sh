@@ -129,7 +129,10 @@ if git diff --quiet && git diff --cached --quiet; then
 fi
 
 if command -v rg >/dev/null 2>&1; then
-  mapfile -t changed_paths < <(git diff --name-only -- .gitmodules vendor/skill-upstreams)
+  changed_paths=()
+  while IFS= read -r path; do
+    changed_paths+=("$path")
+  done < <(git diff --name-only -- .gitmodules vendor/skill-upstreams)
   home_matches=""
   secret_matches=""
   if [[ "${#changed_paths[@]}" -gt 0 ]]; then

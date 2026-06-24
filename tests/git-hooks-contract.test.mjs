@@ -90,6 +90,7 @@ assert.ok(autoSyncScript.includes('NO_MISTAKES_NO_UPDATE_CHECK=1'), 'auto-sync m
 assert.ok(autoSyncScript.includes('update --yes'), 'auto-sync must update no-mistakes non-interactively');
 assert.ok(autoSyncScript.includes('ABID_AGENTS_SKIP_PREREQ_INSTALL=1'), 'auto-sync local refresh must not run prerequisite installers from cron');
 assert.ok(autoSyncScript.includes('git diff --name-only -- .gitmodules vendor/skill-upstreams'), 'auto-sync private-path scan must be scoped to submodule update outputs');
+assert.ok(!autoSyncScript.includes('mapfile'), 'auto-sync must stay compatible with macOS Bash 3');
 assert.ok(autoSyncScript.includes('git commit -m "Auto-update skill submodules"'), 'auto-sync must commit changed submodule pins');
 assert.ok(autoSyncScript.includes('git push --recurse-submodules=check origin main'), 'auto-sync must push bumped submodule pins safely');
 assert.ok(
