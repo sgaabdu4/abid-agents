@@ -1,7 +1,6 @@
 ---
 name: no-mistakes
 description: Use for no-mistakes validation, safe push, PR/CI gate, or `/no-mistakes` after committed code changes.
-user-invocable: true
 ---
 
 # no-mistakes
@@ -44,7 +43,7 @@ no-mistakes axi respond --action approve
 no-mistakes axi status
 no-mistakes axi logs --step <name> --full
 node "$HOME/.agents/skills/no-mistakes/scripts/repair-pr-evidence.mjs"
-node "$HOME/.agents/skills/no-mistakes/scripts/repair-pr-evidence.mjs" --e2e-video-required --videos "<hosted 2x video URL>"
+node "$HOME/.agents/skills/no-mistakes/scripts/repair-pr-evidence.mjs" --e2e-video-required --videos "<local or hosted 2x video>"
 ```
 
 If a command fails, read the returned `help` lines and continue from the exact

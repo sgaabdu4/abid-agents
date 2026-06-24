@@ -255,12 +255,20 @@ export function screenshotStatusRows({ screenshots, uploadError }) {
   }];
 }
 
-export function videoStatusRows({ videos, localVideos, required }) {
+export function videoStatusRows({ videos, localVideos, required, uploadError = '' }) {
   if (videos.length > 0) {
     return [{
       status: 'Resolved',
       issue: '2x E2E video attached',
       evidence: `${videos.length} video link(s) in PR evidence`,
+    }];
+  }
+
+  if (uploadError) {
+    return [{
+      status: 'Open',
+      issue: '2x E2E video upload failed',
+      evidence: compactText(uploadError),
     }];
   }
 
@@ -281,6 +289,16 @@ export function videoStatusRows({ videos, localVideos, required }) {
   }
 
   return [];
+}
+
+export function selectVideoUploadPaths(paths, required) {
+  const unique = [...new Set(paths)];
+  if (!required) return unique;
+
+  return unique.filter((file) => {
+    const name = path.basename(file).toLowerCase();
+    return /(^|[-_.\s])2x([-_.\s]|$)|2x-|recap/.test(name);
+  });
 }
 
 function reviewThreadRowsFromNodes(nodes) {
@@ -349,10 +367,6 @@ export function buildEvidenceSection({ screenshots, videos = [], statusRows, upl
 }
 
 export function insertEvidenceSection(body, section) {
-  const verificationIndex = body.search(/\n## Verification\b/i);
-  if (verificationIndex >= 0) {
-    return `${body.slice(0, verificationIndex).trim()}\n\n${section}\n\n${body.slice(verificationIndex).trim()}\n`;
-  }
   return `${body.trim()}\n\n${section}\n`;
 }
 
@@ -532,6 +546,26 @@ function uploadScreenshots(paths, repoSlug) {
     .filter((line) => /^!\[.*\]\(https:\/\/github\.com\/user-attachments\/assets\//.test(line));
 }
 
+function uploadVideos(paths, repoSlug) {
+  if (paths.length === 0) return [];
+  ensureGhImage();
+  const args = ['image'];
+  if (repoSlug) args.push('--repo', repoSlug);
+  args.push(...paths);
+  const result = run('gh', args);
+  if (!result.ok) {
+    throw new Error((result.stderr || result.stdout || 'gh image upload failed').trim());
+  }
+  return result.stdout
+    .trim()
+    .split('\n')
+    .map((line) => {
+      const match = line.match(/^!\[[^\]]*\]\((https:\/\/github\.com\/user-attachments\/assets\/[a-z0-9-]+)\)$/i);
+      return match ? `[2x E2E video](${match[1]})` : '';
+    })
+    .filter(Boolean);
+}
+
 async function main() {
   const options = parseArgs(process.argv.slice(2));
   const pr = options.pr || currentPrNumber();
@@ -554,8 +588,11 @@ async function main() {
     ...extractHostedVideoMarkdown(originalBody),
     ...hostedVideosFromInputs(options.videos),
   ];
+  const videoUploadPaths = selectVideoUploadPaths(localVideos, options.e2eVideoRequired);
   let screenshotMarkdown = [];
   let uploadError = '';
+  let videoMarkdown = [...new Set(hostedVideos)];
+  let videoUploadError = '';
   if (options.dryRun && localScreenshots.length > 0) {
     screenshotMarkdown = hostedScreenshots.length > 0
       ? hostedScreenshots
@@ -571,12 +608,28 @@ async function main() {
     }
   }
 
+  if (options.dryRun && videoUploadPaths.length > 0) {
+    videoMarkdown = videoMarkdown.length > 0
+      ? videoMarkdown
+      : [`Would upload ${videoUploadPaths.length} video artifact(s).`];
+  } else if (videoUploadPaths.length > 0) {
+    try {
+      videoMarkdown = [...new Set([
+        ...videoMarkdown,
+        ...uploadVideos(videoUploadPaths, repoSlug),
+      ])];
+    } catch (error) {
+      videoUploadError = error.message;
+    }
+  }
+
   const statusRows = [
     ...screenshotStatusRows({ screenshots: screenshotMarkdown, uploadError }),
     ...videoStatusRows({
-      videos: [...new Set(hostedVideos)],
+      videos: videoMarkdown,
       localVideos,
       required: options.e2eVideoRequired,
+      uploadError: videoUploadError,
     }),
     ...noMistakesStatusRows(),
     ...(options.checkReviewThreads ? githubReviewThreadRows(pr, repoSlug) : []),
@@ -584,7 +637,7 @@ async function main() {
   ];
   const section = buildEvidenceSection({
     screenshots: screenshotMarkdown,
-    videos: [...new Set(hostedVideos)],
+    videos: videoMarkdown,
     statusRows,
     uploadError,
     e2eVideoRequired: options.e2eVideoRequired,

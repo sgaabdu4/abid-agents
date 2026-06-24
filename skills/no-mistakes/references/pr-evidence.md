@@ -12,6 +12,8 @@ Use this before finalizing any no-mistakes run that opened or updated a PR.
   URL, never committed evidence files.
 - Screenshot and required video evidence are tracked in the issue-status table
   as resolved, missing, unhosted, or upload-failed.
+- Existing pipeline sections stay in place; append the managed evidence section
+  after the current PR body.
 - no-mistakes findings are shown as resolved or open.
 - GitHub review threads are not checked by default because the pipeline creates
   the PR before external review exists.
@@ -36,6 +38,7 @@ Useful flags:
 ```sh
 node "$HOME/.agents/skills/no-mistakes/scripts/repair-pr-evidence.mjs" --pr 3
 node "$HOME/.agents/skills/no-mistakes/scripts/repair-pr-evidence.mjs" --screenshots /path/to/screenshots
+node "$HOME/.agents/skills/no-mistakes/scripts/repair-pr-evidence.mjs" --e2e-video-required --videos /path/to/final-2x-video.mp4
 node "$HOME/.agents/skills/no-mistakes/scripts/repair-pr-evidence.mjs" --e2e-video-required --videos "https://github.com/user-attachments/assets/..."
 node "$HOME/.agents/skills/no-mistakes/scripts/repair-pr-evidence.mjs" --check-review-threads
 node "$HOME/.agents/skills/no-mistakes/scripts/repair-pr-evidence.mjs" --dry-run
@@ -63,22 +66,24 @@ Never leave local screenshot paths in the PR body.
 
 ## Adding 2x E2E videos to a PR
 
-For UI or phone E2E, attach or upload the final 2x video so reviewers can open
-it from the PR, then pass the hosted URL to the repair script:
+For UI or phone E2E, pass the final local 2x video file or a hosted URL to the
+repair script. Local 2x videos are uploaded with `gh image` and written back as
+GitHub `user-attachments` links.
 
 ```sh
+node "$HOME/.agents/skills/no-mistakes/scripts/repair-pr-evidence.mjs" --pr 3 --e2e-video-required --videos /path/to/final-2x-video.mp4
 node "$HOME/.agents/skills/no-mistakes/scripts/repair-pr-evidence.mjs" --pr 3 --e2e-video-required --videos "https://github.com/user-attachments/assets/..."
 ```
 
 Do not leave local MP4/MOV/WebM paths in the PR body.
-If only local video files are available, the script keeps the evidence table
-open until a reviewer-openable 2x video link is attached.
+If local video upload fails, the script keeps the evidence table open and
+removes all local paths from the PR body.
 
 ## If upload fails
 
 Do not leave local file paths in the PR body.
-State that screenshots were captured but upload failed, include the error at a
-high level, and keep the rest of the evidence section accurate.
+State that screenshots or videos were captured but upload failed, include the
+error at a high level, and keep the rest of the evidence section accurate.
 
 ## Verification
 

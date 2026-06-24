@@ -14,6 +14,7 @@ import {
   reviewThreadRowsFromGraphql,
   sanitizeBody,
   screenshotStatusRows,
+  selectVideoUploadPaths,
   videoStatusRows,
 } from '../../../skills/no-mistakes/scripts/repair-pr-evidence.mjs';
 
@@ -64,6 +65,25 @@ assert.deepEqual(extractHostedImageMarkdown(body), [
 assert.deepEqual(extractHostedVideoMarkdown('2x video: [2x recap](https://github.com/user-attachments/assets/vid)'), [
   '[2x recap](https://github.com/user-attachments/assets/vid)',
 ]);
+assert.deepEqual(
+  selectVideoUploadPaths([
+    '/tmp/no-mistakes-evidence/run/videos/sales-analytics-flow-final.webm',
+    '/tmp/no-mistakes-evidence/run/videos/sales-analytics-flow-2x-final.mp4',
+  ], true),
+  ['/tmp/no-mistakes-evidence/run/videos/sales-analytics-flow-2x-final.mp4'],
+);
+assert.deepEqual(
+  selectVideoUploadPaths(['/tmp/no-mistakes-evidence/run/videos/login_2x_cursor.mp4'], true),
+  ['/tmp/no-mistakes-evidence/run/videos/login_2x_cursor.mp4'],
+);
+assert.deepEqual(
+  selectVideoUploadPaths(['/tmp/no-mistakes-evidence/run/videos/raw.webm'], true),
+  [],
+);
+assert.deepEqual(
+  selectVideoUploadPaths(['/tmp/no-mistakes-evidence/run/videos/raw.webm'], false),
+  ['/tmp/no-mistakes-evidence/run/videos/raw.webm'],
+);
 
 const sanitized = sanitizeBody(body);
 assert.ok(!hasLocalRefs(sanitized), 'sanitized body must not keep local-only evidence');
@@ -130,6 +150,7 @@ assert.ok(repaired.includes('[views/problems.ejs:114](https://github.com/a-s-abb
 assert.ok(repaired.includes('Allow Problems board past contribution gate'));
 assert.ok(repaired.includes('[a449a54](https://github.com/a-s-abbas/lmtb/commit/a449a540000000000000000000000000000000000)'));
 assert.ok(!hasLocalRefs(repaired), 'repaired body must not contain local refs');
+assert.match(repaired.trimEnd(), /<!-- nm-pr-evidence:end -->$/, 'managed evidence must be appended after existing PR content');
 
 assert.deepEqual(
   reviewThreadRowsFromGraphql({
@@ -166,6 +187,15 @@ assert.deepEqual(
     status: 'Open',
     issue: '2x E2E video not hosted',
     evidence: '1 local video artifact(s) found; attach a reviewer-openable 2x video link',
+  }],
+);
+
+assert.deepEqual(
+  videoStatusRows({ videos: [], localVideos: ['/tmp/recap.mp4'], required: true, uploadError: 'upload denied' }),
+  [{
+    status: 'Open',
+    issue: '2x E2E video upload failed',
+    evidence: 'upload denied',
   }],
 );
 
