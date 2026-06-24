@@ -20,7 +20,7 @@
 
 ## Tools
 - `codebase-memory`, `context-mode`, `terse` are support tools, not stages.
-- Code map/callers/deps/routes/blast -> CBM. If CBM MCP closed -> `codebase-memory-mcp cli <tool> '<json>'`; else static search.
+- Code map/callers/deps/routes/blast -> `codebase-memory-mcp cli <tool> '<json>'`; CLI absent -> static search.
 - Logs/output/docs/data -> sandbox/index; no raw dumps.
 - File edits: native tools or `apply_patch`; never context-mode.
 - Shell: concise obs, git writes, approved mutation, focused verify; curate output.
