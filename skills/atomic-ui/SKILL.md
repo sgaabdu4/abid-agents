@@ -1,9 +1,6 @@
 ---
 name: atomic-ui
-description: >-
-  Use for UI work involving components, design systems, atomic design, design
-  tokens, themes, primitives, reusable layouts, or avoiding hardcoded visual
-  decisions. Enforces a project-local SSOT before adding screens or reusable UI.
+description: Use for UI components, design systems, atomic design, tokens, themes, hardcoded visuals, or missing design SSOT.
 ---
 
 # Atomic UI

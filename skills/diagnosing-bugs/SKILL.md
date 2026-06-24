@@ -1,9 +1,6 @@
 ---
 name: diagnosing-bugs
-description: >-
-  Use when the user reports a hard bug, failing behavior, flaky test, exception,
-  regression, or unexplained slowness and needs diagnosis before fixes. Enforces
-  reproduce -> minimise -> hypothesise -> instrument -> fix -> regression-test.
+description: Use for hard bugs, failing behavior, flaky tests, exceptions, regressions, or unexplained slowness before fixing.
 ---
 
 # Diagnosing Bugs

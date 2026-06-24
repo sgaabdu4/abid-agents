@@ -16,9 +16,24 @@ const logPath = path.join(runRoot, "results", "trigger-evals.log");
 
 fs.mkdirSync(path.dirname(resultPath), { recursive: true });
 
-const match = skillMd.match(/^description:\s*>-\n([\s\S]*?)\n---/m);
-if (!match) throw new Error("Could not read SKILL.md description");
-const description = match[1].split("\n").map((line) => line.trim()).join(" ").trim();
+function readDescription(markdown) {
+  const frontmatter = markdown.match(/^---\n([\s\S]*?)\n---/);
+  if (!frontmatter) return "";
+  const lines = frontmatter[1].split("\n");
+  const index = lines.findIndex((line) => line.startsWith("description:"));
+  if (index === -1) return "";
+  const first = lines[index].replace(/^description:\s*/, "").trim();
+  if (![">-", ">", "|"].includes(first)) return first;
+  const folded = [];
+  for (let cursor = index + 1; cursor < lines.length; cursor += 1) {
+    if (/^[a-zA-Z0-9_-]+:/.test(lines[cursor])) break;
+    folded.push(lines[cursor].trim());
+  }
+  return folded.join(" ").trim();
+}
+
+const description = readDescription(skillMd);
+if (!description) throw new Error("Could not read SKILL.md description");
 
 const prompt = `You are evaluating whether a Codex skill should trigger.
 

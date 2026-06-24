@@ -4,8 +4,8 @@
     {
       "id": "workflow_help_front_door",
       "prompt": "I have a feature idea and I am not sure which workflow or skill to use. Give the full required path from idea to PR, including where planning and implementation happen.",
-      "expectTrue": ["usesWorkflowHelp", "keepsSupportToolsAsTools", "usesTreehouseWorkspace", "endsAtNoMistakes"],
-      "expectFalse": ["usesBmadMenuCodes", "usesNoMistakesBeforeImplementation", "skipsWorkspaceIsolation"]
+      "expectTrue": ["usesWorkflowHelp", "keepsSupportToolsAsTools", "usesTreehouseWorkspace", "usesWorktreeReadyGuard", "endsAtNoMistakes"],
+      "expectFalse": ["usesBmadMenuCodes", "usesNoMistakesBeforeImplementation", "skipsWorkspaceIsolation", "skipsWorktreeReadyGuard"]
     },
     {
       "id": "post_grill_me_plan_has_slices",
@@ -48,6 +48,24 @@
       "prompt": "This is a React/Next.js performance cleanup with TS code health concerns before PR.",
       "expectTrue": ["usesReactDoctor", "usesFallow", "usesVercelReactBestPractices"],
       "expectFalse": ["usesOnlyGenericReactRoute"]
+    },
+    {
+      "id": "react_ui_app_ssot_route",
+      "prompt": "I am changing a React app dashboard UI. It has hardcoded spacing/colors and duplicated card components. What should the agent check before and after editing?",
+      "expectTrue": ["usesAtomicUi", "checksDesignSsot", "usesReactDoctor", "usesFallow", "usesFallowCloneGroups", "usesVercelReactBestPractices"],
+      "expectFalse": ["usesOnlyGenericReactRoute", "skipsDesignSsot", "skipsFallowCloneGroups"]
+    },
+    {
+      "id": "react_app_duplication_gate",
+      "prompt": "On a React app, I suspect copy-pasted components and clone groups. It should run React Doctor, but what else must be included for code health before PR?",
+      "expectTrue": ["usesReactDoctor", "usesFallow", "usesFallowCloneGroups", "usesVercelReactBestPractices"],
+      "expectFalse": ["usesOnlyGenericReactRoute", "usesReactDoctorWithoutFallow", "skipsFallowCloneGroups"]
+    },
+    {
+      "id": "ui_ssot_not_optional",
+      "prompt": "The UI task is small: add a reusable filter toolbar and tweak button styling. There might be no design system. Can the agent just hardcode the styles?",
+      "expectTrue": ["usesAtomicUi", "checksDesignSsot", "readinessConcernsOrFail"],
+      "expectFalse": ["skipsDesignSsot", "startsImplementationWithUnknowns"]
     },
     {
       "id": "sentry_front_door_only",
@@ -100,8 +118,20 @@
     {
       "id": "no_mistakes_handoff",
       "prompt": "The feature is implemented and committed. Validate it, push safely, open or update the PR, and follow CI.",
-      "expectTrue": ["usesNoMistakes", "requiresCommittedWorkBeforeNoMistakes"],
-      "expectFalse": ["usesNoMistakesBeforeImplementation"]
+      "expectTrue": ["usesNoMistakes", "requiresCommittedWorkBeforeNoMistakes", "usesWorktreeReadyGuard", "requiresProjectHooksBeforeDryRun"],
+      "expectFalse": ["usesNoMistakesBeforeImplementation", "skipsWorktreeReadyGuard", "treatsDryRunAsSufficientAlone"]
+    },
+    {
+      "id": "worktree_ready_before_dry_run",
+      "prompt": "I created a Treehouse worktree and no-mistakes says an explicit refspec git push --dry-run passed. Can we treat that as the local gate, or what must happen first?",
+      "expectTrue": ["usesTreehouseWorkspace", "usesWorktreeReadyGuard", "requiresProjectHooksBeforeDryRun"],
+      "expectFalse": ["skipsWorktreeReadyGuard", "treatsDryRunAsSufficientAlone"]
+    },
+    {
+      "id": "generic_flutter_hooks_ready",
+      "prompt": "This repo is a Flutter app with tracked .git-hooks/pre-push instead of Husky. A new worktree was created for the feature. What hook-readiness check is required before implementation and before no-mistakes?",
+      "expectTrue": ["usesTreehouseWorkspace", "usesWorktreeReadyGuard", "requiresProjectHooksBeforeDryRun"],
+      "expectFalse": ["skipsWorktreeReadyGuard", "treatsDryRunAsSufficientAlone"]
     },
     {
       "id": "no_bmad_persona_codes",

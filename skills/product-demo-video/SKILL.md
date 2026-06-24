@@ -1,9 +1,6 @@
 ---
 name: product-demo-video
-description: >-
-  Create, record, polish, or deliver product videos, app demos, investor
-  explainers, sales walkthroughs, onboarding reels, launch clips, or feature-demo
-  artifacts when the user explicitly asks for video.
+description: Use only when product video, demo recording, walkthrough, explainer, onboarding reel, or launch clip is explicit.
 ---
 
 # Product Demo Video

@@ -1,9 +1,6 @@
 ---
 name: to-issues
-description: >-
-  Break a PRD, plan, or resolved feature discussion into vertical-slice issues
-  with dependencies, acceptance criteria, verification, and agent-ready context.
-  Use before dispatching implementation work.
+description: Use to turn a PRD, plan, or resolved feature discussion into agent-ready vertical-slice issues.
 ---
 
 # To Issues

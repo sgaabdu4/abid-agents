@@ -1,6 +1,6 @@
 ---
 name: repeated-failure-learning
-description: Use when repeated fixes, trial-and-error process discovery, repeatable misses, or "same issue again" reveal durable project learning that must be captured before final in a skill or nearest project AGENTS.md.
+description: Use when repeated fixes, trial-and-error, recurring misses, or "same issue again" require durable learning before final.
 ---
 
 # Repeated Failure Learning

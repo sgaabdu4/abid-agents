@@ -1,9 +1,6 @@
 ---
 name: codebase-design
-description: >-
-  Use when designing or reviewing module boundaries, public interfaces,
-  ownership, test seams, abstractions, pass-through wrappers, or architecture
-  simplification. Helps make code deep, local, testable, and agent-navigable.
+description: Use for module boundaries, public APIs, ownership, abstractions, wrappers, test seams, or architecture review.
 ---
 
 # Codebase Design

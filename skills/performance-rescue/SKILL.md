@@ -1,9 +1,6 @@
 ---
 name: performance-rescue
-description: >-
-  Use when the user asks to make an app, page, API, DB query, workflow,
-  function, or UI action faster; investigate slowness, latency, p50/p95,
-  efficiency, benchmarking, or optimization.
+description: Use for slowness, latency, p50/p95, efficiency, benchmarks, or making apps, APIs, queries, or UI faster.
 ---
 
 # Performance Rescue

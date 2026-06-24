@@ -22,6 +22,11 @@ TOON to stdout and progress to stderr.
 - If the command is missing or unhealthy, run `no-mistakes doctor`.
 - If setup reports `Directory not empty`, keep the existing repo state and follow
   the tool's recovery guidance instead of deleting or recreating it.
+- Before starting, responding, or trusting a push dry-run, run
+  `"$HOME/.agents/scripts/ensure-worktree-ready.sh" .` from the active checkout.
+  The agent owns this preflight; do not ask the user to run it. This is required
+  inside no-mistakes internal worktrees too; an explicit refspec dry-run is not
+  proof unless project hooks are active.
 - Never run the pipeline from the default branch for new shipping work.
 
 ## Intent

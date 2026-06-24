@@ -1,9 +1,6 @@
 ---
 name: to-prd
-description: >-
-  Turn resolved conversation, repo evidence, or a plan into a concise product
-  requirements document. Use for PRDs, specs, implementation briefs, acceptance
-  criteria, testing decisions, and scope boundaries before building.
+description: Use to turn resolved conversation, repo evidence, or a plan into a concise PRD, spec, or implementation brief.
 ---
 
 # To PRD

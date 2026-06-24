@@ -1,9 +1,6 @@
 ---
 name: workflow-help
-description: >-
-  Use when the user asks what workflow, agent, skill, or next step to use, asks
-  to compare BMAD-style process with this repo, or needs a feature-to-PR route.
-  Routes work without treating support tools as stages.
+description: Use for workflow, skill, next-step, BMAD comparison, or feature-to-PR routing questions.
 ---
 
 # Workflow Help
@@ -30,4 +27,3 @@ Rules:
 - If readiness is weak, return `CONCERNS` or `FAIL` and name the missing input.
 - For shipping work, end at `no-mistakes`, not direct push, unless the user
   explicitly overrides the local gate.
-

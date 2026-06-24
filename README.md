@@ -21,7 +21,7 @@ cd "$HOME/.agents"
 ./scripts/setup.sh
 ```
 
-The setup script detects whether `~/.agents` already exists. On macOS it installs missing bootstrap prerequisites first: Xcode Command Line Tools prompt, Homebrew, Git, Node/npm, Dart, Flutter, and a managed shell PATH block. It then clones or updates the repo, initializes pinned submodules, installs MCP tools, links agent configs and skills, installs local Git hooks, installs or updates [`Treehouse`](https://github.com/kunchenguid/treehouse) and [`no-mistakes`](https://github.com/kunchenguid/no-mistakes), and initializes the `.agents` repo for `git push no-mistakes`. After the repo is available, independent setup phases run in parallel where they do not share mutable package-manager state.
+The setup script detects whether `~/.agents` already exists. On macOS it installs missing bootstrap prerequisites first: Xcode Command Line Tools prompt, Homebrew, Git, Node/npm, Dart, Flutter, and a managed shell PATH block. It then clones or updates the repo, initializes pinned submodules, installs MCP tools, links agent configs and skills, installs local Git hooks, installs or updates [`Treehouse`](https://github.com/kunchenguid/treehouse) and [`no-mistakes`](https://github.com/kunchenguid/no-mistakes), initializes the `.agents` repo for `git push no-mistakes`, and verifies worktree hook readiness. After the repo is available, independent setup phases run in parallel where they do not share mutable package-manager state.
 
 When run in a terminal, setup asks whether to install `Treehouse`, install `no-mistakes`, enable cron, and initialize extra repos. In non-interactive runs, defaults are safe: `Treehouse` on, `no-mistakes` on, cron off, extra repos only from env vars.
 
@@ -31,6 +31,7 @@ The setup is conservative:
 - preserves existing non-managed config files and conflicting skill folders instead of overwriting them
 - initializes pinned submodules
 - installs local Git hooks for this repo
+- verifies portable worktree hook readiness with `scripts/ensure-worktree-ready.sh`
 - leaves cron disabled unless you explicitly enable it
 - initializes extra `no-mistakes` repos only when `ABID_AGENTS_NO_MISTAKES_REPOS=/repo/a:/repo/b` is set
 
@@ -51,6 +52,8 @@ Useful setup switches:
 | `ABID_AGENTS_SKIP_NO_MISTAKES=1` | Skip installing and initializing `no-mistakes`. |
 | `ABID_AGENTS_SKIP_NO_MISTAKES_INIT=1` | Install `no-mistakes` but skip repo initialization. |
 | `ABID_AGENTS_NO_MISTAKES_REPOS=/repo/a:/repo/b` | Initialize extra repos for `git push no-mistakes`. |
+| `ABID_AGENTS_SKIP_WORKTREE_READY=1` | Skip shared worktree readiness checks during setup. |
+| `ABID_AGENTS_WORKTREE_READY_INSTALL=1` | Allow readiness repair to run `npm ci` when a hook manager needs it. |
 
 ---
 
@@ -105,7 +108,7 @@ There are two types:
 - Upstream skills: pinned as submodules and exposed through symlinks.
 - Tool-installed skills: written by their CLI owner, such as `no-mistakes`.
 
-Workflow defaults: use `workflow-help` when the next step is unclear, `grill-me` to clarify ambiguous work before building, then use [`no-mistakes`](https://github.com/kunchenguid/no-mistakes) through `/no-mistakes` or `git push no-mistakes` to validate committed shipping work after implementation.
+Workflow defaults: use `workflow-help` when the next step is unclear, `grill-me` to clarify ambiguous work before building, run `scripts/ensure-worktree-ready.sh` after creating a worktree, then use [`no-mistakes`](https://github.com/kunchenguid/no-mistakes) through `/no-mistakes` or `git push no-mistakes` to validate committed shipping work after implementation.
 
 Planning and engineering helpers:
 
@@ -127,7 +130,7 @@ Quick routing:
 | Split a plan into missing agent-ready slices | `to-issues` |
 | Design or repair tests | `test-quality` |
 | UI systems, tokens, or product polish | `atomic-ui` + `impeccable` |
-| React or Next.js implementation/review | `react-doctor` + `fallow` + `vercel-react-best-practices` |
+| React app or Next.js implementation/review | `react-doctor` + `fallow`; include `fallow dupes` / clone-group checks for duplication; use `vercel-react-best-practices` for performance/composition |
 | Sentry or observability work | `sentry-workflow` |
 | User-like UI regression proof | `e2e` |
 | Latency or efficiency work | `performance-rescue` |
@@ -230,7 +233,7 @@ Useful switches:
 
 ## 8. Shipping and safety checks
 
-Default shipping path: use [`no-mistakes`](https://github.com/kunchenguid/no-mistakes) through `/no-mistakes` or `git push no-mistakes` after a repo has been initialized with `no-mistakes init`.
+Default shipping path: use [`no-mistakes`](https://github.com/kunchenguid/no-mistakes) through `/no-mistakes` or `git push no-mistakes` after a repo has been initialized with `no-mistakes init`. Before trusting a push dry-run, run `scripts/ensure-worktree-ready.sh`; it rejects private or no-mistakes-owned hook paths and repairs known portable hook managers.
 Use direct `git push origin ...` only when explicitly requested or when the gate is unavailable.
 
 Run:

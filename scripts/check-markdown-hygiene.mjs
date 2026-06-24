@@ -18,6 +18,7 @@ const allowedAgentsSections = [
 const maxAgentsLines = 80;
 const maxAgentsTokens = 1000;
 const maxSkillEntrypointLines = 100;
+const maxSkillDescriptionTokens = 30;
 const globalRules = [
   {
     name: 'local machine path',
@@ -125,6 +126,28 @@ function checkAgents(file, text) {
 function checkSkill(file, text) {
   const lines = lineCount(text);
   if (lines > maxSkillEntrypointLines) fail(file, `must stay at or under ${maxSkillEntrypointLines} lines; got ${lines}`);
+  const frontmatter = text.match(/^---\n([\s\S]*?)\n---/);
+  if (!frontmatter) {
+    fail(file, 'must have YAML frontmatter');
+    return;
+  }
+  const description = frontmatter[1]
+    .split('\n')
+    .find((line) => line.startsWith('description:'))
+    ?.replace(/^description:\s*/, '')
+    .trim();
+  if (!description) {
+    fail(file, 'must have a description');
+    return;
+  }
+  if (['>-', '>', '|'].includes(description)) {
+    fail(file, 'description must stay one line to control prompt tokens');
+    return;
+  }
+  const descriptionTokens = tokenCount(description);
+  if (descriptionTokens > maxSkillDescriptionTokens) {
+    fail(file, `description must stay at or under ${maxSkillDescriptionTokens} tokens; got ${descriptionTokens}`);
+  }
 }
 
 for (const absolutePath of walk(root)) {

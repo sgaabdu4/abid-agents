@@ -1,9 +1,6 @@
 ---
 name: security-review
-description: >-
-  Defensive appsec review for owned code. Use for security audit,
-  OWASP/appsec/auth/secrets/dependency/API/LLM review, or finding exploitable
-  risks before shipping.
+description: Use for defensive appsec review: auth, secrets, deps, APIs, LLMs, data exposure, OWASP.
 ---
 
 # Security Review

@@ -1,10 +1,6 @@
 ---
 name: test-quality
-description: >-
-  Use when designing, writing, reviewing, or repairing tests, specs, QA coverage,
-  TDD flows, mutation drills, and AI-generated test audits. Enforces
-  requirements-first scenarios, behavior assertions, minimal mocking, targeted
-  failure proof, and post-implementation gap review.
+description: Use for tests/specs/QA/TDD/mutation: design, write, review, repair, behavior assertions, failure proof.
 ---
 
 # Test Quality

@@ -28,7 +28,7 @@ const policyFiles = [
   'skills/workflow-help/references/route-map.md',
 ];
 
-const policyDigestPattern = /workflow-help|grill-me|to-prd|to-issues|readiness|PASS|CONCERNS|FAIL|correct course|scope expands|codebase-memory|context-mode|support tools|not stages|lavish|visual review|UI choices|react-doctor|fallow|vercel-react-best-practices|sentry-workflow|sentry-cli|sentry-sdk-setup|sentry-feature-setup|security-review|performance-rescue|e2e|real UI|screenshots|events|regression command|thermo-nuclear-code-quality-review|maintainability|no-mistakes|committed|BMAD|menu codes|Treehouse|700|blast radius|surrounding issues|Report:|Why:|What:|Risk:|Proof:/i;
+const policyDigestPattern = /workflow-help|grill-me|to-prd|to-issues|readiness|ensure-worktree-ready|worktree readiness|project hooks|push dry-run|PASS|CONCERNS|FAIL|correct course|scope expands|codebase-memory|context-mode|support tools|not stages|lavish|visual review|UI choices|UI\/components|design-system|design SSOT|atomic-ui|tokens|theme|hardcoded|react-doctor|fallow|clone groups|dupes|duplication|vercel-react-best-practices|sentry-workflow|sentry-cli|sentry-sdk-setup|sentry-feature-setup|security-review|performance-rescue|e2e|real UI|screenshots|events|regression command|thermo-nuclear-code-quality-review|maintainability|no-mistakes|committed|BMAD|menu codes|Treehouse|700|blast radius|surrounding issues|Report:|Why:|What:|Risk:|Proof:/i;
 
 const policyText = policyFiles
   .map((rel) => {
@@ -75,8 +75,14 @@ const keyDefinitions = [
   'usesLavishForVisualUiDecisions: uses Lavish or lavish-axi for UI flow or visual choices that cannot be judged from text',
   'keepsLavishAsSupportTool: treats Lavish as a support tool inside grill-me, not as its own Plan/Implement/Verify stage',
   'treatsLavishAsRequiredStage: incorrectly requires Lavish for every feature or makes it a standalone workflow stage',
+  'usesAtomicUi: includes atomic-ui for UI components, reusable controls, design-system, token, or styling work',
+  'checksDesignSsot: the policy explicitly requires locating or creating the UI design SSOT, such as tokens, theme, primitives, component library, or atomic hierarchy, before reusable UI styling edits',
+  'skipsDesignSsot: incorrectly allows UI styling or reusable component work without checking or creating the project-local design SSOT',
   'usesReactDoctor: includes react-doctor for React or Next.js implementation/review',
   'usesFallow: includes fallow for JS/TS code health, cleanup, risk, or architecture checks',
+  'usesFallowCloneGroups: the policy explicitly requires fallow duplication or clone-group checks such as fallow dupes, clone groups, or duplicated components for React/JS/TS code health; generic fallow is not enough',
+  'usesReactDoctorWithoutFallow: incorrectly runs React Doctor alone for React app code health when fallow is also required',
+  'skipsFallowCloneGroups: incorrectly omits fallow duplication or clone-group checks when duplication or copy-paste is part of the React/JS/TS request',
   'usesVercelReactBestPractices: includes Vercel React best-practices for React/Next performance guidance',
   'usesOnlyGenericReactRoute: says only generic React skills or only react-doctor when the policy requires the full React route',
   'usesSentryWorkflow: routes all Sentry or observability work through sentry-workflow',
@@ -105,6 +111,10 @@ const keyDefinitions = [
   'startsImplementationWithUnknowns: starts coding despite missing outcome, owner, blast radius, proof path, or risk routing',
   'usesTreehouseWorkspace: names Treehouse worktree or isolated branch as the place for feature planning/coding before implementation proceeds',
   'skipsWorkspaceIsolation: incorrectly starts feature implementation without Treehouse/worktree/branch isolation',
+  'usesWorktreeReadyGuard: runs or requires scripts/ensure-worktree-ready.sh after worktree creation or before final gate validation',
+  'skipsWorktreeReadyGuard: incorrectly trusts a worktree, no-mistakes checkout, or push dry-run without the worktree readiness guard',
+  'requiresProjectHooksBeforeDryRun: states push dry-run only counts after project hooks are active',
+  'treatsDryRunAsSufficientAlone: incorrectly treats git push --dry-run or explicit refspec dry-run as sufficient without proving project hooks',
   'correctsCourseOnScopeExpansion: stops and reroutes when scope expands midstream',
   'routesBackToPlanning: uses grill-me, to-prd, to-issues, or codebase-design for expanded or unclear scope',
   'silentlyExpandsScope: continues implementation after scope expansion without rerouting',

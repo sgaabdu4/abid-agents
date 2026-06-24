@@ -32,6 +32,29 @@ assert.notEqual(fail.status, 0, 'checker must fail prompt prose in AGENTS.md');
 assert.match(fail.stderr, /free prose/);
 assert.match(fail.stderr, /bullet, heading, or fenced template/);
 
+const skillTmp = fs.mkdtempSync(path.join(os.tmpdir(), 'markdown-hygiene-skill-'));
+fs.mkdirSync(path.join(skillTmp, 'skills', 'demo'), { recursive: true });
+fs.writeFileSync(path.join(skillTmp, 'AGENTS.md'), '# Agent Rules\n\n## Stops\n- Rule.\n');
+fs.writeFileSync(
+  path.join(skillTmp, 'skills', 'demo', 'SKILL.md'),
+  [
+    '---',
+    'name: demo',
+    'description: Use for a very long skill description that tries to list every possible trigger phrase, workflow, edge case, role, artifact, and implementation detail in metadata.',
+    '---',
+    '',
+    '# Demo',
+    '',
+  ].join('\n'),
+);
+const skillFail = spawnSync(checker, {
+  cwd: skillTmp,
+  env: { ...process.env, AGENTS_HYGIENE_ROOT: skillTmp },
+  encoding: 'utf8',
+});
+assert.notEqual(skillFail.status, 0, 'checker must fail bloated skill descriptions');
+assert.match(skillFail.stderr, /description must stay at or under 30 tokens/);
+
 const leakTmp = fs.mkdtempSync(path.join(os.tmpdir(), 'markdown-hygiene-leak-'));
 fs.writeFileSync(path.join(leakTmp, 'AGENTS.md'), '# Agent Rules\n\n## Stops\n- Rule.\n');
 fs.writeFileSync(path.join(leakTmp, 'README.md'), 'This session said to use /Users/abid/tmp.\n');

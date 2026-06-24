@@ -1,9 +1,6 @@
 ---
 name: create-pdf
-description: >-
-  Create, export, redesign, polish, verify, or regenerate visual PDFs: decks,
-  reports, proposals, one-pagers, PDFs from HTML/browser pages, and investor
-  artifacts. Use when PDF layout quality matters.
+description: Use for visual PDFs: create, polish, export, verify decks, reports, proposals, one-pagers, or HTML-to-PDF.
 ---
 
 # Create PDF

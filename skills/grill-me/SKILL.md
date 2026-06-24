@@ -1,11 +1,6 @@
 ---
 name: grill-me
-description: >-
-  Interview one clear Q at a time before planning or building ideas, greenfield
-  apps, brownfield features, simple changes, codebase maps, specs, stress tests,
-  UI flows, visual review artifacts, mockups, prototypes, or final plans. Uses
-  code/domain docs as evidence, routes depth, persists state, resumes after
-  compaction.
+description: Interview one clear question before planning/building ideas, features, codebase maps, specs, UI flows, prototypes, or final plans.
 ---
 
 # Grill Me

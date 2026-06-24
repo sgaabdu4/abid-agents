@@ -471,6 +471,27 @@ no_mistakes_binary() {
   fi
 }
 
+ensure_worktree_ready_repo() {
+  local repo="$1"
+  local script="$ROOT/scripts/ensure-worktree-ready.sh"
+  local args=()
+
+  if [[ "${ABID_AGENTS_SKIP_WORKTREE_READY:-}" == "1" ]]; then
+    return 0
+  fi
+
+  if [[ ! -x "$script" ]]; then
+    echo "Skipping worktree readiness for $repo: $script is missing or not executable." >&2
+    return 0
+  fi
+
+  if [[ "${ABID_AGENTS_WORKTREE_READY_INSTALL:-}" == "1" ]]; then
+    args+=("--install")
+  fi
+
+  "$script" "${args[@]}" "$repo"
+}
+
 init_no_mistakes_repo() {
   local repo="$1"
   local binary
@@ -502,6 +523,8 @@ init_no_mistakes_repo() {
       NO_MISTAKES_NO_UPDATE_CHECK=1 \
       "$binary" init
   )
+
+  ensure_worktree_ready_repo "$repo"
 }
 
 init_extra_no_mistakes_repos() {

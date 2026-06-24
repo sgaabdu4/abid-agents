@@ -1,9 +1,6 @@
 ---
 name: codebase-memory
-description: >-
-  Use the codebase knowledge graph for code structure, architecture, symbols,
-  callers/callees, dependencies, routes, impact analysis, dead code, graph
-  queries, Cypher examples, and search_graph/trace_path guidance.
+description: Use codebase graph for symbols, callers, deps, routes, impact, dead code, Cypher, search_graph, trace_path.
 ---
 
 # Codebase Memory — Knowledge Graph Tools

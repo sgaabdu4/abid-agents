@@ -1,6 +1,6 @@
 ---
 name: no-mistakes
-description: Validate your code changes through the no-mistakes pipeline - automated code review, tests, lint, docs, push, PR, and CI - before they reach the configured push target. Use when the user asks to run no-mistakes, gate or ship or validate their changes, push safely, asks you to do a task and then validate it, or invokes /no-mistakes.
+description: Use for no-mistakes validation, safe push, PR/CI gate, or `/no-mistakes` after committed code changes.
 user-invocable: true
 ---
 
@@ -17,6 +17,9 @@ Read `references/pr-evidence.md` before finalizing any PR-backed run.
 ## Non-negotiables
 
 - Run `no-mistakes axi` first and respect any active run state.
+- Before `axi run`, `axi respond`, or any push dry-run, the agent must run
+  `"$HOME/.agents/scripts/ensure-worktree-ready.sh" .`; do not ask the user to
+  run it. Stop if hooks cannot be activated.
 - Work must be committed on a feature branch before `axi run` validates it.
 - Pass a rich `--intent` in the user's words, including product decisions that
   are not obvious from the diff.
@@ -34,6 +37,7 @@ Read `references/pr-evidence.md` before finalizing any PR-backed run.
 
 ```sh
 no-mistakes axi
+"$HOME/.agents/scripts/ensure-worktree-ready.sh" .
 no-mistakes axi run --intent "<user goal and relevant decisions>"
 no-mistakes axi respond --action fix --findings <ids>
 no-mistakes axi respond --action approve

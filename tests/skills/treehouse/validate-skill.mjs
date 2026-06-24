@@ -14,10 +14,11 @@ function has(needle) {
 }
 
 if (!text.startsWith("---\nname: treehouse\n")) errors.push("bad frontmatter name");
-has('"tree house"');
+has("tree house");
 has("treehouse <name>");
 has("treehouse status");
 has("treehouse get --lease");
+has("ensure-worktree-ready.sh");
 has("treehouse return <path>");
 has("return --force");
 has("destroy");

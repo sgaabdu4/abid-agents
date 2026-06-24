@@ -1,9 +1,6 @@
 ---
 name: treehouse
-description: >-
-  Use for "tree house", "treehouse", "Treehouse", "tree-house", Treehouse CLI,
-  or worktree isolation. Covers status, lease, return, and unclear-scope handoff
-  to `grill-me`.
+description: Use for Treehouse CLI, tree house/treehouse, reusable worktrees, leases, status, return, or worktree isolation.
 ---
 
 # Treehouse
@@ -15,7 +12,9 @@ Commands:
 - Inspect: `treehouse status`
 - Lease for Codex: `treehouse get --lease --lease-holder "<label>"`; stdout is
   the worktree path. Run from the target repo; it creates or reuses an isolated
-  worktree. Continue there and read `AGENTS.md`.
+  worktree. The agent must run `"$HOME/.agents/scripts/ensure-worktree-ready.sh"
+  <path>` before continuing; do not ask the user to run it. Stop if it fails.
+  Continue there and read `AGENTS.md`.
 - If user says `treehouse <name>`, use `<name>` as the lease holder label; it is
   not a Treehouse branch argument.
 - Stale check: `treehouse prune` is dry-run; deletion needs approved `--yes`.

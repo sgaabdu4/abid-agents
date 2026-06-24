@@ -1,9 +1,6 @@
 ---
 name: thermo-nuclear-code-quality-review
-description: >-
-  Strict maintainability review for diffs, PRs, commits, or branches. Use for
-  thermo-nuclear/harsh/deep code-quality audits, abstraction review, spaghetti
-  review, giant-file review, or commit-by-commit quality checks.
+description: Use for strict maintainability review: diffs, PRs, commits, wrappers, abstractions, spaghetti, giant files, weak tests.
 ---
 
 # Thermo-Nuclear Review

@@ -1,9 +1,6 @@
 ---
 name: e2e
-description: >-
-  Browser-first, full safe E2E sweep for web/Flutter apps. Use for real UI
-  smoke/regression flows, Codex Browser/Chrome/device runs, click-video
-  artifacts, triage, fixes, dogfood, and auditable no-regression reports.
+description: Use for real UI E2E smoke/regression proof across web, Flutter, browser, Chrome, or device flows, with artifacts.
 ---
 
 # E2E

@@ -7,6 +7,7 @@ const repo = path.join(process.env.HOME, '.agents');
 const installScript = fs.readFileSync(path.join(repo, 'scripts', 'install.sh'), 'utf8');
 const setupScript = fs.readFileSync(path.join(repo, 'scripts', 'setup.sh'), 'utf8');
 const setupNewUserScript = fs.readFileSync(path.join(repo, 'scripts', 'setup-new-user.sh'), 'utf8');
+const worktreeReadyScript = fs.readFileSync(path.join(repo, 'scripts', 'ensure-worktree-ready.sh'), 'utf8');
 const autoSyncScript = fs.readFileSync(path.join(repo, 'scripts', 'auto-sync.sh'), 'utf8');
 const cronScript = fs.readFileSync(path.join(repo, 'scripts', 'install-cron.sh'), 'utf8');
 const subtreeSyncScript = fs.readFileSync(path.join(repo, 'scripts', 'sync-subtrees.sh'), 'utf8');
@@ -59,6 +60,13 @@ assert.ok(setupScript.includes('ask_yes_no'), 'setup must ask questions when int
 assert.ok(setupScript.includes('ABID_AGENTS_SETUP_NO_MISTAKES'), 'setup must allow non-interactive no-mistakes choice');
 assert.ok(setupScript.includes('ABID_AGENTS_ENABLE_CRON'), 'setup must allow cron choice');
 assert.ok(setupScript.includes('ABID_AGENTS_NO_MISTAKES_REPOS'), 'new-user setup must support extra no-mistakes repo init');
+assert.ok(setupScript.includes('ensure_worktree_ready_repo'), 'setup must run the shared worktree readiness guard');
+assert.ok(setupScript.includes('ABID_AGENTS_SKIP_WORKTREE_READY'), 'setup must allow skipping worktree readiness only by explicit env');
+assert.ok(setupScript.includes('ABID_AGENTS_WORKTREE_READY_INSTALL'), 'setup must make dependency install for readiness explicit');
+assert.ok(worktreeReadyScript.includes('core.hooksPath'), 'worktree readiness must inspect active Git hook path');
+assert.ok(worktreeReadyScript.includes('/.no-mistakes/repos/'), 'worktree readiness must reject no-mistakes gate hook paths');
+assert.ok(worktreeReadyScript.includes('.githooks'), 'worktree readiness must support generic tracked hook dirs');
+assert.ok(worktreeReadyScript.includes('.husky/_'), 'worktree readiness must support Husky hook shims');
 assert.ok(setupNewUserScript.includes('exec "$SCRIPT_DIR/setup.sh" "$@"'), 'legacy setup-new-user script must delegate to canonical setup');
 assert.ok(installScript.includes('"${1:-}" != "rebase"'), 'post-rewrite hook must only react to rebase rewrites');
 assert.ok(
@@ -154,7 +162,7 @@ if (fs.existsSync(postRewriteHook)) {
   assert.ok(text.includes('ABID_AGENTS_SKIP_SUBMODULE_UPDATE'), 'installed post-rewrite hook must support skipping submodule updates');
 }
 
-for (const relativePath of ['scripts/auto-sync.sh', 'scripts/install-cron.sh', 'scripts/update-submodules.sh', 'scripts/setup.sh', 'scripts/setup-new-user.sh', 'codex/bin/codex-watchdog', 'codex/bin/codex-health']) {
+for (const relativePath of ['scripts/auto-sync.sh', 'scripts/ensure-worktree-ready.sh', 'scripts/install-cron.sh', 'scripts/update-submodules.sh', 'scripts/setup.sh', 'scripts/setup-new-user.sh', 'codex/bin/codex-watchdog', 'codex/bin/codex-health']) {
   const stat = fs.statSync(path.join(repo, relativePath));
   assert.ok((stat.mode & 0o111) !== 0, `${relativePath} must be executable`);
 }

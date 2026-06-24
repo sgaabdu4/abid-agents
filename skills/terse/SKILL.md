@@ -1,10 +1,6 @@
 ---
 name: terse
-description: >-
-  ALWAYS use for every user-facing reply. Be brief, direct, and readable. Cut
-  filler, not meaning. Preserve exact code/API names, paths, commands, flags,
-  literals, errors, and user wording. For paste-ready writing, read
-  human-writing.md.
+description: Always use for user-facing replies. Be brief; preserve exact code/API names, paths, commands, errors, dates, user wording.
 ---
 
 # Terse
