@@ -4,34 +4,32 @@ Use before asking any user-facing interview question.
 
 ## Delivery
 
-- If `request_user_input` is available, use it for interview Qs instead of
-  markdown. One call, one question, 2-3 exclusive options; recommended option
-  first with `(Recommended)`. Put tradeoffs in option descriptions.
+- Default to the markdown `Visible question block`; `grill-me` choices need
+  visible context.
+- Use `request_user_input` only for simple, low-risk choices where the visible
+  text alone is enough. One call, one question, 2-3 exclusive options;
+  recommended option first with `(Recommended)`.
+- The tool `question` string must include compact `Meaning`, `Why it matters`,
+  `Suggested default`, and `Options`. Do not put critical context only in option
+  descriptions; the built-in UI may hide descriptions.
 - Omit `autoResolutionMs` for blocking/high-risk choices; use it only when a
-  default can safely continue. Persist the tool question/options before calling.
-- If the tool is unavailable, use the visible fallback block below.
+  default can safely continue. Persist the exact markdown block or tool
+  question/options before replying/calling.
 
 ## Visible question block
 
-Fallback visible format:
+Visible format:
 
 ```text
 Q<N>: <plain question>
 
-Meaning:
-<what this decision means, with one concrete example if useful>
-
-Why it matters:
-<what changes based on the answer>
-
-Suggested default:
-<A/B/C> - <one clear reason>
+Meaning: <what this decides; include one example if useful>
+Why it matters: <what changes based on the answer>
+Suggested default: <A/B/C> - <one clear reason>
 
 Options:
 A) <plain option>
-
 B) <plain option>
-
 C) <plain option or "Not sure - use the default">
 
 Reply: A/B/C, "use default", "not sure", "skip for now", or your own answer.
@@ -39,13 +37,13 @@ Reply: A/B/C, "use default", "not sure", "skip for now", or your own answer.
 
 ## Rules
 
-- Clarity beats terseness. Normal prompt target: 12-24 lines; max 220 words.
-- Fallback replies use one `text` code fence containing the plain question
+- Clarity beats terseness. Normal prompt target: 8-14 lines; max 160 words.
+- Markdown replies use one `text` code fence containing the plain question
   block; no prose outside it during interview.
 - Before replying, persist the exact block in `session_state.md`.
 - Do not use box drawing, table borders, vertical bars, horizontal rules, or
   decorative lines.
-- Use blank lines between sections and between options.
+- Use blank lines between sections; keep option lists compact.
 - Wrap lines around 72 chars.
 - Explain enough for a nontechnical reader to answer without guessing: plain
   meaning + why it matters + one concrete example when helpful. No essay.
@@ -69,21 +67,14 @@ Reply: A/B/C, "use default", "not sure", "skip for now", or your own answer.
 ```text
 Q3: What must work before real staff try v1?
 
-Meaning:
-Pick the test that decides "ready for real work". Other checks can
-still be required.
-
-Why it matters:
-This tells us what to test first.
-
-Suggested default:
-A - it proves the core flow works.
+Meaning: Pick the test that decides "ready for real work";
+other checks can still be required.
+Why it matters: This tells us what to test first.
+Suggested default: A - it proves the core flow works.
 
 Options:
 A) Task reaches the right person with deadline + notification.
-
 B) Any age user can create/delegate without training.
-
 C) Malayalam voice becomes usable English task text.
 
 Reply: A/B/C, "all", "not sure", "skip for now", or edit it.

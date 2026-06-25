@@ -105,10 +105,13 @@ const questionsText = fs.readFileSync(path.join(skillRoot, "modules/questions.md
 const normalizedQuestionsText = questionsText.replace(/\s+/g, " ");
 for (const required of [
   "request_user_input",
-  "instead of markdown",
+  "Default to the markdown",
+  "only for simple, low-risk choices",
   "2-3 exclusive options",
   "autoResolutionMs",
-  "tool question/options"
+  "The tool `question` string must include",
+  "Do not put critical context only in option descriptions",
+  "built-in UI may hide descriptions"
 ]) {
   if (!normalizedQuestionsText.includes(required)) {
     errors.push(`questions.md missing request_user_input contract: ${required}`);
