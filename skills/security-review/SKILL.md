@@ -9,12 +9,12 @@ Run practical defensive triage. Findings need evidence and realistic fix directi
 
 ## Rules
 
-- Review provided/owned code, configs, artifacts, or URLs only.
-- Read before claiming; cite file/line, hunk, command output, or URL.
-- Mask secrets. Report type/prefix/location, not full value.
-- Do not provide weaponized exploit steps. Explain enough to fix.
-- Treat CVE/dependency status as current; use audit/SCA output or current sources.
-- Start long dependency scans early, collect/stop them before final.
+- Review provided/owned code, configs, artifacts, or URLs only
+- Read before claiming; cite file/line, hunk, command output, or URL
+- Mask secrets. Report type/prefix/location, not full value
+- Do not provide weaponized exploit steps. Explain enough to fix
+- Treat CVE/dependency status as current; use audit/SCA output or current sources
+- Start long dependency scans early, collect/stop them before final
 
 ## Fast Flow
 
@@ -36,7 +36,7 @@ Read `references/checklist.md` for detailed checks covering secrets, auth/sessio
 
 ```md
 ## Findings
-- [Severity] <title> - `<path>:<line>` - issue, impact, evidence, fix, verification.
+- [Severity] <title> - `<path>:<line>` - issue, impact, evidence, fix, verification
 
 ## Checked
 - Secrets/Auth/Data/Uploads/Deps/Hygiene/Injection/LLM: <checked/finding/not checked + evidence>

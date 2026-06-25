@@ -13,10 +13,10 @@ Use relevant skills/tools when available: `terse`, `codebase-memory`, `test-qual
 
 ## Target
 
-- Local branch: upstream merge-base if present, else `origin/main`, else `main`.
-- PR/commit range: exact user range.
-- Dirty tree: include staged and unstaged.
-- Commit-by-commit: review each patch, then cumulative diff.
+- Local branch: upstream merge-base if present, else `origin/main`, else `main`
+- PR/commit range: exact user range
+- Dirty tree: include staged and unstaged
+- Commit-by-commit: review each patch, then cumulative diff
 
 Read full patches; stats/name-only/subjects are insufficient.
 

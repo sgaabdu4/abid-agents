@@ -2,28 +2,28 @@
   "model": "gpt-5.4-mini",
   "cases": [
     {
-      "id": "aa_plan",
+      "id": "he_plan",
       "prompt": "Run stage 1 /he:plan and say if /he:implement is ready.",
       "expectedSkills": ["he-plan"],
       "allowedExtraSkills": ["grill-me", "treehouse"]
     },
     {
-      "id": "aa_implement",
+      "id": "he_implement",
       "prompt": "Stage 1 is PASS. Run stage 2 /he:implement and say if /he:verify is ready.",
       "expectedSkills": ["he-implement"]
     },
     {
-      "id": "aa_verify",
+      "id": "he_verify",
       "prompt": "Implementation is done. Run stage 3 /he:verify and say if /he:ship is ready.",
       "expectedSkills": ["he-verify"]
     },
     {
-      "id": "aa_ship",
+      "id": "he_ship",
       "prompt": "Verification is clean and committed. Run stage 4 /he:ship and say if /he:learn is needed.",
       "expectedSkills": ["he-ship"]
     },
     {
-      "id": "aa_learn",
+      "id": "he_learn",
       "prompt": "Ship found a repeated miss. Run stage 5 /he:learn and close the loop.",
       "expectedSkills": ["he-learn"]
     },

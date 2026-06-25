@@ -35,9 +35,9 @@ docs/e2e/<RUN_ID>/
 
 ## Discovery
 
-- `full`: graph routes/screens/views; prioritize auth, checkout/payment, settings/account, write-heavy flows, recent incidents.
-- `diff`: changed files/symbols -> inbound dependency trace depth 4 -> impacted screens/routes.
-- specific target: one rooted flow plus downstream screens/actions.
+- `full`: graph routes/screens/views; prioritize auth, checkout/payment, settings/account, write-heavy flows, recent incidents
+- `diff`: changed files/symbols -> inbound dependency trace depth 4 -> impacted screens/routes
+- specific target: one rooted flow plus downstream screens/actions
 
 ## Plan Template
 
@@ -92,9 +92,9 @@ Regression: <command/result or pending>
 
 ## Triage
 
-- Regression: app error/log/stack or changed file involvement.
-- Spec-gap: expected UI absent and no app error.
-- Flake: timing/network; one retry passes without code.
+- Regression: app error/log/stack or changed file involvement
+- Spec-gap: expected UI absent and no app error
+- Flake: timing/network; one retry passes without code
 
 Guided mode asks before category/fix. Auto mode uses the heuristic; for click-time violations, patch actionable regressions within risk limits, rerun the failing step/flow, then continue. Mark spec gaps, retry flakes once, then escalate after 3 failed loops.
 After any fix, rerun the impacted flow and the smallest existing regression command that could catch the breakage.

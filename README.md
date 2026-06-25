@@ -89,21 +89,24 @@ Run one `/he:*` command per stage. Start each stage in a fresh thread with the p
 
 `he-state.json` tracks:
 
-- `steps[]`: every internal step and receipt.
-- `findings[]`: failures, review findings, planning concerns, and the owner repair stage.
-- `guardrails[]`: deterministic scripts, tests, lints, scanners, hooks, evals, command status, evidence, and whether they block push.
+- `steps[]`: every internal step and receipt
+- `findings[]`: failures, review findings, planning concerns, and the owner repair stage
+- `guardrails[]`: deterministic scripts, tests, lints, scanners, hooks, evals, command status, evidence, and whether they block push
+- `context.product`, `context.design`, `context.tokenOwner`: `PRODUCT.md`, `DESIGN.md`, and token/design-system owner paths
 
 Every stage ends with a compact receipt: `Stage`, `State`, `Decision`, `Owner/proof`, `Artifacts`, `Blocker`, and `Next`. `he-state.mjs validate` must pass before any ready-yes handoff.
 
 | Stage | Command | What it does | Invokes automatically | Exit |
 | --- | --- | --- | --- | --- |
-| 1. Plan | `/he:plan` | Decides scope, owner, blast radius, proof path, risk route, and readiness. | Treehouse/worktree readiness; `grill-me` for unclear outcome, scope, proof, risk, UI flow, or visual direction; `to-prd` or `to-issues` only when that artifact is needed. | `Next: ready for /he:implement: yes/no` |
+| 1. Plan | `/he:plan` | Decides scope, owner, blast radius, proof path, risk route, product/design context, and readiness. | Treehouse/worktree readiness; `check-project-context-gates.mjs --require-all`; `grill-me` for unclear outcome, scope, proof, risk, UI flow, or visual direction; `to-prd` or `to-issues` only when that artifact is needed. | `Next: ready for /he:implement: yes/no` |
 | 2. Implement | `/he:implement` | Changes the canonical owner and wires deterministic guardrails. | `codebase-design` when ownership is unclear; existing scripts/tests/hooks before fresh reasoning; touched-area skills. | `Next: ready for /he:verify: yes/no` |
 | 3. Verify | `/he:verify` | Runs the proof loop until every required test, review, guardrail, and E2E check is clean or explicitly blocked. | `test-quality`, security/perf when touched, thermo review, E2E last, and subagents for independent proof. | `Next: ready for /he:ship: yes/no` |
 | 4. Ship | `/he:ship` | Runs status/secrets checks, hook readiness, quality gates, `no-mistakes`, PR evidence repair, and CI follow-through. | `ensure-worktree-ready.sh --check --require-pre-push`, `check-project-quality-gates.mjs --require-push-gate`, `no-mistakes`. | `Next: ready for /he:learn: yes` or `Next: loop complete: yes` |
 | 5. Learn | `/he:learn` | Adds a durable guard only when state has an open learning finding. | `repeated-failure-learning`; `skill-creator` only when a skill/stage contract is the owner. | `Next: loop complete: yes/no` |
 
 Grill Me stays inside Plan. It owns `session_state.md`, its stage map, and the one-question loop. It asks as many one-by-one questions as needed until aligned or the user explicitly parks the unknown. UI uncertainty goes through Grill Me UI flow or visual design stages before implementation guesses.
+
+Plan also gates context docs. Product behavior changes update `PRODUCT.md`; design, UI, component, or token changes update `DESIGN.md` and the token owner. `he-state.json` records those paths before `/he:implement` is ready.
 
 Verify is the main fix loop. If any proof fails, `/he:verify` records a finding, routes code changes back through `/he:implement`, then reruns only the affected proof. `/he:ship` starts only after the verify loop is clean and work is committed.
 
@@ -131,11 +134,33 @@ React/Next guardrails include React Doctor, Fallow audit/dupes, lint, and typech
 | Strict maintainability review | `thermo-nuclear-code-quality-review` |
 | Direct no-mistakes validation details | `no-mistakes` |
 
-BMAD and Compound Engineering inspiration, local rules win:
+## Inspiration And Upstreams
 
-- Steal: help/front-door routing, readiness checks, next-action clarity, sharper vertical slices, and visible loop structure.
-- Do not steal: personas, menu codes, generated story state, or planning ceremony that slows implementation.
-- Local delivery stays stricter: code evidence, state receipts, owner-first implementation, deterministic guardrails, E2E proof, thermo review, and `no-mistakes`.
+Hard Eng borrows ideas from good public agent-workflow projects, but keeps this
+repo's state, hooks, and local rules as the source of truth.
+
+| Project | GitHub | What Hard Eng takes |
+| --- | --- | --- |
+| Compound Engineering | [`EveryInc/compound-engineering-plugin`](https://github.com/EveryInc/compound-engineering-plugin) | Plan/review/execute loop shape, subagent-friendly stages, and compounding workflow mindset. |
+| BMAD Method | [`bmad-code-org/BMAD-METHOD`](https://github.com/bmad-code-org/BMAD-METHOD) | Structured planning, role separation, and readiness before build. |
+| Matt Pocock skills | [`mattpocock/skills`](https://github.com/mattpocock/skills) | Grill Me-style human alignment and senior-engineer taste; Hard Eng makes it stateful with stage receipts, context gates, and loop enforcement. |
+| DESIGN.md | [`google-labs-code/design.md`](https://github.com/google-labs-code/design.md) | Persistent product/design context and token-owned design memory. |
+| Treehouse | [`kunchenguid/treehouse`](https://github.com/kunchenguid/treehouse) | Isolated reusable worktrees before feature planning/coding. |
+| no-mistakes | [`kunchenguid/no-mistakes`](https://github.com/kunchenguid/no-mistakes) | Final safety gate, PR evidence, and push discipline. |
+| Impeccable | [`pbakaus/impeccable`](https://github.com/pbakaus/impeccable) | PRODUCT/DESIGN context loading and token-first UI review. |
+| React Doctor | [`millionco/react-doctor`](https://github.com/millionco/react-doctor) | React/Next diagnostics before ship. |
+| Fallow skills | [`fallow-rs/fallow-skills`](https://github.com/fallow-rs/fallow-skills) | JS/TS code-health, duplicate, and risk checks. |
+| Vercel agent skills | [`vercel-labs/agent-skills`](https://github.com/vercel-labs/agent-skills) | React/Next performance and composition guidance. |
+| Anthropic skills | [`anthropics/skills`](https://github.com/anthropics/skills) | Skill packaging and reusable agent capability patterns. |
+| Tavily skills | [`tavily-ai/skills`](https://github.com/tavily-ai/skills) | Web research and URL extraction workflow patterns. |
+| Sentry AI skills | [`getsentry/sentry-for-ai`](https://github.com/getsentry/sentry-for-ai) | Sentry-first issue routing and observability workflows. |
+| Sentry CLI | [`getsentry/cli`](https://github.com/getsentry/cli) | CLI-backed Sentry inspection. |
+
+Local rules win:
+
+- Steal: help/front-door routing, readiness checks, next-action clarity, sharper vertical slices, and visible loop structure
+- Do not steal: personas, menu codes, generated story state, or planning ceremony that slows implementation
+- Local delivery stays stricter: code evidence, state receipts, owner-first implementation, deterministic guardrails, E2E proof, thermo review, and `no-mistakes`
 
 ## Repo Layout
 

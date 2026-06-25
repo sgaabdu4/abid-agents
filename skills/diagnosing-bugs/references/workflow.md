@@ -42,7 +42,7 @@ If no source is named, choose the shortest user-like reproduction path.
 
 ## Stop Conditions
 
-- The reproduction cannot be built with available tools.
+- The reproduction cannot be built with available tools
 - The evidence points outside the repo or to data the user has not approved
   changing.
 - The requested change would weaken security, data loss, validation, or

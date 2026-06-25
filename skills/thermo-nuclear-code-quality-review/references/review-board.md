@@ -4,11 +4,11 @@
 
 Use independent reviewers when a subagent tool exists:
 
-- Staff/architecture: ownership, abstraction quality, code-judo simplification.
-- Test quality: public-boundary coverage, mocks, edge cases, tests that cannot fail.
-- Edge/ripple: null, empty, concurrency, timezone, permissions, network partials, downstream callers.
-- Security: auth, authorization, trust boundaries, secrets, injection, data exposure, crypto, config.
-- Stack specialists only when touched: React/TS, Flutter, Appwrite, Fallow/cleanup, perf, UX, DevOps.
+- Staff/architecture: ownership, abstraction quality, code-judo simplification
+- Test quality: public-boundary coverage, mocks, edge cases, tests that cannot fail
+- Edge/ripple: null, empty, concurrency, timezone, permissions, network partials, downstream callers
+- Security: auth, authorization, trust boundaries, secrets, injection, data exposure, crypto, config
+- Stack specialists only when touched: React/TS, Flutter, Appwrite, Fallow/cleanup, perf, UX, DevOps
 
 Each reviewer returns findings only: severity, evidence, structural risk, simpler direction, confidence. Parent verifies and decides.
 
@@ -18,10 +18,10 @@ Re-read evidence for every candidate finding. Reject uncited, preference-only, o
 
 ## Severity
 
-- Critical: correctness break, security/privacy exposure, data loss, broken gate/build, migration/schema/API contract risk, cross-package regression, shared-flow spaghetti, wrong-owner logic, weak contract hiding invariant, file-size violation, missing required pre-push/React/Fallow gate.
-- Medium: localized maintainability risk, missing public-boundary tests, duplication, avoidable special case, incomplete docs for changed behavior, brittle orchestration with contained blast radius.
-- Low: cheap localized clarity/naming/test/docs issue.
-- Info only: best practice, education, future cleanup, praise, optional alternative. No required change.
+- Critical: correctness break, security/privacy exposure, data loss, broken gate/build, migration/schema/API contract risk, cross-package regression, shared-flow spaghetti, wrong-owner logic, weak contract hiding invariant, file-size violation, missing required pre-push/React/Fallow gate
+- Medium: localized maintainability risk, missing public-boundary tests, duplication, avoidable special case, incomplete docs for changed behavior, brittle orchestration with contained blast radius
+- Low: cheap localized clarity/naming/test/docs issue
+- Info only: best practice, education, future cleanup, praise, optional alternative. No required change
 
 ## React / Next / TS Gate
 
@@ -42,13 +42,13 @@ Check hook manager setup, `.husky/pre-push`/`lefthook.yml`/`.git/hooks/pre-push`
 ```md
 ## Findings
 ### Critical
-- <file:line> - <required change>. Evidence: <quote/hunk/cmd>. Risk: <why blocks>. Fix: <simpler target>.
+- <file:line> - <required change>. Evidence: <quote/hunk/cmd>. Risk: <why blocks>. Fix: <simpler target>
 ### Medium
-- ...
+- <none>
 ### Low
-- ...
+- <none>
 ### Info only
-- ...
+- <none>
 
 ## Code-Judo Opportunities
 - <behavior-preserving simplification> - evidence: <file:line/hunk>
@@ -64,5 +64,5 @@ Check hook manager setup, `.husky/pre-push`/`lefthook.yml`/`.git/hooks/pre-push`
 - Pre-push/dry-run/React Doctor/Fallow/tests/typecheck/lint: <pass/fail/not run + evidence>
 
 ## Verdict
-- Block / approve with reservations / approve.
+- Block / approve with reservations / approve
 ```

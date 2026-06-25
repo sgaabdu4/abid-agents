@@ -13,6 +13,7 @@ const stateStatuses = new Set(['in_progress', 'blocked', 'ready', 'complete']);
 const findingStatuses = new Set(['open', 'owned', 'fixed', 'blocked', 'accepted']);
 const guardrailKinds = new Set(['script', 'test', 'lint', 'scanner', 'hook', 'eval', 'ci', 'manual']);
 const guardrailStatuses = new Set(['planned', 'active', 'passed', 'failed', 'blocked', 'skipped']);
+const contextStatuses = new Set(['current', 'updated', 'created']);
 
 function template() {
   return {
@@ -30,6 +31,11 @@ function template() {
     ],
     findings: [],
     guardrails: [],
+    context: {
+      product: { path: 'PRODUCT.md', status: 'current' },
+      design: { path: 'DESIGN.md', status: 'current' },
+      tokenOwner: { path: 'docs/design/tokens.css', status: 'current' },
+    },
     decisions: [],
     blockers: [],
   };
@@ -107,6 +113,21 @@ function validate(state) {
       }
     }
   }
+  if (state.context !== undefined) {
+    if (!isObject(state.context)) {
+      errors.push('context must be an object');
+    } else {
+      for (const key of ['product', 'design', 'tokenOwner']) {
+        const entry = state.context[key];
+        if (!isObject(entry)) {
+          errors.push(`context.${key} is required`);
+          continue;
+        }
+        if (typeof entry.path !== 'string' || !entry.path.trim()) errors.push(`context.${key}.path is required`);
+        if (!contextStatuses.has(entry.status)) errors.push(`context.${key}.status must be current, updated, or created`);
+      }
+    }
+  }
   if (!Array.isArray(state.steps) || state.steps.length === 0) {
     errors.push('steps must be a non-empty array');
   } else {
@@ -145,6 +166,14 @@ function validate(state) {
       }
       if (state.stage === 'he-ship' && state.next?.target === '/he:learn' && !unresolvedLearning?.length) {
         errors.push('he-ship should target loop-complete when there are no unresolved learning findings');
+      }
+      if (state.stage === 'he-plan') {
+        const context = state.context;
+        for (const key of ['product', 'design', 'tokenOwner']) {
+          if (!context?.[key] || !contextStatuses.has(context[key].status)) {
+            errors.push(`he-plan ready handoff requires context.${key} to be current, updated, or created`);
+          }
+        }
       }
       const brokenGuardrails = state.guardrails?.filter((guardrail) => guardrail?.blocksPush === true && ['failed', 'blocked', 'planned'].includes(guardrail.status));
       if (brokenGuardrails?.length) errors.push('next.ready cannot be true while push-blocking guardrails are unresolved');

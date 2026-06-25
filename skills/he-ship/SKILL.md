@@ -11,11 +11,11 @@ Read `../workflow-help/references/route-map.md` and `../no-mistakes/SKILL.md` be
 
 ## Contract
 
-- Update `he-state.json` before/after each gate step; record gate findings in `findings[]`; validate it before any ready-yes handoff.
-- Require clean local proof and committed feature-branch work before `no-mistakes axi run`.
-- Run `git status --short`; stop on secrets, `.env*`, unrelated files, or unapproved destructive state.
-- Run `ensure-worktree-ready.sh --check --require-pre-push .`, `check-project-quality-gates.mjs --require-push-gate .`, `no-mistakes axi`, rich `--intent`, PR evidence repair, and CI follow-through.
-- Do not trust push dry-runs until project hooks are active and push-blocking guardrails have passed or been explicitly skipped with evidence.
-- Failure loop: no-mistakes findings stay in `he-ship`; code fixes go to `he-implement`, proof gaps to `he-verify`.
-- If `he-state.json` has open learning findings, exit with `Next: ready for /he:learn: yes`; if learning is empty, exit with `Next: loop complete: yes`.
-- Exit with the stage receipt: state path, decision, owner/proof, artifacts, blocker, and next handoff. No transcript dump; next stage can start a fresh thread from state.
+- Update `he-state.json` before/after each gate step; record gate findings in `findings[]`; validate it before any ready-yes handoff
+- Require clean local proof and committed feature-branch work before `no-mistakes axi run`
+- Run `git status --short`; stop on secrets, `.env*`, unrelated files, or unapproved destructive state
+- Run `ensure-worktree-ready.sh --check --require-pre-push .`, `check-project-quality-gates.mjs --require-push-gate .`, `no-mistakes axi`, rich `--intent`, PR evidence repair, and CI follow-through
+- Do not trust push dry-runs until project hooks are active and push-blocking guardrails have passed or been explicitly skipped with evidence
+- Failure loop: no-mistakes findings stay in `he-ship`; code fixes go to `he-implement`, proof gaps to `he-verify`
+- If `he-state.json` has open learning findings, exit with `Next: ready for /he:learn: yes`; if learning is empty, exit with `Next: loop complete: yes`
+- Exit with the stage receipt: state path, decision, owner/proof, artifacts, blocker, and next handoff. No transcript dump; next stage can start a fresh thread from state

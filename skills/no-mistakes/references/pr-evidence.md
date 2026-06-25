@@ -4,8 +4,8 @@ Use this before finalizing any no-mistakes run that opened or updated a PR.
 
 ## Required result
 
-- PR description contains actual GitHub links, not machine-local paths.
-- UI work has screenshots when the run captured them.
+- PR description contains actual GitHub links, not machine-local paths
+- UI work has screenshots when the run captured them
 - UI or phone E2E has a reviewer-openable 2x video link, or the evidence table
   stays open until one is attached.
 - Screenshots are GitHub `user-attachments` URLs or another reviewer-openable
@@ -14,7 +14,7 @@ Use this before finalizing any no-mistakes run that opened or updated a PR.
   as resolved, missing, unhosted, or upload-failed.
 - Existing pipeline sections stay in place; append the managed evidence section
   after the current PR body.
-- no-mistakes findings are shown as resolved or open.
+- no-mistakes findings are shown as resolved or open
 - GitHub review threads are not checked by default because the pipeline creates
   the PR before external review exists.
 - Only pass `--check-review-threads` after Copilot or human review has run, or

@@ -12,7 +12,7 @@ Use this when the prompt says to make E2E easy, asks for a full/default flow, or
 - leave or reuse a runnable automated E2E command for every checked flow;
 - ask only when auth, target, data mode, seeded data, or risky side effects cannot be inferred;
 - patch actionable click-time violations within risk limits after evidence identifies a cause;
-- finish with impacted E2E reruns plus the smallest existing regression checks.
+- finish with impacted E2E reruns plus the smallest existing regression checks
 
 Default scope is dirty tree or requested diff when local changes exist, otherwise full product smoke.
 Default data mode is mock or seeded test data.
@@ -53,6 +53,6 @@ Plan only the axes the app actually has:
 - permissions, files, camera/location/native dialogs;
 - data persistence and cross-screen refresh;
 - responsive layout and basic accessibility affordances;
-- regression command for existing tests/lint/typecheck/build.
+- regression command for existing tests/lint/typecheck/build
 
 Use `full-safe` for normal work, `diff-safe` when a dirty patch should be contained, `audit` when every step needs screenshots/video/traces, and `report-only` when the user forbids changes.

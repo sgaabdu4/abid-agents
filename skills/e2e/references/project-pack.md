@@ -51,7 +51,7 @@ Then fill only what the current run can verify:
 - critical flows, especially login, primary happy path, settings/account, and write-heavy areas;
 - runnable automated E2E commands for every persisted flow;
 - console/server/network log commands;
-- regression commands that should run after E2E fixes.
+- regression commands that should run after E2E fixes
 
 ## Reuse Rule
 
@@ -81,6 +81,6 @@ Capture logs for each run when available:
 - dev server output;
 - mobile/device logs;
 - existing test runner output;
-- app-specific audit/event logs when safe.
+- app-specific audit/event logs when safe
 
 The final report must say which logs were captured and which were unavailable.

@@ -83,7 +83,7 @@ for (const snippet of requiredCoverage) {
   assert.ok(text.includes(snippet), `missing no-mistakes coverage: ${snippet}`);
 }
 
-const personalHomePath = ['/Users', 'abid'].join('/');
+const personalHomePath = process.env.HOME;
 assert.ok(!text.includes(personalHomePath), 'no-mistakes skill files must not contain personal absolute paths');
 
 console.log('no-mistakes migration coverage: pass');

@@ -11,12 +11,12 @@ Read `../workflow-help/references/route-map.md`, `../test-quality/SKILL.md`, and
 
 ## Contract
 
-- Update `he-state.json` before/after each proof step; record proof findings in `findings[]`; validate it before any ready-yes handoff.
-- Targeted tests first; use `test-quality` for assertion, fixture, or gap design.
-- Run every command in `guardrails[]`; missing or failing guardrails route back to `he-implement`.
-- Run `node "$HOME/.agents/scripts/check-project-quality-gates.mjs" --require-push-gate .` for React/Next, JS/TS, or Flutter work before readying ship.
-- Add security/perf review when requested or touched; run maintainability review before E2E.
-- User-visible changes need real UI artifacts.
-- Auto-fix loop: diagnose failures, return code changes to `he-implement`, update state, rerun affected proof only, repeat until clean or blocked.
-- Failure loop: no ship handoff until all required proof is clean or the blocker is explicit.
-- Exit with the stage receipt: state path, decision, owner/proof, artifacts, blocker, and `Next: ready for /he:ship: yes/no`. No transcript dump; next stage can start a fresh thread from state.
+- Update `he-state.json` before/after each proof step; record proof findings in `findings[]`; validate it before any ready-yes handoff
+- Targeted tests first; use `test-quality` for assertion, fixture, or gap design
+- Run every command in `guardrails[]`; missing or failing guardrails route back to `he-implement`
+- Run `node "$HOME/.agents/scripts/check-project-quality-gates.mjs" --require-push-gate .` for React/Next, JS/TS, or Flutter work before readying ship
+- Add security/perf review when requested or touched; run maintainability review before E2E
+- User-visible changes need real UI artifacts
+- Auto-fix loop: diagnose failures, return code changes to `he-implement`, update state, rerun affected proof only, repeat until clean or blocked
+- Failure loop: no ship handoff until all required proof is clean or the blocker is explicit
+- Exit with the stage receipt: state path, decision, owner/proof, artifacts, blocker, and `Next: ready for /he:ship: yes/no`. No transcript dump; next stage can start a fresh thread from state

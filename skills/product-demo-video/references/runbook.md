@@ -39,11 +39,11 @@ Read keys from env or hidden prompts only. Save raw and fitted VO. Probe duratio
 
 ## Motion
 
-- Cursor glides; click bloom is brief.
-- Text enters after scene stabilizes.
-- Captions never cover clicked controls.
-- Long forms scroll deliberately: top/title, pause, interact, scroll, save/proof.
-- Process connectors stay in owned gaps/SVG viewBoxes and never cross content, faces, labels, or unrelated cards.
+- Cursor glides; click bloom is brief
+- Text enters after scene stabilizes
+- Captions never cover clicked controls
+- Long forms scroll deliberately: top/title, pause, interact, scroll, save/proof
+- Process connectors stay in owned gaps/SVG viewBoxes and never cross content, faces, labels, or unrelated cards
 
 ## QA
 

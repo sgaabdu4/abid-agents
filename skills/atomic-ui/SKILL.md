@@ -10,10 +10,10 @@ Use atomic design as a practical UI SSOT, not folder dogma.
 ## Trigger
 
 Use for:
-- New or changed UI components.
-- Design-system or token work.
-- Reusable layout, theme, primitive, or page composition.
-- Removing duplicated styles or hardcoded visual decisions.
+- New or changed UI components
+- Design-system or token work
+- Reusable layout, theme, primitive, or page composition
+- Removing duplicated styles or hardcoded visual decisions
 
 ## Flow
 
@@ -40,8 +40,8 @@ Use for:
 ## Review Report
 
 For UI reviews, report:
-- SSOT found or created.
-- Token/theme reuse.
-- New reusable components and their hierarchy role.
-- Hardcoded visual values left behind.
-- Responsive/accessibility verification.
+- SSOT found or created
+- Token/theme reuse
+- New reusable components and their hierarchy role
+- Hardcoded visual values left behind
+- Responsive/accessibility verification

@@ -11,10 +11,10 @@ Read `../workflow-help/references/route-map.md`, `../repeated-failure-learning/S
 
 ## Contract
 
-- Update `he-state.json` before/after each learning step; validate it before loop-complete yes.
-- If learning findings are empty, do not run this stage; `/he:ship` should close with `Next: loop complete: yes`.
-- Store learning at the narrow owner: source, script, test, hook, route map, or skill.
-- Use `skill-creator` only for skill/stage-contract changes.
-- Prefer executable checks; prose-only guidance is last resort.
-- Failure loop: stay in `he-learn` until the durable guard exists and passes.
-- Exit with the stage receipt: state path, decision, owner/proof, artifacts, blocker, and `Next: loop complete: yes/no`. No transcript dump; future runs can resume from state.
+- Update `he-state.json` before/after each learning step; validate it before loop-complete yes
+- If learning findings are empty, do not run this stage; `/he:ship` should close with `Next: loop complete: yes`
+- Store learning at the narrow owner: source, script, test, hook, route map, or skill
+- Use `skill-creator` only for skill/stage-contract changes
+- Prefer executable checks; prose-only guidance is last resort
+- Failure loop: stay in `he-learn` until the durable guard exists and passes
+- Exit with the stage receipt: state path, decision, owner/proof, artifacts, blocker, and `Next: loop complete: yes/no`. No transcript dump; future runs can resume from state

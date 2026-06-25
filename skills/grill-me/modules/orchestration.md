@@ -20,10 +20,10 @@ closing a stage, or writing the final plan.
 - For understanding/codebase-understanding requests, map current owners,
   behavior, routes, data, constraints, and unknowns before proposing a build
   path. Ask only what evidence cannot answer.
-- Do not ask what code can answer. Inspect only for existing-code tasks.
-- Q1 must resolve the highest-impact unknown that request context cannot answer.
-- No evidence = `unknown`.
-- No codebase = do not research; ask a request-specific product/constraint Q.
+- Do not ask what code can answer. Inspect only for existing-code tasks
+- Q1 must resolve the highest-impact unknown that request context cannot answer
+- No evidence = `unknown`
+- No codebase = do not research; ask a request-specific product/constraint Q
 
 ## Intake
 
@@ -35,7 +35,7 @@ First Q rules:
   building?" if the ask names it.
 - If a slug/title is inferable from the ask, infer it; ask only if ambiguous or
   conflicting.
-- Prefer a domain/tech decision tied to the target area, e.g.
+- Prefer a domain/tech decision tied to the target area, e.g
   screen/route/entity/API boundary/data source/success metric.
 - Generic intake Qs are allowed only when they unblock all later work and cannot
   be inferred from request/code.
@@ -58,21 +58,21 @@ artifact, acceptance checks, verification, and domain-doc impact.
 
 ## Files
 
-- Ensure `docs/planning/<slug>/`; infer slug when safe, ask only if ambiguous.
+- Ensure `docs/planning/<slug>/`; infer slug when safe, ask only if ambiguous
 - Interview writes only `session_state.md` plus `plan_draft.md`, except when the
   user explicitly asks for docs/status.
 - `stage-handoff.md` owns temp stage paths; create them lazily only at stage
   close, artifact creation, user request, or final synthesis.
-- Final plan is `docs/planning/<slug>/plan.md`; never write `99-final-plan.md`.
-- Visual/prototype modules own artifact paths and mock-data placement.
-- Domain docs module owns proposed `CONTEXT.md` terms and ADR candidates.
+- Final plan is `docs/planning/<slug>/plan.md`; never write `99-final-plan.md`
+- Visual/prototype modules own artifact paths and mock-data placement
+- Domain docs module owns proposed `CONTEXT.md` terms and ADR candidates
 - If old draft/handoff paths exist, read and absorb needed content into current
   state or `plan.md`; remove temp duplicates after verified final synthesis.
-- File edits use native file tools; shell/context-mode only run or verify.
+- File edits use native file tools; shell/context-mode only run or verify
 
 ## Handoff model
 
-- Fast interview mode is default.
+- Fast interview mode is default
 - While asking Qs, do not create/update stage handoffs. Append only the user's
   answer + confirmed decision to `plan_draft.md`.
 - Create a stage handoff only when:
@@ -80,20 +80,20 @@ artifact, acceptance checks, verification, and domain-doc impact.
   - an artifact exists (visual design/prototype/etc.),
   - risk/control details cannot fit in the tiny draft,
   - user asks for docs/status,
-  - final plan synthesis starts.
+  - final plan synthesis starts
 - Handoffs are compact summaries, not transcripts. Copy decisions from the
   draft; do not restate every option/suggested default.
-- `skip`/`n/a` stages have no handoff.
-- If a handoff conflicts with user answers, ask one Q; do not silently choose.
+- `skip`/`n/a` stages have no handoff
+- If a handoff conflicts with user answers, ask one Q; do not silently choose
 - If a module asks for many handoff details, treat that as final synthesis
   guidance. Interim handoff max: status, decisions, open blockers, artifacts,
   next.
 
 ## Clarification depth
 
-- Full clarification beats speed.
-- Still ask one Q at a time. Ask as many one-by-one Qs as needed.
-- Do not move to the next stage while important unknowns remain.
+- Full clarification beats speed
+- Still ask one Q at a time. Ask as many one-by-one Qs as needed
+- Do not move to the next stage while important unknowns remain
 - A stage is clear only when the needed user behavior, boundaries, constraints,
   non-goals, acceptance checks, and risky edge cases are decided or explicitly
   parked by the user.
@@ -116,7 +116,7 @@ known enough to choose the next stage.
 - If the user explicitly says `lite`, `align`, `build-plan`, `full`, or
   `review`, use that as the starting cap. If the user says understand, explain,
   map, learn the codebase, or figure out what is going on, use `understand`.
-- Infer artifact depth from the conversation and what the user asks for.
+- Infer artifact depth from the conversation and what the user asks for
 - During interview, gather decisions first; the output shape emerges from
   answers.
 - Near synthesis, if the needed artifact is still unclear, ask one plain Q:
@@ -127,7 +127,7 @@ known enough to choose the next stage.
 
 ## Stage close refinement
 
-- At the end of each stage, refine before moving on.
+- At the end of each stage, refine before moving on
 - Refinement = convert the answer ledger into a compact stage summary/handoff or
   compact draft section.
 - Refine only after the clarity gate passes, or after the user explicitly parks
@@ -142,7 +142,7 @@ known enough to choose the next stage.
   interview.
 
 Draft rules:
-- `plan_draft.md` is an answer ledger, not a plan. Target <= 60 lines / 4 KB.
+- `plan_draft.md` is an answer ledger, not a plan. Target <= 60 lines / 4 KB
 - Record only: current stage, next Q, user answers, confirmed decisions, and
   confirmed domain-doc notes when active.
 - `session_state.md` owns route profile, stage map, exact last/next question,
@@ -193,8 +193,8 @@ Each turn:
 
 ## Global rules
 
-- Never batch Qs.
-- Ask as many one-by-one Qs as needed; do not optimize for fewer questions.
+- Never batch Qs
+- Ask as many one-by-one Qs as needed; do not optimize for fewer questions
 - Greenfield means question-first: no repo research, no indexing, no
   architecture scan unless user asks.
 - During interview, visible reply is only the next question; no draft/status
@@ -216,7 +216,7 @@ Each turn:
 - No full-flow UI prototype before visual direction is chosen and prototype tech
   stack is decided, unless the user explicitly says to skip visual design.
 - No backend/infra tech stack before product + UI flow + visual design alignment
-  + approved prototype when prototype runs.
+  + approved prototype when prototype runs
 - No backend/API/auth/storage/realtime integration before the mock-data prototype
   is approved.
 - No final plan until every `run`/`brief` stage is clarified or parked. If
@@ -224,13 +224,13 @@ Each turn:
   do not close UI flow/visual design without accepted screen-flow/look choices.
 - Final plan must be self-contained: summary, decisions, Q&A, artifact refs,
   acceptance checks, verification, risks, unknowns, traceability.
-- Do not write `99-final-plan.md`; write `plan.md` only.
+- Do not write `99-final-plan.md`; write `plan.md` only
 - Schema/data/auth/security/deploy/stateful changes require human review gate,
   rollback/migration notes, and telemetry/audit expectations.
-- Surface glossary/ADR conflicts with evidence before final synthesis or plans.
-- Resolve parent decisions before child decisions.
-- Replace fuzzy terms with canonical terms.
-- Surface contradictions with evidence.
+- Surface glossary/ADR conflicts with evidence before final synthesis or plans
+- Resolve parent decisions before child decisions
+- Replace fuzzy terms with canonical terms
+- Surface contradictions with evidence
 - Within the inferred mode cap, do not stop early. Skip irrelevant stages;
   continue until answers/decisions are enough for the requested artifact.
 - Stop at the inferred mode cap. A capped `align` session can finish with a plan

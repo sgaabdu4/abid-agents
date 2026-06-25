@@ -39,6 +39,11 @@ const valid = {
   ],
   findings: [],
   guardrails: [],
+  context: {
+    product: { path: 'PRODUCT.md', status: 'current' },
+    design: { path: 'DESIGN.md', status: 'current' },
+    tokenOwner: { path: 'docs/design/tokens.css', status: 'current' },
+  },
   decisions: [],
   blockers: [],
 };
@@ -79,6 +84,11 @@ result = run({
 });
 assert.notEqual(result.status, 0);
 assert.match(result.stderr, /blocking findings are unresolved/);
+
+const { context, ...missingContext } = valid;
+result = run(missingContext);
+assert.notEqual(result.status, 0);
+assert.match(result.stderr, /he-plan ready handoff requires context\.product/);
 
 result = run({
   ...valid,

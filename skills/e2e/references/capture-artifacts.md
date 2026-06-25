@@ -31,7 +31,7 @@ Use the product-demo-video cursor pattern when video capture is possible:
 - smooth pointer movement to the target;
 - click bloom or ripple at the exact click coordinate;
 - emitted event metadata for hover, click, type, navigation, and assertion;
-- final video composed with cursor/click layer when raw driver video lacks it.
+- final video composed with cursor/click layer when raw driver video lacks it
 
 If the driver cannot render an overlay, record coordinates in `events.jsonl` and pair each event with a screenshot or video timestamp.
 
@@ -44,14 +44,14 @@ Default capture:
 - `events.jsonl` for every click, input, navigation, wait, assertion, fallback, issue, and fix verification;
 - screenshot after each verified step or on every failure;
 - console/network logs when available;
-- trace on retry/failure.
+- trace on retry/failure
 
 Audit capture:
 
 - screenshot every step;
 - video every flow;
 - trace every flow when supported;
-- final artifact linter before claiming the run is complete.
+- final artifact linter before claiming the run is complete
 
 Never claim a click, input, or navigation was tested if no event row or UI artifact proves it.
 If desktop or mobile video or a 2x recap cannot be produced because every viable driver or encoder is unsupported, unavailable, or blocked, record the fallback reason in `report.md` and list the run as incomplete for visual proof.

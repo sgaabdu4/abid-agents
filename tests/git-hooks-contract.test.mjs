@@ -42,6 +42,14 @@ assert.ok(
   'pre-push hook must test live Codex config sync before pushing'
 );
 assert.ok(
+  installScript.includes('node "$repo/scripts/check-generated-assets.mjs" "$repo"'),
+  'pre-commit/pre-push hooks must block stale generated README images'
+);
+assert.ok(
+  installScript.includes('node "$repo/scripts/check-project-context-gates.mjs" --require-all "$repo"'),
+  'pre-push hook must run product/design context gates before pushing'
+);
+assert.ok(
   installScript.includes('node "$repo/scripts/check-project-quality-gates.mjs" --require-push-gate "$repo"'),
   'pre-push hook must run deterministic project quality gate checks before pushing'
 );
@@ -64,7 +72,9 @@ assert.ok(installScript.includes('[[ "$mode" == "160000" ]]'), 'pre-commit hook 
 assert.ok(installScript.includes('is_binary_staged'), 'pre-commit hook must identify staged binary files');
 assert.ok(installScript.includes('git diff --cached --numstat -- "$1"'), 'pre-commit hook must use git binary detection');
 assert.ok(installScript.includes('if is_binary_staged "$file"; then'), 'pre-commit hook must skip binary blobs for text scans');
-assert.ok(installScript.includes('git grep --cached -I -l -i -E "$pattern"'), 'pre-commit private-path scan must ignore binary blobs');
+assert.ok(installScript.includes('git grep --cached -I -l -F "$HOME"'), 'pre-commit private-path scan must use runtime HOME');
+assert.ok(installScript.includes('HARD_ENG_PRIVATE_CONTENT_PATTERN'), 'pre-commit private-path scan must allow a private local pattern without storing it');
+assert.ok(installScript.includes('git grep --cached -I -l -i -E "$private_pattern"'), 'pre-commit private pattern scan must ignore binary blobs');
 assert.ok(installScript.includes("':!scripts/check-markdown-hygiene.mjs'"), 'pre-commit private-path scan must not flag the checker pattern');
 assert.ok(installScript.includes("':!tests/markdown-hygiene.test.mjs'"), 'pre-commit private-path scan must not flag the hygiene test fixture');
 assert.ok(installScript.includes('Preserving existing file'), 'installer must preserve existing non-managed config files');
@@ -178,6 +188,8 @@ if (fs.existsSync(prePushHook)) {
   const text = fs.readFileSync(prePushHook, 'utf8');
   assert.ok((stat.mode & 0o111) !== 0, 'installed pre-push hook must be executable');
   assert.ok(text.includes('node "$repo/tests/codex-config-sync.test.mjs"'), 'installed pre-push hook must test live Codex config sync');
+  assert.ok(text.includes('node "$repo/scripts/check-generated-assets.mjs" "$repo"'), 'installed pre-push hook must block stale generated README images');
+  assert.ok(text.includes('node "$repo/scripts/check-project-context-gates.mjs" --require-all "$repo"'), 'installed pre-push hook must run product/design context gates');
   assert.ok(text.includes('node "$repo/scripts/check-project-quality-gates.mjs" --require-push-gate "$repo"'), 'installed pre-push hook must run deterministic project quality gate checks');
   assert.ok(text.includes('HARD_ENG_CHECK_SUBMODULES_BEFORE_PUSH'), 'installed pre-push hook must keep submodule status opt-in');
   assert.ok(text.includes('Blocked push: reachable git history contains private path or secret-like references.'));
@@ -191,6 +203,7 @@ if (fs.existsSync(preCommitHook)) {
   const text = fs.readFileSync(preCommitHook, 'utf8');
   assert.ok((stat.mode & 0o111) !== 0, 'installed pre-commit hook must be executable');
   assert.ok(text.includes('scripts/check-markdown-hygiene.mjs'), 'installed pre-commit hook must run Markdown hygiene');
+  assert.ok(text.includes('scripts/check-generated-assets.mjs'), 'installed pre-commit hook must block stale generated README images');
   assert.ok(text.includes('Blocked commit: staged forbidden files must not be edited.'), 'installed pre-commit hook must block forbidden files');
   assert.ok(text.includes('Blocked commit: staged files over 700 lines must be split below 700.'), 'installed pre-commit hook must block staged files over 700 lines');
   assert.ok(text.includes('Blocked commit: staged content contains secret-like values.'), 'installed pre-commit hook must block secret-like values');
@@ -198,6 +211,8 @@ if (fs.existsSync(preCommitHook)) {
   assert.ok(text.includes('[[ "$mode" == "160000" ]]'), 'installed pre-commit hook must skip staged submodule gitlinks');
   assert.ok(text.includes("':!scripts/check-markdown-hygiene.mjs'"), 'installed pre-commit hook must ignore checker pattern file');
   assert.ok(text.includes("':!tests/markdown-hygiene.test.mjs'"), 'installed pre-commit hook must ignore test fixture pattern file');
+  assert.ok(text.includes('git grep --cached -I -l -F "$HOME"'), 'installed pre-commit hook must use runtime HOME');
+  assert.ok(text.includes('HARD_ENG_PRIVATE_CONTENT_PATTERN'), 'installed pre-commit hook must keep private pattern env support');
   assert.ok(text.includes('Blocked commit: staged content contains private project/local path references.'));
 }
 
@@ -211,7 +226,7 @@ if (fs.existsSync(postRewriteHook)) {
   assert.ok(text.includes('HARD_ENG_SKIP_SUBMODULE_UPDATE'), 'installed post-rewrite hook must support skipping submodule updates');
 }
 
-for (const relativePath of ['scripts/auto-sync.sh', 'scripts/ensure-worktree-ready.sh', 'scripts/install-cron.sh', 'scripts/update-submodules.sh', 'scripts/setup.sh', 'scripts/setup-new-user.sh', 'codex/bin/codex-watchdog', 'codex/bin/codex-health']) {
+for (const relativePath of ['scripts/auto-sync.sh', 'scripts/check-generated-assets.mjs', 'scripts/check-project-context-gates.mjs', 'scripts/ensure-worktree-ready.sh', 'scripts/install-cron.sh', 'scripts/update-submodules.sh', 'scripts/setup.sh', 'scripts/setup-new-user.sh', 'codex/bin/codex-watchdog', 'codex/bin/codex-health']) {
   const stat = fs.statSync(path.join(repo, relativePath));
   assert.ok((stat.mode & 0o111) !== 0, `${relativePath} must be executable`);
 }

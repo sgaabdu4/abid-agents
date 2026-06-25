@@ -40,14 +40,14 @@ Reply: A/B/C, "use default", "not sure", "skip for now", or your own answer.
 
 ## Rules
 
-- Clarity beats terseness. Normal prompt target: 8-14 lines; max 160 words.
+- Clarity beats terseness. Normal prompt target: 8-14 lines; max 160 words
 - Markdown replies use one `text` code fence containing the plain question
   block; no prose outside it during interview.
-- Before replying, persist the exact block in `session_state.md`.
+- Before replying, persist the exact block in `session_state.md`
 - Do not use box drawing, table borders, vertical bars, horizontal rules, or
   decorative lines.
-- Use blank lines between sections; keep option lists compact.
-- Wrap lines around 72 chars.
+- Use blank lines between sections; keep option lists compact
+- Wrap lines around 72 chars
 - Explain enough for a nontechnical reader to answer without guessing: plain
   meaning + why it matters + one concrete example when helpful. No essay.
 - Use complete sentences in the visible card. Do not compress with terse
@@ -58,9 +58,9 @@ Reply: A/B/C, "use default", "not sure", "skip for now", or your own answer.
   `Verification`, `Evidence`, or `Scenario` blocks in the visible prompt.
 - Put definitions/evidence/acceptance criteria/verification/scenarios in the
   handoff/final plan only.
-- Add `Details (optional)` only when needed; max 2 bullets.
-- Options must be directly selectable. Avoid multi-clause options.
-- If the user seems unsure, offer `Not sure - use the default`.
+- Add `Details (optional)` only when needed; max 2 bullets
+- Options must be directly selectable. Avoid multi-clause options
+- If the user seems unsure, offer `Not sure - use the default`
 - If the user says `all`, `both`, or `all important`, accept it when feasible;
   record all as required and move to the next concrete behavior. Do not force a
   primary ranking unless scope truly breaks.
@@ -107,8 +107,8 @@ Internal details:
 
 ## Internal rules
 
-- Never batch Qs.
-- Do not rely on chat memory for the last or next Q; use `session_state.md`.
+- Never batch Qs
+- Do not rely on chat memory for the last or next Q; use `session_state.md`
 - Always list 2-3 directly selectable options in the visible prompt and
   internal record.
 - If only one option works, visible option C is `Not sure - use the default`

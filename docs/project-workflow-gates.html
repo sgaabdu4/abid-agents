@@ -4,25 +4,8 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Project Workflow Gates</title>
+  <link rel="stylesheet" href="design/tokens.css">
   <style>
-    :root {
-      --bg: oklch(98% 0.006 250);
-      --ink: oklch(18% 0.025 250);
-      --muted: oklch(42% 0.032 250);
-      --line: oklch(84% 0.018 250);
-      --panel: oklch(100% 0 0);
-      --blue: oklch(49% 0.15 250);
-      --green: oklch(48% 0.12 156);
-      --amber: oklch(55% 0.12 78);
-      --rose: oklch(53% 0.13 18);
-      --soft-blue: oklch(95% 0.028 250);
-      --soft-green: oklch(95% 0.032 156);
-      --soft-amber: oklch(95% 0.045 78);
-      --soft-rose: oklch(95% 0.032 18);
-      --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
-      --sans: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-    }
-
     * { box-sizing: border-box; }
     html { background: var(--bg); color: var(--ink); font-family: var(--sans); }
     body { margin: 0; }
@@ -183,6 +166,7 @@
       <ul>
         <li>Loads the required specialist skills for the touched area.</li>
         <li>Updates <code>he-state.json</code> before and after each internal step.</li>
+        <li>Records <code>PRODUCT.md</code>, <code>DESIGN.md</code>, and token/design-system owner paths before implementation readiness.</li>
         <li>Records findings with an owner repair stage and guardrails with command, status, evidence, and push-blocking status.</li>
         <li>Uses parallel subagents when tasks are independent.</li>
         <li>Validates state before any ready-yes handoff.</li>
@@ -194,8 +178,9 @@
       <li class="step">
         <div>
           <h2>Plan the work</h2>
-          <p>Decides scope, owner, blast radius, proof path, risk route, and whether implementation is ready.</p>
-          <div class="invokes"><strong>Invokes automatically</strong><span>Treehouse and worktree readiness for isolation; <code>grill-me</code> for unclear outcome, scope, proof, risk, UI flow, or visual direction; <code>to-prd</code> or <code>to-issues</code> only when the plan needs that artifact.</span></div>
+          <p>Decides scope, owner, blast radius, proof path, risk route, product/design context, and whether implementation is ready.</p>
+          <div class="invokes"><strong>Invokes automatically</strong><span>Treehouse and worktree readiness for isolation; <code>check-project-context-gates.mjs --require-all</code> for <code>PRODUCT.md</code>, <code>DESIGN.md</code>, and token owner proof; <code>grill-me</code> for unclear outcome, scope, proof, risk, UI flow, or visual direction; <code>to-prd</code> or <code>to-issues</code> only when the plan needs that artifact.</span></div>
+          <div class="invokes"><strong>Context docs</strong><span>Product changes update <code>PRODUCT.md</code>. Design, UI, component, or token changes update <code>DESIGN.md</code> and the token owner before <code>/he:implement</code> is ready.</span></div>
           <div class="invokes"><strong>Grill Me behavior</strong><span>Grill Me owns <code>session_state.md</code>, its stage map, and the one-question loop. It asks as many one-by-one questions as needed until aligned or the user parks the unknown.</span></div>
         </div>
         <pre class="terminal" aria-label="Plan commands"><code>/he:plan

@@ -11,8 +11,8 @@ Load `references/workflow.md` for the diagnosis loop.
 
 Coordinate with nearby skills:
 
-- If the user asks about latency, load `performance-rescue` too.
-- If the fix needs test design or TDD, load `test-quality` too.
+- If the user asks about latency, load `performance-rescue` too
+- If the fix needs test design or TDD, load `test-quality` too
 - If the bug is security, auth, secrets, or data exposure related, load
   `security-review` too.
 

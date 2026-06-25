@@ -14,12 +14,12 @@ TOON to stdout and progress to stderr.
 
 ## Preconditions
 
-- Start with `no-mistakes axi`.
+- Start with `no-mistakes axi`
 - If the current branch already has an active run, resume it or abort only when
   the user has approved aborting.
-- If another branch has an active run, leave it alone.
-- If the repo is not initialized, follow the tool's `no-mistakes init` guidance.
-- If the command is missing or unhealthy, run `no-mistakes doctor`.
+- If another branch has an active run, leave it alone
+- If the repo is not initialized, follow the tool's `no-mistakes init` guidance
+- If the command is missing or unhealthy, run `no-mistakes doctor`
 - If setup reports `Directory not empty`, keep the existing repo state and follow
   the tool's recovery guidance instead of deleting or recreating it.
 - Before starting, responding, or trusting a push dry-run, run
@@ -27,7 +27,7 @@ TOON to stdout and progress to stderr.
   The agent owns this preflight; do not ask the user to run it. This is required
   inside no-mistakes internal worktrees too; an explicit refspec dry-run is not
   proof unless project hooks are active.
-- Never run the pipeline from the default branch for new shipping work.
+- Never run the pipeline from the default branch for new shipping work
 
 ## Intent
 
@@ -49,8 +49,8 @@ Do not cancel or restart because they look quiet.
 Check progress from another call with `no-mistakes axi status`.
 Common actions:
 
-- `auto-fix`: safe for the agent to send to the pipeline with `--action fix`.
-- `no-op`: informational, approve when no action is needed.
+- `auto-fix`: safe for the agent to send to the pipeline with `--action fix`
+- `no-op`: informational, approve when no action is needed
 - `ask-user`: stop and relay the finding verbatim unless the user gave clear
   unattended consent.
 
@@ -72,8 +72,8 @@ without stopping for each `ask-user` finding.
 
 ## Outcomes
 
-- `checks-passed`: validation and checks are green, PR is ready for human review.
-- `passed`: the pipeline completed after merge or close.
+- `checks-passed`: validation and checks are green, PR is ready for human review
+- `passed`: the pipeline completed after merge or close
 - `failed` or `cancelled`: inspect the failing step, fix root cause, commit the
   fix, and rerun or explain the blocker.
 
@@ -103,9 +103,9 @@ Abort only when the user has approved cancelling the current-branch active run.
 
 ## Reading output
 
-- Output is TOON: `key: value` pairs, tables, and `help` lines.
-- Follow `help` lines instead of guessing the next command.
-- Errors are printed as `error: ...` with recovery guidance.
+- Output is TOON: `key: value` pairs, tables, and `help` lines
+- Follow `help` lines instead of guessing the next command
+- Errors are printed as `error: ...` with recovery guidance
 - Exit codes: `0` success or normal gate, `1` failed or cancelled final
   outcome, `2` bad usage.
 
@@ -113,7 +113,7 @@ Abort only when the user has approved cancelling the current-branch active run.
 
 At the end, include:
 
-- PR link when one exists.
-- Pipeline findings and fixes, especially fixes your original change missed.
-- Verification commands and their pass/fail status.
-- Any skipped checks and residual risk.
+- PR link when one exists
+- Pipeline findings and fixes, especially fixes your original change missed
+- Verification commands and their pass/fail status
+- Any skipped checks and residual risk

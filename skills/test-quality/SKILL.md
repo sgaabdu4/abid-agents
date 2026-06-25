@@ -10,11 +10,11 @@ Keep tests requirement-led, behavior-facing, and executable.
 ## Trigger
 
 Use for:
-- Writing or reviewing tests.
-- Fixing weak/flaky/over-mocked tests.
-- Adding tests after an implementation.
-- Checking AI-generated test quality.
-- Mutation or "make it fail" drills.
+- Writing or reviewing tests
+- Fixing weak/flaky/over-mocked tests
+- Adding tests after an implementation
+- Checking AI-generated test quality
+- Mutation or "make it fail" drills
 
 ## Flow
 
@@ -32,18 +32,18 @@ Use for:
 8. Run the smallest relevant test command.
 9. For risky logic, prove test strength with one red state:
    - first run a failing test when doing TDD, or
-   - make a tiny production mutation and confirm the test fails, then restore it.
+   - make a tiny production mutation and confirm the test fails, then restore it
 10. After implementation, audit requirements and diff for missing cases.
 
 ## Review Report
 
 For test reviews, report:
-- Missing requirement scenarios.
-- Over-mocking or internal assertions.
-- Tautological assertions.
-- Boundary gaps.
-- Flake risks.
-- Verification command and result.
+- Missing requirement scenarios
+- Over-mocking or internal assertions
+- Tautological assertions
+- Boundary gaps
+- Flake risks
+- Verification command and result
 
 ## Stop Conditions
 

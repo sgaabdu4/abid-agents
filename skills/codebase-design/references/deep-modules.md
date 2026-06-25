@@ -39,9 +39,9 @@ fallbacks, flags, storage details, or data-shaping rules.
 
 When reporting a design opportunity, include:
 
-- Current owner and public surface.
-- Caller knowledge that leaks across the boundary.
-- Proposed owner and contract.
-- What code, branches, or concepts can disappear.
-- Tests that prove the behavior through the new surface.
-- Risks, especially schema, storage, route, or cross-package effects.
+- Current owner and public surface
+- Caller knowledge that leaks across the boundary
+- Proposed owner and contract
+- What code, branches, or concepts can disappear
+- Tests that prove the behavior through the new surface
+- Risks, especially schema, storage, route, or cross-package effects

@@ -39,9 +39,9 @@ If workspace dependency helpers expose Node, Python, Poppler, or Chrome paths, u
 
 ## Quality Bar
 
-- PDF feels designed, not printed.
-- Text is readable, aligned, unclipped, and high contrast.
-- Required fonts are loaded, not silently replaced.
-- Images reveal the subject and are intentionally cropped.
-- Numbers, charts, maps, QR codes, and links work at final PDF scale.
-- No stale placeholders, broken assets, low-res screenshots, overlap, or wrong page order.
+- PDF feels designed, not printed
+- Text is readable, aligned, unclipped, and high contrast
+- Required fonts are loaded, not silently replaced
+- Images reveal the subject and are intentionally cropped
+- Numbers, charts, maps, QR codes, and links work at final PDF scale
+- No stale placeholders, broken assets, low-res screenshots, overlap, or wrong page order

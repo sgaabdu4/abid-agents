@@ -12,9 +12,9 @@ logic between modules, adding a public interface, or reviewing architecture.
 
 Coordinate with nearby skills:
 
-- For strict diff review, load `thermo-nuclear-code-quality-review` too.
-- For large feature planning, load `grill-me` or `to-prd` first.
-- For tests around a chosen interface, load `test-quality` too.
+- For strict diff review, load `thermo-nuclear-code-quality-review` too
+- For large feature planning, load `grill-me` or `to-prd` first
+- For tests around a chosen interface, load `test-quality` too
 
 Prefer deleting concepts, moving behavior to the canonical owner, and shrinking
 public surfaces before adding new layers.

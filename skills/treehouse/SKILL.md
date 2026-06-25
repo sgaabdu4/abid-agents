@@ -17,8 +17,8 @@ Commands:
   Continue there and read `AGENTS.md`.
 - If user says `treehouse <name>`, use `<name>` as the lease holder label; it is
   not a Treehouse branch argument.
-- Stale check: `treehouse prune` is dry-run; deletion needs approved `--yes`.
-- Release: `treehouse return <path>` only after needed work/processes are clear.
+- Stale check: `treehouse prune` is dry-run; deletion needs approved `--yes`
+- Release: `treehouse return <path>` only after needed work/processes are clear
 
 Approval needed: `return --force`, `destroy`, `prune --yes`,
 `prune --prune-orphans`, `update`, install. If missing, `.agents/scripts/setup.sh`

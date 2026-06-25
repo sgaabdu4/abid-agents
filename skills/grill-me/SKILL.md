@@ -7,16 +7,16 @@ description: Interview one clear question before planning/building ideas, featur
 
 ## Core contract
 
-- Interview one clear, plain-language Q at a time.
-- Evidence-only. No evidence = `unknown`.
-- Persist state in the target repo only when a grill-me session actually starts.
+- Interview one clear, plain-language Q at a time
+- Evidence-only. No evidence = `unknown`
+- Persist state in the target repo only when a grill-me session actually starts
 - `session_state.md` is the source of truth after compaction/resume; chat memory
   is not.
 - User can answer with A/B/C, `use default`, `not sure`, `skip for now`, or a
   custom answer.
-- During interview, visible reply = next question only.
-- Do not batch Qs.
-- Ask what matters for the chosen depth; mode caps limit scope, not question count.
+- During interview, visible reply = next question only
+- Do not batch Qs
+- Ask what matters for the chosen depth; mode caps limit scope, not question count
 - Ask as many one-by-one Qs as needed until the active stage is aligned or the
   user explicitly parks the unknown.
 
@@ -48,7 +48,7 @@ description: Interview one clear question before planning/building ideas, featur
 - `build-plan`: implementation sequencing + verification. Run vertical
   slices/verification; skip design/prototype unless requested or needed for a risky UX
   unknown.
-- `full`: full staged pipeline for broad greenfield/major product work.
+- `full`: full staged pipeline for broad greenfield/major product work
 - `review`: inspect existing plan/spec/docs/code, find gaps/risks, ask focused
   Qs, produce findings or revised plan.
 - Domain words like migration, auth, billing, onboarding, redesign, refactor, or
@@ -61,7 +61,7 @@ description: Interview one clear question before planning/building ideas, featur
   repo first.
 - If existing code/docs/pages matter, inspect them before Q1. Do not ask what
   evidence can answer.
-- Q1 resolves the highest-impact unknown that request context cannot answer.
+- Q1 resolves the highest-impact unknown that request context cannot answer
 
 ## Module index
 
@@ -85,13 +85,13 @@ Stages:
 
 ## Non-negotiables
 
-- Load the relevant module before working that stage.
-- Run only stages mapped `run` or `brief`.
-- Skipped/n/a stages do not create handoff files.
-- Update `session_state.md` before asking each Q and after recording each answer.
-- `plan_draft.md` is an answer ledger, not a plan.
-- Final plan lives in `docs/planning/<slug>/plan.md`; no `99-final-plan.md`.
-- Final plan absorbs temp docs, then removes them after verification.
-- Domain docs are lazy: read docs, capture terms/ADRs, write on request/synthesis.
+- Load the relevant module before working that stage
+- Run only stages mapped `run` or `brief`
+- Skipped/n/a stages do not create handoff files
+- Update `session_state.md` before asking each Q and after recording each answer
+- `plan_draft.md` is an answer ledger, not a plan
+- Final plan lives in `docs/planning/<slug>/plan.md`; no `99-final-plan.md`
+- Final plan absorbs temp docs, then removes them after verification
+- Domain docs are lazy: read docs, capture terms/ADRs, write on request/synthesis
 - Schema/data/auth/security/deploy/stateful changes need human review,
   rollback/migration notes, and telemetry/audit expectations.

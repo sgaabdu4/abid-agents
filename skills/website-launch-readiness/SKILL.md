@@ -14,10 +14,10 @@ Use this skill to make a web surface launch-ready without mixing marketing, port
 
 ## Scope Rules
 
-- Keep public marketing content and authenticated portal content separate.
-- For portals, expose only product/operational public documentation to agents. Do not expose private workspace data, task text, user records, tokens, or authenticated API schemas.
-- For Cloudflare findings, do not mutate unrelated `workers.dev`, staging, or sibling-zone findings unless the user explicitly scopes them.
-- MFA and account-user findings are owner actions. Report them instead of attempting account takeover-style setup.
+- Keep public marketing content and authenticated portal content separate
+- For portals, expose only product/operational public documentation to agents. Do not expose private workspace data, task text, user records, tokens, or authenticated API schemas
+- For Cloudflare findings, do not mutate unrelated `workers.dev`, staging, or sibling-zone findings unless the user explicitly scopes them
+- MFA and account-user findings are owner actions. Report them instead of attempting account takeover-style setup
 
 ## Validation
 

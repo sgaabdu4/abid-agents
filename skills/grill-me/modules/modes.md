@@ -12,7 +12,7 @@ Modes are generic depth caps, not domain-specific workflows.
 
 ## Modes
 
-- `auto`: default. Infer mode from the request.
+- `auto`: default. Infer mode from the request
 - `align` / `lite`: decision alignment + plan only. Use for "plan",
   "plan for X", "approach", "align", "what's best", "strategy",
   "compare options", or "no prototype/build" requests. Read supplied
@@ -34,7 +34,7 @@ Modes are generic depth caps, not domain-specific workflows.
 
 ## Rules
 
-- If the user names a mode, honor it unless it conflicts with a stated goal.
+- If the user names a mode, honor it unless it conflicts with a stated goal
 - If the user says "just", "only", "no prototype", "no build", or "plan plan",
   treat that as an `align` cap.
 - Domain words like migration, auth, billing, onboarding, redesign, refactor, or
@@ -85,7 +85,7 @@ Modes are generic depth caps, not domain-specific workflows.
   skip/brief already-decided product, UI, visual design, prototype, and backend
   sections with evidence; run vertical slices/verification if implementation is
   requested.
-- Simple feature: pin goal, owner, boundary, acceptance check, and verification.
+- Simple feature: pin goal, owner, boundary, acceptance check, and verification
   UI/backend run only if changed; visual/prototype are `n/a` unless needed.
 - Existing UI feature: product brief if problem/success criteria are unclear;
   UI flow only if navigation/state changes; visual design only if surface/style

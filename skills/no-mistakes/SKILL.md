@@ -15,11 +15,11 @@ Read `references/pr-evidence.md` before finalizing any PR-backed run.
 
 ## Non-negotiables
 
-- Run `no-mistakes axi` first and respect any active run state.
+- Run `no-mistakes axi` first and respect any active run state
 - Before `axi run`, `axi respond`, or any push dry-run, the agent must run
   `"$HOME/.agents/scripts/ensure-worktree-ready.sh" .`; do not ask the user to
   run it. Stop if hooks cannot be activated.
-- Work must be committed on a feature branch before `axi run` validates it.
+- Work must be committed on a feature branch before `axi run` validates it
 - Pass a rich `--intent` in the user's words, including product decisions that
   are not obvious from the diff.
 - At gates, let the pipeline own its findings and fixes. Use `axi respond`
@@ -30,7 +30,7 @@ Read `references/pr-evidence.md` before finalizing any PR-backed run.
   batch fixes locally, and rerun the fewest checks.
 - On `checks-passed` or `passed`, report what was validated, what was found,
   and every pipeline fix applied.
-- Before finalizing a PR-backed run, repair the PR evidence section so it has hosted screenshots, required 2x E2E video links, no local paths, and clear screenshot/video and no-mistakes status.
+- Before finalizing a PR-backed run, repair the PR evidence section so it has hosted screenshots, required 2x E2E video links, no local paths, and clear screenshot/video and no-mistakes status
 - Only check GitHub review threads after external PR review has run or the user
   explicitly asks for comment handling.
 
@@ -50,8 +50,8 @@ node "$HOME/.agents/skills/no-mistakes/scripts/repair-pr-evidence.mjs" --e2e-vid
 
 ## Output notes
 
-- Output is TOON; follow returned `help` lines instead of guessing.
-- `checks-passed` means checks are green and the PR is ready for human review.
-- `failed` or `cancelled` means inspect logs, fix, commit, then rerun.
-- `Directory not empty` is a recovery state; preserve data and follow tool help.
-- Use `--yes` only with user consent for unattended actionable gates.
+- Output is TOON; follow returned `help` lines instead of guessing
+- `checks-passed` means checks are green and the PR is ready for human review
+- `failed` or `cancelled` means inspect logs, fix, commit, then rerun
+- `Directory not empty` is a recovery state; preserve data and follow tool help
+- Use `--yes` only with user consent for unattended actionable gates

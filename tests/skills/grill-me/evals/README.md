@@ -6,27 +6,27 @@ unneeded UI/design/prototype work.
 
 ## Files
 
-- `evals.json` - task-level behavior evals.
-- `session-regression-evals.json` - focused regressions from real sessions.
+- `evals.json` - task-level behavior evals
+- `session-regression-evals.json` - focused regressions from real sessions
 - `trigger-evals.json` - should-trigger and should-not-trigger prompt set for
   description tuning.
-- `validate-evals.mjs` - deterministic suite checks.
+- `validate-evals.mjs` - deterministic suite checks
 
 ## Coverage
 
-- Greenfield full and greenfield lite.
-- Brownfield features.
-- Simple narrow features.
-- Understanding/codebase-understanding.
-- UI-needed vs UI-not-needed routing.
-- Visual design/prototype gates.
-- Backend/API/schema/auth/stateful risk controls.
+- Greenfield full and greenfield lite
+- Brownfield features
+- Simple narrow features
+- Understanding/codebase-understanding
+- UI-needed vs UI-not-needed routing
+- Visual design/prototype gates
+- Backend/API/schema/auth/stateful risk controls
 - Existing `CONTEXT.md`/ADR use, missing-doc silence, glossary capture, and
   docs-aware final synthesis.
-- Compaction, missing state, unanswered Q, and answer-recording recovery.
+- Compaction, missing state, unanswered Q, and answer-recording recovery
 - Final synthesis for build-plan and understand-only sessions, including
   next-step handoff after `plan.md` is written.
-- Trigger near-misses where other skills should win.
+- Trigger near-misses where other skills should win
 
 ## Local Check
 

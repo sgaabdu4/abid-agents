@@ -21,11 +21,12 @@ function assertNotIncludes(haystack, needle, message = `unexpected ${needle}`) {
 assert.ok(text.startsWith('# Agent Rules\n\n## Stops\n'), 'AGENTS.md must start with rules, not prose preamble');
 assertIncludes(text, 'Touched/connected files >700 lines must end <700');
 assertIncludes(text, '`SKILL.md`: no 3+ step workflows');
+assertIncludes(text, 'Prod -> `PRODUCT.md`; design/UI/token -> `DESIGN.md` + token owner before handoff.');
 assertIncludes(text, '`codebase-memory`, `context-mode`, `terse` are support tools, not stages.');
 assertIncludes(text, 'violation -> lint/scanner/gate; repeat -> run/add script/test/hook/eval');
 assertIncludes(text, 'GH CI -> parallel logs/jobs, batch fixes, least reruns.');
 assertIncludes(text, "codebase-memory-mcp cli <tool> '<json>'");
-assertIncludes(text, 'Logs/output/docs/data -> sandbox/index; no raw dumps.');
+assertIncludes(text, 'Logs/output/docs/data -> sandbox/index; no dumps.');
 assertIncludes(text, 'Semantic edits: blast radius + surrounding issues');
 assertNotIncludes(text, 'This file is the gatekeeper');
 assertNotIncludes(text, 'Skills and scripts own detailed workflows');
@@ -91,8 +92,10 @@ const installText = fs.readFileSync(path.join(repo, 'scripts', 'install.sh'), 'u
 const mcpInstallText = fs.readFileSync(path.join(repo, 'scripts', 'install-mcp-tools.sh'), 'utf8');
 const setupText = fs.readFileSync(path.join(repo, 'scripts', 'setup.sh'), 'utf8');
 const readmeText = fs.readFileSync(path.join(repo, 'README.md'), 'utf8');
+const designDocText = fs.readFileSync(path.join(repo, 'DESIGN.md'), 'utf8');
 const routeMapText = fs.readFileSync(path.join(repo, 'skills', 'workflow-help', 'references', 'route-map.md'), 'utf8');
 const projectWorkflowGatesHtml = fs.readFileSync(path.join(repo, 'docs', 'project-workflow-gates.html'), 'utf8');
+const hePlanText = fs.readFileSync(path.join(repo, 'skills', 'he-plan', 'SKILL.md'), 'utf8');
 const grillFinalPlanText = fs.readFileSync(path.join(repo, 'skills', 'grill-me', 'modules', 'final-plan.md'), 'utf8');
 const grillUiFlowText = fs.readFileSync(path.join(repo, 'skills', 'grill-me', 'modules', 'ui-flow.md'), 'utf8');
 const grillVisualDesignText = fs.readFileSync(path.join(repo, 'skills', 'grill-me', 'modules', 'visual-design.md'), 'utf8');
@@ -111,6 +114,10 @@ const contextProbeText = fs.readFileSync(contextProbePath, 'utf8');
 const routingEvalText = fs.readFileSync(path.join(repo, 'tests', 'agents-md-routing', 'evals', 'run-evals.mjs'), 'utf8');
 const markdownHygienePath = path.join(repo, 'scripts', 'check-markdown-hygiene.mjs');
 const markdownHygieneText = fs.readFileSync(markdownHygienePath, 'utf8');
+const generatedAssetsPath = path.join(repo, 'scripts', 'check-generated-assets.mjs');
+const generatedAssetsText = fs.readFileSync(generatedAssetsPath, 'utf8');
+const contextGatePath = path.join(repo, 'scripts', 'check-project-context-gates.mjs');
+const contextGateText = fs.readFileSync(contextGatePath, 'utf8');
 const deterministicOwnerPath = path.join(repo, 'scripts', 'find-deterministic-owner.mjs');
 const deterministicOwnerText = fs.readFileSync(deterministicOwnerPath, 'utf8');
 const worktreeReadyPath = path.join(repo, 'scripts', 'ensure-worktree-ready.sh');
@@ -121,7 +128,7 @@ const treehouseSkillText = fs.readFileSync(path.join(repo, 'skills', 'treehouse'
 const noMistakesSkillText = fs.readFileSync(path.join(repo, 'skills', 'no-mistakes', 'SKILL.md'), 'utf8');
 const noMistakesAxiText = fs.readFileSync(path.join(repo, 'skills', 'no-mistakes', 'references', 'axi-workflow.md'), 'utf8');
 
-for (const executable of [cleanupPath, updateStackPath, contextHealthPath, cbmProbePath, contextProbePath, markdownHygienePath, deterministicOwnerPath, worktreeReadyPath]) {
+for (const executable of [cleanupPath, updateStackPath, contextHealthPath, cbmProbePath, contextProbePath, markdownHygienePath, generatedAssetsPath, contextGatePath, deterministicOwnerPath, worktreeReadyPath]) {
   assert.ok(fs.existsSync(executable), `${executable} must exist`);
   assert.ok(fs.statSync(executable).mode & 0o111, `${executable} must be executable`);
 }
@@ -136,15 +143,41 @@ assertIncludes(readmeText, '<a id="tested-scope"></a>');
 assertIncludes(readmeText, 'only been tested on Codex running on macOS');
 assertIncludes(readmeText, 'docs/images/hard-eng-hero.png');
 assertIncludes(readmeText, 'docs/images/project-workflow-gates.png');
+assertIncludes(readmeText, '`context.product`, `context.design`, `context.tokenOwner`');
+assertIncludes(readmeText, 'check-project-context-gates.mjs --require-all');
+assertIncludes(readmeText, 'Product behavior changes update `PRODUCT.md`; UI, component, visual, stage-diagram, or token changes update `DESIGN.md`');
+for (const inspirationLink of [
+  'https://github.com/EveryInc/compound-engineering-plugin',
+  'https://github.com/bmad-code-org/BMAD-METHOD',
+  'https://github.com/mattpocock/skills',
+  'https://github.com/google-labs-code/design.md',
+  'https://github.com/kunchenguid/treehouse',
+  'https://github.com/kunchenguid/no-mistakes',
+  'https://github.com/pbakaus/impeccable',
+  'https://github.com/millionco/react-doctor',
+  'https://github.com/fallow-rs/fallow-skills',
+  'https://github.com/vercel-labs/agent-skills',
+  'https://github.com/anthropics/skills',
+  'https://github.com/tavily-ai/skills',
+  'https://github.com/getsentry/sentry-for-ai',
+  'https://github.com/getsentry/cli',
+]) assertIncludes(readmeText, inspirationLink);
+assertIncludes(readmeText, 'Grill Me-style human alignment and senior-engineer taste');
+assertIncludes(readmeText, 'Hard Eng makes it stateful with stage receipts, context gates, and loop enforcement.');
 assertIncludes(readmeText, 'curl -fsSLO https://raw.githubusercontent.com/sgaabdu4/hard-eng/main/scripts/setup.sh');
 assertIncludes(readmeText, 'bash setup.sh --full');
 assertIncludes(readmeText, 'bash setup.sh --skills-only');
 assertIncludes(readmeText, './scripts/uninstall.sh --yes');
 assertIncludes(readmeText, 'bash setup.sh --uninstall --yes');
+for (const requiredContextFile of ['PRODUCT.md', 'DESIGN.md', 'docs/design/tokens.css']) {
+  assert.ok(fs.existsSync(path.join(repo, requiredContextFile)), `${requiredContextFile} must exist`);
+}
+assertIncludes(designDocText, 'https://github.com/google-labs-code/design.md');
+assertIncludes(designDocText, 'https://github.com/pbakaus/impeccable');
 assertNotIncludes(readmeText, 'less setup.sh && bash setup.sh');
 assertNotIncludes(readmeText, 'curl -fsSL https://raw.githubusercontent.com/sgaabdu4/hard-eng/main/scripts/setup.sh | bash');
-assertNotIncludes(readmeText, 'Abid ' + 'Agents');
-assertNotIncludes(readmeText, 'ABID' + '_AGENTS');
+assertNotIncludes(readmeText, String.fromCharCode(65, 98, 105, 100) + ' Agents');
+assertNotIncludes(readmeText, String.fromCharCode(65, 66, 73, 68) + '_AGENTS');
 assertNotIncludes(readmeText, '/a' + 'a:');
 assertNotIncludes(readmeText, 'a' + 'a-state');
 assertIncludes(readmeText, 'scripts/ensure-worktree-ready.sh');
@@ -166,6 +199,8 @@ assertIncludes(routeMapText, '`to-issues` only for missing agent-ready slices');
 assertIncludes(routeMapText, 'when the accepted `plan.md` already has vertical slices or task waves');
 assertIncludes(routeMapText, '`grill-me` with `atomic-ui` + `impeccable`');
 assertIncludes(routeMapText, 'Create the Treehouse worktree before feature planning/coding.');
+assertIncludes(routeMapText, 'Run `node "$HOME/.agents/scripts/check-project-context-gates.mjs" --require-all <path>`');
+assertIncludes(routeMapText, 'product changes update `PRODUCT.md`, design/UI/token changes update `DESIGN.md`, and token/design-system owner paths must exist');
 assertIncludes(routeMapText, 'Reroute to `he-ship`/`no-mistakes` only after committed implementation work is ready for the gate.');
 assertIncludes(routeMapText, 'Run `security-review` or `performance-rescue` when requested or when those risks were touched, then `thermo-nuclear-code-quality-review`, then `e2e` last');
 assertIncludes(routeMapText, 'Loop back to Implement until tests, reviews, and required E2E are clean.');
@@ -181,6 +216,7 @@ assertIncludes(routeMapText, 'Start the new thread with the next `/he:*` command
 assertIncludes(routeMapText, 'The visible command is one `he-*` command per stage.');
 assertIncludes(routeMapText, 'uses parallel subagents only for independent work that can merge back through the active stage.');
 assertIncludes(routeMapText, 'State is required: each feature keeps an `he-state.json` in the plan/worktree.');
+assertIncludes(routeMapText, 'Plan also records `context.product`, `context.design`, and `context.tokenOwner`.');
 assertIncludes(routeMapText, 'every finding from Plan onward updates `findings[]` with owner repair stage');
 assertIncludes(routeMapText, 'every deterministic guard updates `guardrails[]` with owner, command, status, evidence, and whether it blocks push');
 assertIncludes(routeMapText, 'Return to `he-plan` only when a finding changes scope, owner, proof path, risk route, artifact choice, or Grill Me stage map.');
@@ -188,6 +224,8 @@ assertIncludes(routeMapText, 'Before any `Next: ... yes`, run `node "$HOME/.agen
 assertIncludes(routeMapText, 'To avoid context rot, every stage exits with a receipt, not a transcript');
 assertIncludes(routeMapText, '`Stage:` current stage; `State:` path to `he-state.json`; `Decision:` pass/blocker; `Owner/proof:` paths or commands; `Artifacts:` links/paths; `Blocker:` none or exact ask; `Next:` ready/not-ready.');
 assertIncludes(routeMapText, 'Update state before and after each internal step, not only at stage end.');
+assertIncludes(routeMapText, 'Record product/design context in `context`: `PRODUCT.md`, `DESIGN.md`, and token/design-system owner path.');
+assertIncludes(routeMapText, 'Product behavior changes update `PRODUCT.md`; design/UI/token changes update `DESIGN.md` and the token owner.');
 assertIncludes(routeMapText, 'New stage threads read `he-state.json` first; they do not need the previous chat transcript.');
 assertIncludes(routeMapText, '`next.ready: true` is invalid while any step is pending, in progress, or blocked.');
 assertIncludes(routeMapText, '`next.ready: true` is invalid while blocking findings or push-blocking guardrails are unresolved.');
@@ -206,6 +244,10 @@ for (const needle of [
   'supporting skills, state updates, validation, receipts, and parallel subagents',
   '<strong>Invokes automatically</strong>',
   'Treehouse and worktree readiness for isolation',
+  '<code>check-project-context-gates.mjs --require-all</code>',
+  '<strong>Context docs</strong>',
+  'Product changes update <code>PRODUCT.md</code>.',
+  'Design, UI, component, or token changes update <code>DESIGN.md</code>',
   '<code>grill-me</code> for unclear outcome, scope, proof, risk, UI flow, or visual direction',
   '<strong>Grill Me behavior</strong>',
   'It asks as many one-by-one questions as needed until aligned or the user parks the unknown.',
@@ -222,6 +264,7 @@ for (const needle of [
   '<code>skill-creator</code> updates stage skills when they are the owner',
   '<h2>Automatic Work</h2>',
   'Loads the required specialist skills for the touched area.',
+  'Records <code>PRODUCT.md</code>, <code>DESIGN.md</code>, and token/design-system owner paths before implementation readiness.',
   'Records findings with an owner repair stage and guardrails with command, status, evidence, and push-blocking status.',
   'Uses parallel subagents when tasks are independent.',
   'Validates state before any ready-yes handoff.',
@@ -255,8 +298,14 @@ for (const needle of [
   '/he:learn',
   'Visual quick reference derived from <code>skills/workflow-help/references/route-map.md</code>',
 ]) assertIncludes(projectWorkflowGatesHtml, needle);
+assertIncludes(hePlanText, 'check-project-context-gates.mjs --require-all');
+assertIncludes(hePlanText, 'he-state.json.context');
+assertIncludes(hePlanText, 'Product changes update `PRODUCT.md`; design/UI/token changes update `DESIGN.md` and the token owner.');
 assertIncludes(grillFinalPlanText, 'Sliced plan -> readiness');
 assertIncludes(grillFinalPlanText, '`to-issues` only for missing');
+assertIncludes(grillFinalPlanText, '## Product/Design Context');
+assertIncludes(grillFinalPlanText, 'Plan cannot hand off to implementation without PRODUCT.md, DESIGN.md, and token/design-system owner evidence.');
+assertIncludes(grillFinalPlanText, 'Product behavior changes update `PRODUCT.md`; design/UI/token changes update `DESIGN.md` and the token owner.');
 assertNotIncludes(fs.readFileSync(path.join(repo, '.gitmodules'), 'utf8'), 'vendor/skill-upstreams/lavish-axi');
 assert.ok(!fs.existsSync(path.join(repo, 'vendor', 'skill-upstreams', 'lavish-axi')), 'Lavish upstream skill must not be vendored');
 assertIncludes(grillUiFlowText, 'project-local route/component/state');
@@ -286,6 +335,8 @@ assertIncludes(installText, 'CODEX_CBM_COMMAND', 'install.sh must pass a resolve
 assertIncludes(installText, '$HOME/.codex/bin/codebase-memory-mcp', 'install.sh must point Codex at the stable CBM binary copy');
 assertIncludes(installText, 'resolve_codebase_memory_mcp_command', 'install.sh must resolve CBM through the stable command owner');
 assertIncludes(installText, 'default_mode_request_user_input', 'install.sh must sync Codex request-user-input feature into ~/.codex/config.toml');
+assertIncludes(installText, 'node "$repo/scripts/check-generated-assets.mjs" "$repo"', 'install.sh hooks must block stale generated README images');
+assertIncludes(installText, 'node "$repo/scripts/check-project-context-gates.mjs" --require-all "$repo"', 'install.sh hooks must enforce PRODUCT/DESIGN context before push');
 assertIncludes(installText, 'mcp_servers.context-mode', 'install.sh must keep context-mode MCP registered');
 assertIncludes(installText, 'CONTEXT_MODE_DIR', 'install.sh must pin context-mode storage outside ~/.claude');
 assertIncludes(mcpInstallText, 'HARD_ENG_CONTEXT_MODE_VERSION');
@@ -339,6 +390,12 @@ assertIncludes(markdownHygieneText, 'requires explicit markdown-hygiene:');
 assertIncludes(markdownHygieneText, 'allow-local-machine-paths');
 assertIncludes(markdownHygieneText, 'allow-conversation-state');
 assertIncludes(markdownHygieneText, 'allow-setup-internals');
+assertIncludes(generatedAssetsText, 'docs/project-workflow-gates.html');
+assertIncludes(generatedAssetsText, 'docs/images/project-workflow-gates.png');
+assertIncludes(generatedAssetsText, 'is older than');
+assertIncludes(contextGateText, '--require-product-update');
+assertIncludes(contextGateText, '--require-design-update');
+assertIncludes(contextGateText, 'Token owner');
 assertIncludes(deterministicOwnerText, 'package scripts, scripts, tests, hooks');
 assertIncludes(deterministicOwnerText, 'Run matching owners before fresh LLM reasoning.');
 assertIncludes(deterministicOwnerText, 'package.json');

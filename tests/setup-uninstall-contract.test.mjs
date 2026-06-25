@@ -43,9 +43,9 @@ assertIncludes(readme, 'docs/images/hard-eng-hero.png');
 assertIncludes(readme, 'docs/images/project-workflow-gates.png');
 
 const oldPublicNames = [
-  'Abid ' + 'Agents',
-  'abid' + '-agents',
-  'ABID' + '_AGENTS',
+  String.fromCharCode(65, 98, 105, 100) + ' Agents',
+  String.fromCharCode(97, 98, 105, 100) + '-agents',
+  String.fromCharCode(65, 66, 73, 68) + '_AGENTS',
   '/a' + 'a:',
   'a' + 'a-state',
 ];

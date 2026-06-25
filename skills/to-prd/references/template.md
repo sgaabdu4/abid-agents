@@ -22,7 +22,7 @@ Use project glossary terms and respect nearby ADRs when they exist.
 - <explicitly out of scope>
 
 ## User Stories
-- As a <actor>, I want <capability>, so that <benefit>.
+- As a <actor>, I want <capability>, so that <benefit>
 
 ## Requirements
 - <functional requirement with acceptance signal>
@@ -53,8 +53,8 @@ Use project glossary terms and respect nearby ADRs when they exist.
 
 ## Quality Bar
 
-- Separate confirmed decisions from assumptions.
-- Keep requirements behavior-facing.
-- Name data contracts, routes, schemas, and storage keys when known.
-- Prefer existing test seams and existing module owners.
-- Mark unknowns plainly instead of inventing scope.
+- Separate confirmed decisions from assumptions
+- Keep requirements behavior-facing
+- Name data contracts, routes, schemas, and storage keys when known
+- Prefer existing test seams and existing module owners
+- Mark unknowns plainly instead of inventing scope

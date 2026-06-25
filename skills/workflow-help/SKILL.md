@@ -19,12 +19,12 @@ Keep the answer focused on:
 
 Rules:
 
-- `codebase-memory`, `context-mode`, and `terse` are support tools, not stages.
-- Route by task and risk, not by persona names or BMAD menu codes.
-- If the request is ambiguous, send it to `grill-me`.
+- `codebase-memory`, `context-mode`, and `terse` are support tools, not stages
+- Route by task and risk, not by persona names or BMAD menu codes
+- If the request is ambiguous, send it to `grill-me`
 - If a feature is ready to build, require a branch or Treehouse worktree before
   implementation.
-- If readiness is weak, return `CONCERNS` or `FAIL` and name the missing input.
-- At stage exit, use the receipt format from `route-map.md`; no transcript dump.
+- If readiness is weak, return `CONCERNS` or `FAIL` and name the missing input
+- At stage exit, use the receipt format from `route-map.md`; no transcript dump
 - For shipping work, end at `he-ship`/`no-mistakes`, not direct push, unless
   the user explicitly overrides the local gate.

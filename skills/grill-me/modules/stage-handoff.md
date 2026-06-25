@@ -62,26 +62,26 @@ controls, gate criteria.
 
 ## Gate status rules
 
-- `draft`: still interviewing/building.
-- `blocked`: needs user/code decision before next stage.
-- `accepted`: enough evidence/decisions for next stage.
-- `brief`: intentionally light; next stage can proceed with named unknowns.
-- `skipped`: legacy only. New skipped/n/a stages use Stage Map entries, not files.
+- `draft`: still interviewing/building
+- `blocked`: needs user/code decision before next stage
+- `accepted`: enough evidence/decisions for next stage
+- `brief`: intentionally light; next stage can proceed with named unknowns
+- `skipped`: legacy only. New skipped/n/a stages use Stage Map entries, not files
 
 ## Rules
 
-- Do not update handoffs per question. During Q&A, update only `plan_draft.md` answer ledger.
-- Keep handoffs compact; decisions > prose; do not fill unused sections.
-- Use exact paths, URLs, device names, routes, states.
-- No hidden assumptions. Put unknowns in `Open questions`.
-- Before moving stages, confirm the stage is fully clarified, then refine the stage summary and set gate status.
-- Ask as many one-by-one clarification Qs as needed before the gate passes; do not optimize for fewer questions.
+- Do not update handoffs per question. During Q&A, update only `plan_draft.md` answer ledger
+- Keep handoffs compact; decisions > prose; do not fill unused sections
+- Use exact paths, URLs, device names, routes, states
+- No hidden assumptions. Put unknowns in `Open questions`
+- Before moving stages, confirm the stage is fully clarified, then refine the stage summary and set gate status
+- Ask as many one-by-one clarification Qs as needed before the gate passes; do not optimize for fewer questions
 - Clarification blockers: contradiction, vague term/domain conflict, missing
   required decision, unsafe risk/control gap, unclear acceptance, or
   artifact cannot be produced.
-- If no blocker, do not ask extra refinement Qs; write the compact summary and continue.
-- `run`/`brief` stages need acceptance criteria + verification, or an explicitly user-parked blocker/unknown.
-- High-risk schema/data/auth/security/deploy/stateful work needs controls before final plan.
-- Final plan must copy needed content into `plan.md`; no required info may live only here.
+- If no blocker, do not ask extra refinement Qs; write the compact summary and continue
+- `run`/`brief` stages need acceptance criteria + verification, or an explicitly user-parked blocker/unknown
+- High-risk schema/data/auth/security/deploy/stateful work needs controls before final plan
+- Final plan must copy needed content into `plan.md`; no required info may live only here
 - After verified final plan, remove absorbed temp handoffs. Keep only if content
   was not copied or ownership is unclear.

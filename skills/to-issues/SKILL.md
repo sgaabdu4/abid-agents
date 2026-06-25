@@ -13,7 +13,7 @@ Load `references/vertical-slices.md` before drafting issues.
 
 Coordinate with nearby skills:
 
-- Use `codebase-design` when slices depend on ownership or interface choices.
-- Use `test-quality` for acceptance and verification wording.
+- Use `codebase-design` when slices depend on ownership or interface choices
+- Use `test-quality` for acceptance and verification wording
 
 Do not create external tracker issues unless the user explicitly asks to publish.

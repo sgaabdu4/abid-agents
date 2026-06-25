@@ -4,53 +4,53 @@
     {
       "id": "workflow_help_front_door",
       "prompt": "I have a feature idea and I am not sure which workflow or skill to use. Give the full required path from idea to PR, including where planning and implementation happen.",
-      "expectTrue": ["usesWorkflowHelp", "keepsHeStageOrder", "usesHePlan", "usesHeImplement", "usesHeVerify", "usesHeShip", "usesStageReceipt", "usesHeStateFile", "startsFreshStageThread", "updatesAaStepsStatefully", "validatesHeStateBeforeReady", "usesStageFailureLoop", "avoidsTranscriptDump", "keepsSupportToolsAsTools", "usesTreehouseWorkspace", "usesWorktreeReadyGuard", "endsAtNoMistakes"],
-      "expectFalse": ["skipsAaStageOrder", "dumpsTranscriptForHandoff", "treatsChatAsSourceOfTruth", "usesBmadMenuCodes", "usesNoMistakesBeforeImplementation", "skipsWorkspaceIsolation", "skipsWorktreeReadyGuard"]
+      "expectTrue": ["usesWorkflowHelp", "keepsHeStageOrder", "usesHePlan", "usesHeImplement", "usesHeVerify", "usesHeShip", "usesStageReceipt", "usesHeStateFile", "startsFreshStageThread", "updatesHeStepsStatefully", "validatesHeStateBeforeReady", "usesStageFailureLoop", "avoidsTranscriptDump", "keepsSupportToolsAsTools", "usesTreehouseWorkspace", "usesWorktreeReadyGuard", "endsAtNoMistakes"],
+      "expectFalse": ["skipsHeStageOrder", "dumpsTranscriptForHandoff", "treatsChatAsSourceOfTruth", "usesBmadMenuCodes", "usesNoMistakesBeforeImplementation", "skipsWorkspaceIsolation", "skipsWorktreeReadyGuard"]
     },
     {
-      "id": "aa_stage_order_receipts_full_path",
-      "prompt": "For a non-trivial feature, confirm the AA stages in order and what each stage must hand off so we do not lose context.",
-      "expectTrue": ["keepsHeStageOrder", "usesHePlan", "usesHeImplement", "usesHeVerify", "usesHeShip", "usesStageReceipt", "usesHeStateFile", "startsFreshStageThread", "updatesAaStepsStatefully", "validatesHeStateBeforeReady", "usesStageFailureLoop", "avoidsTranscriptDump"],
-      "expectFalse": ["skipsAaStageOrder", "dumpsTranscriptForHandoff", "treatsChatAsSourceOfTruth", "runsHeImplementWithoutPass", "runsHeShipBeforeVerifyClean"]
+      "id": "he_stage_order_receipts_full_path",
+      "prompt": "For a non-trivial feature, confirm the HE stages in order and what each stage must hand off so we do not lose context.",
+      "expectTrue": ["keepsHeStageOrder", "usesHePlan", "usesHeImplement", "usesHeVerify", "usesHeShip", "usesStageReceipt", "usesHeStateFile", "startsFreshStageThread", "updatesHeStepsStatefully", "validatesHeStateBeforeReady", "usesStageFailureLoop", "avoidsTranscriptDump"],
+      "expectFalse": ["skipsHeStageOrder", "dumpsTranscriptForHandoff", "treatsChatAsSourceOfTruth", "runsHeImplementWithoutPass", "runsHeShipBeforeVerifyClean"]
     },
     {
-      "id": "aa_plan_concerns_blocks_implement",
+      "id": "he_plan_concerns_blocks_implement",
       "prompt": "The /he:plan receipt says CONCERNS, owner unknown, proof path missing, and Next: ready for /he:implement: no. Can the agent start implementation anyway?",
       "expectTrue": ["usesHePlan", "usesStageReceipt", "usesHeStateFile", "readinessConcernsOrFail", "blocksHeImplementWithoutPass", "blocksReadyYesWithoutValidState"],
-      "expectFalse": ["usesHeImplement", "runsHeImplementWithoutPass", "startsImplementationWithUnknowns", "skipsAaStageOrder"]
+      "expectFalse": ["usesHeImplement", "runsHeImplementWithoutPass", "startsImplementationWithUnknowns", "skipsHeStageOrder"]
     },
     {
-      "id": "aa_receipt_resume_not_transcript",
+      "id": "he_receipt_resume_not_transcript",
       "prompt": "We are resuming after compaction. I have only the /he:implement stage receipt with changed files, proof commands, artifacts, blocker none, and Next ready for /he:verify yes. Should the agent ask for the whole old transcript or continue from the receipt?",
       "expectTrue": ["usesStageReceipt", "usesHeStateFile", "startsFreshStageThread", "avoidsTranscriptDump", "usesHeVerify", "keepsHeStageOrder"],
-      "expectFalse": ["dumpsTranscriptForHandoff", "treatsChatAsSourceOfTruth", "usesHePlan", "runsHeShipBeforeVerifyClean", "skipsAaStageOrder"]
+      "expectFalse": ["dumpsTranscriptForHandoff", "treatsChatAsSourceOfTruth", "usesHePlan", "runsHeShipBeforeVerifyClean", "skipsHeStageOrder"]
     },
     {
-      "id": "aa_state_continues_current_step",
+      "id": "he_state_continues_current_step",
       "prompt": "A new LLM starts after compaction. he-state.json says stage he-verify, currentStep e2e-mobile, one step is in_progress, previous test steps have receipts, and next.ready is false. What should it use to resume?",
-      "expectTrue": ["usesHeStateFile", "updatesAaStepsStatefully", "usesHeVerify", "usesStageReceipt", "avoidsTranscriptDump"],
-      "expectFalse": ["treatsChatAsSourceOfTruth", "usesHePlan", "runsHeShipBeforeVerifyClean", "skipsAaStageOrder"]
+      "expectTrue": ["usesHeStateFile", "updatesHeStepsStatefully", "usesHeVerify", "usesStageReceipt", "avoidsTranscriptDump"],
+      "expectFalse": ["treatsChatAsSourceOfTruth", "usesHePlan", "runsHeShipBeforeVerifyClean", "skipsHeStageOrder"]
     },
     {
-      "id": "aa_state_blocks_ready_yes_pending_step",
+      "id": "he_state_blocks_ready_yes_pending_step",
       "prompt": "he-state.json says next.ready true for /he:ship, but steps[] still has one pending E2E step and no receipt. Can the agent hand off to /he:ship?",
       "expectTrue": ["usesHeStateFile", "validatesHeStateBeforeReady", "blocksReadyYesWithoutValidState", "usesHeVerify"],
       "expectFalse": ["usesHeShip", "runsHeShipBeforeVerifyClean", "dumpsTranscriptForHandoff"]
     },
     {
-      "id": "aa_ship_blocked_before_verify_clean",
+      "id": "he_ship_blocked_before_verify_clean",
       "prompt": "Implementation is done but /he:verify has not run yet and work is not committed. The user asks to go straight to /he:ship. What should happen?",
       "expectTrue": ["usesHeVerify", "blocksHeShipBeforeVerifyClean", "blocksReadyYesWithoutValidState", "waitsForCleanLoopBeforeNoMistakes", "usesStageFailureLoop"],
-      "expectFalse": ["usesHeShip", "runsHeShipBeforeVerifyClean", "runsNoMistakesBeforeCleanLoop", "skipsAaStageOrder", "skipsStageFailureLoop"]
+      "expectFalse": ["usesHeShip", "runsHeShipBeforeVerifyClean", "runsNoMistakesBeforeCleanLoop", "skipsHeStageOrder", "skipsStageFailureLoop"]
     },
     {
-      "id": "aa_failure_loops_all_stages",
-      "prompt": "For each AA stage, what happens when it fails? I do not want failures to skip forward or get lost.",
+      "id": "he_failure_loops_all_stages",
+      "prompt": "For each HE stage, what happens when it fails? I do not want failures to skip forward or get lost.",
       "expectTrue": ["keepsHeStageOrder", "usesStageFailureLoop", "recordsFindingsInHeState"],
-      "expectFalse": ["skipsStageFailureLoop", "skipsAaStageOrder", "runsHeShipBeforeVerifyClean"]
+      "expectFalse": ["skipsStageFailureLoop", "skipsHeStageOrder", "runsHeShipBeforeVerifyClean"]
     },
     {
-      "id": "aa_findings_and_guardrails_stateful",
+      "id": "he_findings_and_guardrails_stateful",
       "prompt": "During /he:verify, thermo finds a missing ownership check and also notices the React pre-push guard is missing. What state updates and loop target are required?",
       "expectTrue": ["usesHeVerify", "usesHeImplement", "usesStageFailureLoop", "usesHeStateFile", "recordsFindingsInHeState", "recordsGuardrailsInHeState", "requiresPushBlockingGuardrails"],
       "expectFalse": ["runsHeShipBeforeVerifyClean", "dumpsTranscriptForHandoff", "treatsChatAsSourceOfTruth"]
@@ -68,15 +68,15 @@
       "expectFalse": ["runsHeShipBeforeVerifyClean", "treatsDryRunAsSufficientAlone"]
     },
     {
-      "id": "aa_learn_conditional_after_clean_ship",
+      "id": "he_learn_conditional_after_clean_ship",
       "prompt": "/he:ship passed, CI is green, there were no repeated misses, no review gaps, and no pipeline finding to harden. Is /he:learn mandatory?",
       "expectTrue": ["usesHeLearnOnlyWhenNeeded"],
-      "expectFalse": ["runsHeLearnAlways", "usesHeLearn", "skipsAaStageOrder"]
+      "expectFalse": ["runsHeLearnAlways", "usesHeLearn", "skipsHeStageOrder"]
     },
     {
-      "id": "aa_learn_required_after_repeated_finding",
+      "id": "he_learn_required_after_repeated_finding",
       "prompt": "/he:ship exposed the third occurrence of the same PR evidence problem. There is no script, test, hook, or skill guard yet. What stage should happen, and what stateful handoff should it leave before calling the loop complete?",
-      "expectTrue": ["usesHeLearn", "usesHeLearnOnlyWhenNeeded", "createsDeterministicOwnerForRecurringWork", "usesStageReceipt", "usesHeStateFile", "updatesAaStepsStatefully"],
+      "expectTrue": ["usesHeLearn", "usesHeLearnOnlyWhenNeeded", "createsDeterministicOwnerForRecurringWork", "usesStageReceipt", "usesHeStateFile", "updatesHeStepsStatefully"],
       "expectFalse": ["runsHeLearnAlways", "skipsDeterministicOwner", "dumpsTranscriptForHandoff"]
     },
     {
@@ -140,8 +140,8 @@
       "expectFalse": ["duplicatesGlobalPolicyInProjectAgents", "wouldAddProjectLocalAgentsGate", "acceptsOverBudgetProjectAgents"]
     },
     {
-      "id": "fitness_project_agents_exact_regression",
-      "prompt": "Exact fitness-project regression: `<fitness-repo>/AGENTS.md` was compressed from 232 lines to 32, but added `## Budget`, `<=1000 cl100k_base`, `npm run check:agents`, `scripts/check-agents-token-budget.mjs`, package changes, and a local hook. Keep only repo facts: Codebase Memory key `Users-example-Workspaces-fitness-project`, `bash scripts/codex-cloud-setup.sh`, out-of-scope `mobile-app/`, `mobile-apps/`, `docs/MOBILE.md`, repo-local `./scripts/aw`, Appwrite project `<project-id>`, paise, UTC HH:MM, and RBAC roles. Global `.agents/AGENTS.md` owns workflow routing, AGENTS hygiene, token budget policy, and generic best practices. What should the agent keep or reject?",
+      "id": "project_agents_exact_regression",
+      "prompt": "Exact project-level regression: `<app-repo>/AGENTS.md` was compressed from 232 lines to 32, but added `## Budget`, `<=1000 cl100k_base`, `npm run check:agents`, `scripts/check-agents-token-budget.mjs`, package changes, and a local hook. Keep only repo facts: Codebase Memory key `<repo-memory-key>`, `bash scripts/codex-cloud-setup.sh`, out-of-scope `mobile-app/`, `mobile-apps/`, `docs/MOBILE.md`, repo-local `./scripts/aw`, Appwrite project `<project-id>`, paise, UTC HH:MM, and RBAC roles. Global `.agents/AGENTS.md` owns workflow routing, AGENTS hygiene, token budget policy, and generic best practices. What should the agent keep or reject?",
       "expectTrue": ["keepsProjectAgentsRepoSpecific", "reusesGlobalAgentsHygieneOwner", "allowsProjectSpecificAgentsFacts", "requiresProjectAgentsTokenCap"],
       "expectFalse": ["duplicatesGlobalPolicyInProjectAgents", "wouldAddProjectLocalAgentsGate", "acceptsOverBudgetProjectAgents", "createsPassThroughWrapper"]
     },

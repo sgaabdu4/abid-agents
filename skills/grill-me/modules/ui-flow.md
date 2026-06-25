@@ -5,36 +5,36 @@ Use for UI flow stage when mapped `run` or `brief`. During Q&A, update only `pla
 ## Scope
 
 Map:
-- Screens/routes.
-- Entry points.
-- Primary journey.
-- Empty/loading/error/success states.
-- Permissions/auth gates.
-- Back/cancel/retry paths.
-- Low-fi route/component/state artifact when route/state choices need to be seen.
+- Screens/routes
+- Entry points
+- Primary journey
+- Empty/loading/error/success states
+- Permissions/auth gates
+- Back/cancel/retry paths
+- Low-fi route/component/state artifact when route/state choices need to be seen
 
 Out of scope:
-- Visual layout details.
-- Prototype implementation.
-- Backend/infra selection.
+- Visual layout details
+- Prototype implementation
+- Backend/infra selection
 
 ## Stage handoff plan
 
 At stage close/final synthesis, `02-ui-flow.md` includes only relevant decisions:
-- Screen/route inventory.
-- Entry points.
-- Primary journey steps.
-- Required states: empty/loading/error/success/permission.
-- Navigation rules.
-- Route/component/state artifact path + status when used.
-- Next-stage handoff for visual design only when useful.
+- Screen/route inventory
+- Entry points
+- Primary journey steps
+- Required states: empty/loading/error/success/permission
+- Navigation rules
+- Route/component/state artifact path + status when used
+- Next-stage handoff for visual design only when useful
 
 Clarity gate:
-- Parent screens/routes named.
-- Primary journey ordered.
-- Required states captured.
-- Permissions/auth gates named or marked n/a.
-- Any needed visual flow artifact is reviewed, or explicitly skipped.
+- Parent screens/routes named
+- Primary journey ordered
+- Required states captured
+- Permissions/auth gates named or marked n/a
+- Any needed visual flow artifact is reviewed, or explicitly skipped
 
 ## Q pattern
 
@@ -47,11 +47,11 @@ that artifact.
 
 ## Rules
 
-- Parent routes/screens before child components.
+- Parent routes/screens before child components
 - Parent screen choices are UI-flow decisions, not product cleanup, when the
   user asks how it looks, how it flows, or cannot choose from text.
-- Name exact route/screen/state.
-- Include empty/loading/error/permission states before visual design.
+- Name exact route/screen/state
+- Include empty/loading/error/permission states before visual design
 - UI-flow artifacts are wireflows/maps/state boards, not visual direction or
   prototype. Use existing routes/components/tokens when available; otherwise
   mark them representative.
@@ -60,5 +60,5 @@ that artifact.
   planning artifact owner.
 - Fix visible layout, state-label, and responsive issues before asking the user
   to review.
-- Do not update `02-ui-flow.md` per Q; record answers in `plan_draft.md` and summarize only at stage close/final synthesis.
-- No tech-stack/backend choices here except route/runtime facts from existing code.
+- Do not update `02-ui-flow.md` per Q; record answers in `plan_draft.md` and summarize only at stage close/final synthesis
+- No tech-stack/backend choices here except route/runtime facts from existing code
