@@ -1,102 +1,102 @@
 [
   {
-    "query": "Full grill me for a greenfield app that helps gym staff assign daily work. I only have the idea and need you to ask questions before anything gets built.",
+    "query": "I have a new product idea, but it is still rough. Interview me first so we know what should exist before anything gets built.",
     "should_trigger": true
   },
   {
-    "query": "I have a rough idea for our existing admin portal: managers should bulk approve timesheets. I don't know if it needs UI, backend, or mockups. Grill me and figure out the right path.",
+    "query": "There is an existing workflow I want to improve. It might touch UI, data, permissions, and rollout risk. Ask questions and choose the right planning path.",
     "should_trigger": true
   },
   {
-    "query": "Before touching code, help me understand how reminder delivery works in this repo and ask me only the questions the code cannot answer.",
+    "query": "Before touching code, help me understand where this behavior is owned in the repo and ask only the questions the code cannot answer.",
     "should_trigger": true
   },
   {
-    "query": "Plan a tiny feature: add an Archived filter to the bookings table. It should be simple, but ask the important questions first.",
+    "query": "I need a small feature plan. It should be simple, but ask the important questions before we build it.",
     "should_trigger": true
   },
   {
-    "query": "Stress test this plan.md and ask me the single most important unresolved question before we commit to it.",
+    "query": "Stress test this plan and ask the single most important unresolved question before we commit to it.",
     "should_trigger": true
   },
   {
-    "query": "I want a clickable mock for a new onboarding flow. Include visual direction, prototype tech, fake data, and a final implementation plan.",
+    "query": "I want a clickable mock for a new flow. Include look and feel, prototype tech, fake data, and a later implementation plan.",
     "should_trigger": true
   },
   {
-    "query": "Grill me for this UI flow, but I need to actually see the options and annotate them before choosing.",
+    "query": "Help me decide a UI flow, but I need to see concrete options before choosing rather than deciding from prose.",
     "should_trigger": true
   },
   {
-    "query": "I need to decide build-vs-buy for search. Ask me questions until the tradeoffs and risks are clear, then summarize the decision.",
+    "query": "I need to choose between two approaches. Ask questions until the tradeoffs, risks, and default recommendation are clear.",
     "should_trigger": true
   },
   {
-    "query": "We need to migrate billing providers. It touches auth, webhooks, schema, admin screens, and rollout risk. Grill me before planning.",
+    "query": "We need to migrate a risky system. It touches auth, external callbacks, schema, admin operations, and rollback. Interview me before planning.",
     "should_trigger": true
   },
   {
-    "query": "Continue the grill-me session after compaction. session_state.md says the last question is unanswered.",
+    "query": "Continue the interview after compaction. The saved session state says the last question is still unanswered.",
     "should_trigger": true
   },
   {
-    "query": "Help me understand the codebase area that owns push notifications. I may implement later, but right now I want a map and the next question.",
+    "query": "Help me map the codebase area that owns a feature. I may implement later, but right now I want evidence and the next useful question.",
     "should_trigger": true
   },
   {
-    "query": "Grill me with the existing CONTEXT.md and ADRs before we finalize this billing migration plan.",
+    "query": "Use the existing project docs and decision records before asking me what is still open in this plan.",
     "should_trigger": true
   },
   {
-    "query": "Run pnpm test and fix whatever fails.",
+    "query": "Run the test suite and fix whatever fails.",
     "should_trigger": false
   },
   {
-    "query": "Generate a hero image for a venue website.",
+    "query": "Generate a visual asset for a website hero.",
     "should_trigger": false
   },
   {
-    "query": "Summarize this PDF invoice and extract the totals into a CSV.",
+    "query": "Summarize this document and extract the totals into a spreadsheet.",
     "should_trigger": false
   },
   {
-    "query": "Please commit and push my current changes.",
+    "query": "Commit and push the current staged changes.",
     "should_trigger": false
   },
   {
-    "query": "Add Sentry SDK setup to this Next.js app.",
+    "query": "Install error monitoring in this web app.",
     "should_trigger": false
   },
   {
-    "query": "Review this PR for security vulnerabilities only.",
+    "query": "Review this change for security issues only.",
     "should_trigger": false
   },
   {
-    "query": "Make this React component faster by reducing re-renders.",
+    "query": "Make this component faster and reduce unnecessary renders.",
     "should_trigger": false
   },
   {
-    "query": "Look up current Appwrite pricing and tell me which plan I need.",
+    "query": "Look up the current pricing for this external service and tell me which plan fits.",
     "should_trigger": false
   },
   {
-    "query": "Create a spreadsheet with monthly sales and a chart.",
+    "query": "Create a spreadsheet with sample monthly data and a chart.",
     "should_trigger": false
   },
   {
-    "query": "Run the existing app in Chrome and click through checkout.",
+    "query": "Run the app in a browser and click through the main flow.",
     "should_trigger": false
   },
   {
-    "query": "I already gave you exact requirements. Implement the archived filter now without asking planning questions.",
+    "query": "I already gave exact requirements. Implement the change now without asking planning questions.",
     "should_trigger": false
   },
   {
-    "query": "Explain what this one function does: parseReminderPayload(). No interview, just explain the code.",
+    "query": "Explain what this one function does. No interview, just explain the code.",
     "should_trigger": false
   },
   {
-    "query": "Update CONTEXT.md with exactly these glossary terms. Do not ask questions or run a planning interview.",
+    "query": "Update the glossary with exactly these terms. Do not ask questions or run a planning interview.",
     "should_trigger": false
   }
 ]

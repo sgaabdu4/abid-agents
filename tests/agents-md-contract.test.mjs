@@ -277,7 +277,8 @@ assertIncludes(noMistakesSkillText, 'ensure-worktree-ready.sh');
 assertIncludes(noMistakesSkillText, 'For GitHub Actions/`gh` CI failures, inspect logs in parallel where possible');
 assertIncludes(noMistakesAxiText, 'explicit refspec');
 assertIncludes(noMistakesAxiText, 'For GitHub Actions or `gh` CI failures, inspect all failing checks/logs before');
-assertIncludes(noMistakesAxiText, 'batch fixes into one local verify loop, and rerun only the needed workflows/checks');
+assertIncludes(noMistakesAxiText, 'batch fixes');
+assertIncludes(noMistakesAxiText, 'rerun only the needed workflows/checks');
 
 assertIncludes(autoSyncText, 'refresh_local_install', 'auto-sync must refresh installed scripts after pulls');
 assertIncludes(autoSyncText, 'ABID_AGENTS_SKIP_NPM_INSTALL=1', 'auto-sync refresh must not run package updates');
