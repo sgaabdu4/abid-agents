@@ -21,12 +21,12 @@ function assertNotIncludes(haystack, needle, message = `unexpected ${needle}`) {
 assert.ok(text.startsWith('# Agent Rules\n\n## Stops\n'), 'AGENTS.md must start with rules, not prose preamble');
 assertIncludes(text, 'Touched/connected files >700 lines must end <700');
 assertIncludes(text, '`SKILL.md`: no 3+ step workflows');
-assertIncludes(text, 'Prod -> `PRODUCT.md`; design/UI/token -> `DESIGN.md` + token owner before handoff.');
-assertIncludes(text, '`codebase-memory`, `context-mode`, `terse` are support tools, not stages.');
+assertIncludes(text, 'Prod -> `PRODUCT.md`; design/UI/token -> `DESIGN.md` + token owner before handoff');
+assertIncludes(text, '`codebase-memory`, `context-mode`, `terse` are support tools, not stages');
 assertIncludes(text, 'violation -> lint/scanner/gate; repeat -> run/add script/test/hook/eval');
-assertIncludes(text, 'GH CI -> parallel logs/jobs, batch fixes, least reruns.');
+assertIncludes(text, 'GH CI -> parallel logs/jobs, batch fixes, least reruns');
 assertIncludes(text, "codebase-memory-mcp cli <tool> '<json>'");
-assertIncludes(text, 'Logs/output/docs/data -> sandbox/index; no dumps.');
+assertIncludes(text, 'Logs/output/docs/data -> sandbox/index; no dumps');
 assertIncludes(text, 'Semantic edits: blast radius + surrounding issues');
 assertNotIncludes(text, 'This file is the gatekeeper');
 assertNotIncludes(text, 'Skills and scripts own detailed workflows');
@@ -43,16 +43,16 @@ assertNotIncludes(text, 'exact-symbol');
 assertNotIncludes(text, 'Load `terse`;');
 assertNotIncludes(text, '## Final Change Report');
 assertIncludes(text, 'Report:');
-assertIncludes(text, 'Why: root cause/evidence.');
-assertIncludes(text, 'What: files/behavior.');
-assertIncludes(text, 'Risk: Direct callers; Cross-package; Schema/index; Cache/storage keys; Tests/fixtures; Routes/endpoints; Docs/config/agent assets.');
-assertIncludes(text, 'Proof: tests/gaps.');
-assertIncludes(text, 'Project AGENTS.md overrides global; repo facts only, <=600 o200k.');
-assertIncludes(text, 'User-facing replies -> `terse`.');
-assertIncludes(text, 'React/Next/perf/dupes -> `react-doctor` + `fallow` dupes + `vercel-react-best-practices`.');
-assertIncludes(text, 'Sentry/observability/issues/setup -> `sentry-workflow` only.');
-assertIncludes(text, 'Features -> `he-plan`/`he-implement`/`he-verify`; ship:`he-ship`; learn:`he-learn`.');
-assertIncludes(text, 'Post-`grill-me`: clear skip; brief `to-prd`; missing -> `to-issues`; sliced -> build; big -> both.');
+assertIncludes(text, 'Why: root cause/evidence');
+assertIncludes(text, 'What: files/behavior');
+assertIncludes(text, 'Risk: Direct callers; Cross-package; Schema/index; Cache/storage keys; Tests/fixtures; Routes/endpoints; Docs/config/agent assets');
+assertIncludes(text, 'Proof: tests/gaps');
+assertIncludes(text, 'Project AGENTS.md overrides global; repo facts only, <=600 o200k');
+assertIncludes(text, 'User-facing replies -> `terse`');
+assertIncludes(text, 'React/Next/perf/dupes -> `react-doctor` + `fallow` dupes + `vercel-react-best-practices`');
+assertIncludes(text, 'Sentry/observability/issues/setup -> `sentry-workflow` only');
+assertIncludes(text, 'Features -> `he-plan`/`he-implement`/`he-verify`; ship:`he-ship`; learn:`he-learn`');
+assertIncludes(text, 'Post-`grill-me`: clear skip; brief `to-prd`; missing -> `to-issues`; sliced -> build; big -> both');
 
 const tokenCheck = spawnSync('python3', ['-c', `
 import sys
@@ -145,7 +145,7 @@ assertIncludes(readmeText, 'docs/images/hard-eng-hero.png');
 assertIncludes(readmeText, 'docs/images/project-workflow-gates.png');
 assertIncludes(readmeText, '`context.product`, `context.design`, `context.tokenOwner`');
 assertIncludes(readmeText, 'check-project-context-gates.mjs --require-all');
-assertIncludes(readmeText, 'Product behavior changes update `PRODUCT.md`; UI, component, visual, stage-diagram, or token changes update `DESIGN.md`');
+assertIncludes(readmeText, 'Product behavior changes update `PRODUCT.md`; design, UI, component, or token changes update `DESIGN.md`');
 for (const inspirationLink of [
   'https://github.com/EveryInc/compound-engineering-plugin',
   'https://github.com/bmad-code-org/BMAD-METHOD',
@@ -223,12 +223,12 @@ assertIncludes(routeMapText, 'Return to `he-plan` only when a finding changes sc
 assertIncludes(routeMapText, 'Before any `Next: ... yes`, run `node "$HOME/.agents/scripts/he-state.mjs" validate <he-state.json>`.');
 assertIncludes(routeMapText, 'To avoid context rot, every stage exits with a receipt, not a transcript');
 assertIncludes(routeMapText, '`Stage:` current stage; `State:` path to `he-state.json`; `Decision:` pass/blocker; `Owner/proof:` paths or commands; `Artifacts:` links/paths; `Blocker:` none or exact ask; `Next:` ready/not-ready.');
-assertIncludes(routeMapText, 'Update state before and after each internal step, not only at stage end.');
-assertIncludes(routeMapText, 'Record product/design context in `context`: `PRODUCT.md`, `DESIGN.md`, and token/design-system owner path.');
-assertIncludes(routeMapText, 'Product behavior changes update `PRODUCT.md`; design/UI/token changes update `DESIGN.md` and the token owner.');
-assertIncludes(routeMapText, 'New stage threads read `he-state.json` first; they do not need the previous chat transcript.');
-assertIncludes(routeMapText, '`next.ready: true` is invalid while any step is pending, in progress, or blocked.');
-assertIncludes(routeMapText, '`next.ready: true` is invalid while blocking findings or push-blocking guardrails are unresolved.');
+assertIncludes(routeMapText, 'Update state before and after each internal step, not only at stage end');
+assertIncludes(routeMapText, 'Record product/design context in `context`: `PRODUCT.md`, `DESIGN.md`, and token/design-system owner path');
+assertIncludes(routeMapText, 'Product behavior changes update `PRODUCT.md`; design/UI/token changes update `DESIGN.md` and the token owner');
+assertIncludes(routeMapText, 'New stage threads read `he-state.json` first; they do not need the previous chat transcript');
+assertIncludes(routeMapText, '`next.ready: true` is invalid while any step is pending, in progress, or blocked');
+assertIncludes(routeMapText, '`next.ready: true` is invalid while blocking findings or push-blocking guardrails are unresolved');
 assertIncludes(routeMapText, 'Auto-fix loop: diagnose failures, route code changes back through `he-implement`, update state, rerun affected proof only, repeat until clean or blocked.');
 assertIncludes(routeMapText, 'Every failed stage records a finding in `he-state.json`, loops to the owning repair stage');
 assertIncludes(routeMapText, '| `he-ship` | Use the no-mistakes response loop; code changes return through `he-implement`, proof gaps through `he-verify`, gate/evidence fixes stay in `he-ship`. |');
