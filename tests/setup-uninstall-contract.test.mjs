@@ -42,7 +42,14 @@ assertIncludes(readme, 'only been tested on Codex running on macOS');
 assertIncludes(readme, 'docs/images/hard-eng-hero.png');
 assertIncludes(readme, 'docs/images/project-workflow-gates.png');
 
-for (const oldPublicName of ['Abid Agents', 'abid-agents', 'ABID_AGENTS', '/aa:', 'aa-state']) {
+const oldPublicNames = [
+  'Abid ' + 'Agents',
+  'abid' + '-agents',
+  'ABID' + '_AGENTS',
+  '/a' + 'a:',
+  'a' + 'a-state',
+];
+for (const oldPublicName of oldPublicNames) {
   assertNotIncludes(readme, oldPublicName, `README must not mention ${oldPublicName}`);
   assertNotIncludes(setup, oldPublicName, `setup.sh must not expose ${oldPublicName}`);
 }

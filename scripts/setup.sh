@@ -29,7 +29,7 @@ load_homebrew_shellenv() {
 }
 
 prepend_agent_paths() {
-  export PATH="$HOME/.npm-global/bin:$HOME/.local/bin:$HOME/flutter/bin:$HOME/Workspaces/flutter/bin:$HOME/.pub-cache/bin:$PATH"
+  export PATH="$HOME/.npm-global/bin:$HOME/.local/bin:$HOME/flutter/bin:$HOME/.pub-cache/bin:$PATH"
   load_homebrew_shellenv
   hash -r 2>/dev/null || true
 }
@@ -82,7 +82,7 @@ if [ -x /opt/homebrew/bin/brew ]; then
 elif [ -x /usr/local/bin/brew ]; then
   eval "$(/usr/local/bin/brew shellenv)"
 fi
-export PATH="$HOME/.npm-global/bin:$HOME/.local/bin:$HOME/flutter/bin:$HOME/Workspaces/flutter/bin:$HOME/.pub-cache/bin:$PATH"
+export PATH="$HOME/.npm-global/bin:$HOME/.local/bin:$HOME/flutter/bin:$HOME/.pub-cache/bin:$PATH"
 # END hard-eng bootstrap path
 EOF
 }
@@ -92,25 +92,18 @@ install_shell_path_block() {
     return 0
   fi
 
-  local target begin end old_owner old_begin old_end tmp
+  local target begin end tmp
   target="${HARD_ENG_SHELL_ENV_FILE:-$HOME/.zshenv}"
   begin="# BEGIN hard-eng bootstrap path"
   end="# END hard-eng bootstrap path"
-  old_owner="abid""-agents"
-  old_begin="# BEGIN ${old_owner} bootstrap path"
-  old_end="# END ${old_owner} bootstrap path"
   mkdir -p "$(dirname "$target")"
   if [[ -f "$target" ]] && grep -q "$begin" "$target" && ! grep -q "$end" "$target"; then
     echo "Preserving malformed managed PATH block in $target; missing end marker." >&2
     return 0
   fi
-  if [[ -f "$target" ]] && grep -q "$old_begin" "$target" && ! grep -q "$old_end" "$target"; then
-    echo "Preserving malformed old managed PATH block in $target; missing end marker." >&2
-    return 0
-  fi
-  if [[ -f "$target" ]] && { grep -q "$begin" "$target" || grep -q "$old_begin" "$target"; }; then
+  if [[ -f "$target" ]] && grep -q "$begin" "$target"; then
     tmp="${target}.hard-eng.$$"
-    awk -v begin="$begin" -v end="$end" -v old_begin="$old_begin" -v old_end="$old_end" '
+    awk -v begin="$begin" -v end="$end" '
       function print_block() {
         print "# BEGIN hard-eng bootstrap path"
         print "if [ -x /opt/homebrew/bin/brew ]; then"
@@ -118,10 +111,10 @@ install_shell_path_block() {
         print "elif [ -x /usr/local/bin/brew ]; then"
         print "  eval \"$(/usr/local/bin/brew shellenv)\""
         print "fi"
-        print "export PATH=\"$HOME/.npm-global/bin:$HOME/.local/bin:$HOME/flutter/bin:$HOME/Workspaces/flutter/bin:$HOME/.pub-cache/bin:$PATH\""
+        print "export PATH=\"$HOME/.npm-global/bin:$HOME/.local/bin:$HOME/flutter/bin:$HOME/.pub-cache/bin:$PATH\""
         print "# END hard-eng bootstrap path"
       }
-      $0 == begin || $0 == old_begin {
+      $0 == begin {
         if (!done) {
           print_block()
         }
@@ -129,7 +122,7 @@ install_shell_path_block() {
         skipping = 1
         next
       }
-      ($0 == end || $0 == old_end) && skipping {
+      $0 == end && skipping {
         skipping = 0
         next
       }

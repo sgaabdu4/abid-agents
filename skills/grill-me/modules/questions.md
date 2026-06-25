@@ -6,12 +6,15 @@ Use before asking any user-facing interview question.
 
 - Default to the markdown `Visible question block`; `grill-me` choices need
   visible context.
-- Use `request_user_input` only for simple, low-risk choices where the visible
-  text alone is enough. One call, one question, 2-3 exclusive options;
-  recommended option first with `(Recommended)`.
-- The tool `question` string must include compact `Meaning`, `Why it matters`,
-  `Suggested default`, and `Options`. Do not put critical context only in option
-  descriptions; the built-in UI may hide descriptions.
+- Do not use `request_user_input` for `grill-me` interview prompts that need
+  `Meaning`, `Why it matters`, `Suggested default`, or `Options`. That rich
+  context belongs in the markdown block.
+- Use `request_user_input` only for simple, low-risk choices where a one-line
+  question and short option labels are enough. One call, one question, 2-3
+  exclusive options; recommended option first with `(Recommended)`.
+- In a `request_user_input` call, the tool `question` string is only the short
+  question. Options must be self-contained. Descriptions are optional and
+  non-critical because the built-in UI may hide them.
 - Omit `autoResolutionMs` for blocking/high-risk choices; use it only when a
   default can safely continue. Persist the exact markdown block or tool
   question/options before replying/calling.

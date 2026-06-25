@@ -3,7 +3,7 @@
 set -eu
 
 HOME_DIR="${HOME:?HOME is required}"
-PATH="/opt/homebrew/bin:/usr/local/bin:$HOME_DIR/.npm-global/bin:$HOME_DIR/.local/bin:$HOME_DIR/flutter/bin:$HOME_DIR/Workspaces/flutter/bin:$HOME_DIR/.pub-cache/bin:/usr/bin:/bin:/usr/sbin:/sbin"
+PATH="/opt/homebrew/bin:/usr/local/bin:$HOME_DIR/.npm-global/bin:$HOME_DIR/.local/bin:$HOME_DIR/flutter/bin:$HOME_DIR/.pub-cache/bin:/usr/bin:/bin:/usr/sbin:/sbin"
 LOG_DIR="$HOME_DIR/.codex/logs"
 LOG_FILE="$LOG_DIR/codex-watchdog.log"
 mkdir -p "$LOG_DIR"

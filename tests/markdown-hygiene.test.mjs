@@ -57,7 +57,7 @@ assert.match(skillFail.stderr, /description must stay at or under 30 tokens/);
 
 const leakTmp = fs.mkdtempSync(path.join(os.tmpdir(), 'markdown-hygiene-leak-'));
 fs.writeFileSync(path.join(leakTmp, 'AGENTS.md'), '# Agent Rules\n\n## Stops\n- Rule.\n');
-fs.writeFileSync(path.join(leakTmp, 'README.md'), 'This session said to use /Users/abid/tmp.\n');
+fs.writeFileSync(path.join(leakTmp, 'README.md'), `This session said to use ${os.homedir()}/tmp.\n`);
 const leak = spawnSync(checker, {
   cwd: leakTmp,
   env: { ...process.env, AGENTS_HYGIENE_ROOT: leakTmp },

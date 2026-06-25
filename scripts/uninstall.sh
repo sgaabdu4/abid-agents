@@ -60,28 +60,22 @@ remove_exact_stub() {
 
 remove_managed_file() {
   local target="$1"
-  local old_owner
-  old_owner="abid""-agents"
   [[ -f "$target" ]] || return 0
-  if grep -q 'Managed by hard-eng installer' "$target" 2>/dev/null ||
-    grep -q "Managed by ${old_owner} installer" "$target" 2>/dev/null; then
+  if grep -q 'Managed by hard-eng installer' "$target" 2>/dev/null; then
     run rm -f "$target"
   fi
 }
 
 remove_shell_block() {
   local target="${HARD_ENG_SHELL_ENV_FILE:-$HOME/.zshenv}"
-  local tmp old_owner
-  old_owner="abid""-agents"
+  local tmp
   [[ -f "$target" ]] || return 0
   tmp="${target}.hard-eng-uninstall.$$"
   awk \
     -v begin="# BEGIN hard-eng bootstrap path" \
-    -v end="# END hard-eng bootstrap path" \
-    -v old_begin="# BEGIN ${old_owner} bootstrap path" \
-    -v old_end="# END ${old_owner} bootstrap path" '
-      $0 == begin || $0 == old_begin { skip = 1; next }
-      $0 == end || $0 == old_end { skip = 0; next }
+    -v end="# END hard-eng bootstrap path" '
+      $0 == begin { skip = 1; next }
+      $0 == end { skip = 0; next }
       !skip { print }
     ' "$target" >"$tmp"
   if [[ "$DRY_RUN" == "1" ]]; then
@@ -94,22 +88,16 @@ remove_shell_block() {
 
 remove_cron_blocks() {
   command -v crontab >/dev/null 2>&1 || return 0
-  local current tmp old_owner old_config
-  old_owner="abid""-agents"
-  old_config="agent""-config"
+  local current tmp
   current="$(crontab -l 2>/dev/null || true)"
   tmp="$(mktemp)"
   printf '%s\n' "$current" | awk \
     -v begin="# BEGIN hard-eng auto-sync" \
     -v end="# END hard-eng auto-sync" \
     -v stack_begin="# BEGIN hard-eng codex-stack-update" \
-    -v stack_end="# END hard-eng codex-stack-update" \
-    -v old_begin="# BEGIN ${old_owner} auto-sync" \
-    -v old_end="# END ${old_owner} auto-sync" \
-    -v old_config_begin="# BEGIN ${old_config} auto-sync" \
-    -v old_config_end="# END ${old_config} auto-sync" '
-      $0 == begin || $0 == stack_begin || $0 == old_begin || $0 == old_config_begin { skip = 1; next }
-      $0 == end || $0 == stack_end || $0 == old_end || $0 == old_config_end { skip = 0; next }
+    -v stack_end="# END hard-eng codex-stack-update" '
+      $0 == begin || $0 == stack_begin { skip = 1; next }
+      $0 == end || $0 == stack_end { skip = 0; next }
       !skip { print }
     ' >"$tmp"
   run crontab "$tmp"
@@ -118,18 +106,14 @@ remove_cron_blocks() {
 
 remove_launch_agent() {
   [[ "$(uname -s)" == "Darwin" ]] || return 0
-  local label old_owner old_user old_label plist
+  local label plist
   label="dev.hard-eng.codex-watchdog"
-  old_owner="abid""-agents"
-  old_user="ab""id"
-  for old_label in "$label" "dev.${old_owner}.codex-watchdog" "com.${old_user}.codex-watchdog"; do
-    if command -v launchctl >/dev/null 2>&1; then
-      run launchctl bootout "gui/$(id -u)/$old_label" >/dev/null 2>&1 || true
-      run launchctl disable "gui/$(id -u)/$old_label" >/dev/null 2>&1 || true
-    fi
-    plist="$HOME/Library/LaunchAgents/${old_label}.plist"
-    [[ -e "$plist" ]] && run rm -f "$plist"
-  done
+  if command -v launchctl >/dev/null 2>&1; then
+    run launchctl bootout "gui/$(id -u)/$label" >/dev/null 2>&1 || true
+    run launchctl disable "gui/$(id -u)/$label" >/dev/null 2>&1 || true
+  fi
+  plist="$HOME/Library/LaunchAgents/${label}.plist"
+  [[ -e "$plist" ]] && run rm -f "$plist"
 }
 
 remove_hooks() {

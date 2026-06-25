@@ -106,12 +106,14 @@ const normalizedQuestionsText = questionsText.replace(/\s+/g, " ");
 for (const required of [
   "request_user_input",
   "Default to the markdown",
+  "Do not use `request_user_input` for `grill-me` interview prompts",
+  "rich context belongs in the markdown block",
   "only for simple, low-risk choices",
   "2-3 exclusive options",
   "autoResolutionMs",
-  "The tool `question` string must include",
-  "Do not put critical context only in option descriptions",
-  "built-in UI may hide descriptions"
+  "the tool `question` string is only the short question",
+  "Descriptions are optional and non-critical",
+  "built-in UI may hide them"
 ]) {
   if (!normalizedQuestionsText.includes(required)) {
     errors.push(`questions.md missing request_user_input contract: ${required}`);

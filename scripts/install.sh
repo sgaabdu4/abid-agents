@@ -76,8 +76,6 @@ replace_with_link_file() {
 install_managed_executable() {
   local source="$1"
   local target="$2"
-  local old_owner
-  old_owner="abid""-agents"
   mkdir -p "$(dirname "$target")"
   if [[ -L "$target" ]]; then
     if [[ "$(readlink "$target")" == "$source" ]]; then
@@ -86,8 +84,7 @@ install_managed_executable() {
     echo "Preserving existing symlink: $target"
     return 0
   elif [[ -e "$target" ]] &&
-    ! grep -q 'Managed by hard-eng installer' "$target" 2>/dev/null &&
-    ! grep -q "Managed by ${old_owner} installer" "$target" 2>/dev/null; then
+    ! grep -q 'Managed by hard-eng installer' "$target" 2>/dev/null; then
     echo "Preserving existing file: $target"
     return 0
   fi
@@ -96,7 +93,7 @@ install_managed_executable() {
 }
 
 install_codex_watchdog() {
-  local codex_bin launch_agent launch_label old_owner old_user old_label
+  local codex_bin launch_agent launch_label
   if [[ "${HARD_ENG_SKIP_WATCHDOG:-}" == "1" ]]; then
     return 0
   fi
@@ -162,12 +159,6 @@ EOF
       echo "Codex watchdog installed but not loaded; run: launchctl bootstrap gui/$(id -u) $launch_agent" >&2
     }
   fi
-  old_owner="abid""-agents"
-  old_user="ab""id"
-  for old_label in "dev.${old_owner}.codex-watchdog" "com.${old_user}.codex-watchdog"; do
-    launchctl bootout "gui/$(id -u)/$old_label" >/dev/null 2>&1 || true
-    launchctl disable "gui/$(id -u)/$old_label" >/dev/null 2>&1 || true
-  done
 }
 
 resolve_codebase_memory_mcp_command() {
@@ -490,7 +481,6 @@ fi
 
 "$repo/scripts/check-markdown-hygiene.mjs"
 
-pattern='frontline|frontline-fitness|repem|jabal[ -_]?sina|jabal|afenso|/Users/abid|Workspaces/afenso|/Users/abid/Workspaces'
 grep_pathspecs=(. ':!scripts/install.sh' ':!scripts/check-markdown-hygiene.mjs' ':!tests/markdown-hygiene.test.mjs')
 secret_pattern='(github_pat_[A-Za-z0-9_]{20,}|gh[pousr]_[A-Za-z0-9_]{20,}|sk-[A-Za-z0-9_-]{20,}|AKIA[0-9A-Z]{16}|-----BEGIN [A-Z ]*PRIVATE KEY-----)'
 generated_marker="AUTO""-GENERATED"
@@ -553,7 +543,13 @@ if [[ -n "$secret_files" ]]; then
   exit 1
 fi
 
-matches="$(git grep --cached -I -l -i -E "$pattern" -- "${grep_pathspecs[@]}" || true)"
+home_matches="$(git grep --cached -I -l -F "$HOME" -- "${grep_pathspecs[@]}" || true)"
+private_pattern="${HARD_ENG_PRIVATE_CONTENT_PATTERN:-}"
+pattern_matches=""
+if [[ -n "$private_pattern" ]]; then
+  pattern_matches="$(git grep --cached -I -l -i -E "$private_pattern" -- "${grep_pathspecs[@]}" || true)"
+fi
+matches="${home_matches}${home_matches:+$'\n'}${pattern_matches}"
 
 if [[ -n "$matches" ]]; then
   printf '%s\n' "Blocked commit: staged content contains private project/local path references."

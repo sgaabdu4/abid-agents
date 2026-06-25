@@ -4,19 +4,13 @@ set -euo pipefail
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 SCHEDULE="${HARD_ENG_CRON_SCHEDULE:-*/15 * * * *}"
 CODEX_STACK_SCHEDULE="${HARD_ENG_CODEX_STACK_CRON_SCHEDULE:-17 5 * * 1}"
-PATH_VALUE="${HARD_ENG_CRON_PATH:-/opt/homebrew/bin:/usr/local/bin:$HOME/.npm-global/bin:$HOME/.local/bin:$HOME/flutter/bin:$HOME/Workspaces/flutter/bin:$HOME/.pub-cache/bin:/usr/bin:/bin:/usr/sbin:/sbin}"
+PATH_VALUE="${HARD_ENG_CRON_PATH:-/opt/homebrew/bin:/usr/local/bin:$HOME/.npm-global/bin:$HOME/.local/bin:$HOME/flutter/bin:$HOME/.pub-cache/bin:/usr/bin:/bin:/usr/sbin:/sbin}"
 LOG="$ROOT/.git/auto-sync.log"
 CODEX_STACK_LOG="$HOME/.codex/logs/codex-update-stack.log"
 BEGIN_MARK="# BEGIN hard-eng auto-sync"
 END_MARK="# END hard-eng auto-sync"
 CODEX_STACK_BEGIN_MARK="# BEGIN hard-eng codex-stack-update"
 CODEX_STACK_END_MARK="# END hard-eng codex-stack-update"
-OLD_OWNER="abid""-agents"
-OLD_CONFIG="agent""-config"
-OLD_BEGIN_MARK="# BEGIN ${OLD_OWNER} auto-sync"
-OLD_END_MARK="# END ${OLD_OWNER} auto-sync"
-OLD_CONFIG_BEGIN_MARK="# BEGIN ${OLD_CONFIG} auto-sync"
-OLD_CONFIG_END_MARK="# END ${OLD_CONFIG} auto-sync"
 JOB="$SCHEDULE cd \"$ROOT\" && PATH=\"$PATH_VALUE\" \"$ROOT/scripts/auto-sync.sh\" >> \"$LOG\" 2>&1"
 CODEX_STACK_JOB="$CODEX_STACK_SCHEDULE mkdir -p \"$HOME/.codex/logs\" && cd \"$ROOT\" && PATH=\"$PATH_VALUE\" \"$ROOT/codex/bin/codex-update-stack\" >> \"$CODEX_STACK_LOG\" 2>&1"
 TMP_CRON="$(mktemp)"
@@ -68,13 +62,9 @@ filtered="$(printf '%s\n' "$current" | awk \
   -v begin="$BEGIN_MARK" \
   -v end="$END_MARK" \
   -v stack_begin="$CODEX_STACK_BEGIN_MARK" \
-  -v stack_end="$CODEX_STACK_END_MARK" \
-  -v old_begin="$OLD_BEGIN_MARK" \
-  -v old_end="$OLD_END_MARK" \
-  -v old_config_begin="$OLD_CONFIG_BEGIN_MARK" \
-  -v old_config_end="$OLD_CONFIG_END_MARK" '
-  $0 == begin || $0 == stack_begin || $0 == old_begin || $0 == old_config_begin { skip = 1; next }
-  $0 == end || $0 == stack_end || $0 == old_end || $0 == old_config_end { skip = 0; next }
+  -v stack_end="$CODEX_STACK_END_MARK" '
+  $0 == begin || $0 == stack_begin { skip = 1; next }
+  $0 == end || $0 == stack_end { skip = 0; next }
   !skip { print }
 ')"
 

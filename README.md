@@ -38,7 +38,7 @@ cd "$HOME/.agents"
 
 | Mode | Use it when | Installs |
 | --- | --- | --- |
-| `--full` | You want the workstation path. | prerequisites when allowed, MCP tools, skills, configs, Git hooks, watchdog, Treehouse, `no-mistakes`, optional cron, worktree readiness |
+| `--full` | You want the workstation path. | prerequisites when allowed, MCP tools, skills, configs, Git hooks, watchdog, [`Treehouse`](https://github.com/kunchenguid/treehouse), `no-mistakes`, optional cron, worktree readiness |
 | `--skills-only` | You only want the agent surface. | repo clone/update, pinned skill submodules, linked `AGENTS.md`, linked skills/configs, local hooks |
 | `--prereqs-only` | You are repairing setup dependencies. | prerequisite tools only |
 | `--uninstall --yes` | You want to remove what Hard Eng installed. | managed links, skills, hooks, cron blocks, watchdog, managed bins, cache, shell PATH block |

@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 import fs from 'node:fs';
+import os from 'node:os';
 import path from 'node:path';
 import { spawnSync } from 'node:child_process';
 
@@ -20,11 +21,21 @@ const maxAgentsLines = 80;
 const maxAgentsTokens = 1000;
 const maxSkillEntrypointLines = 100;
 const maxSkillDescriptionTokens = 30;
+
+function escapeRegExp(value) {
+  return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
+const localMachinePatterns = [escapeRegExp(os.homedir())];
+if (process.env.HARD_ENG_MARKDOWN_PRIVATE_PATTERN) {
+  localMachinePatterns.push(process.env.HARD_ENG_MARKDOWN_PRIVATE_PATTERN);
+}
+
 const globalRules = [
   {
     name: 'local machine path',
     marker: 'allow-local-machine-paths',
-    pattern: /\/Users\/abid|Workspaces\/afenso/,
+    pattern: new RegExp(localMachinePatterns.join('|')),
   },
   {
     name: 'conversation state',
