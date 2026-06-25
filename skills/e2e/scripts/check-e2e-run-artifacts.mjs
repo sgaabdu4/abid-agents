@@ -5,17 +5,25 @@ import path from 'node:path';
 const args = process.argv.slice(2);
 const runDirIndex = args.indexOf('--run-dir');
 const videoModeIndex = args.indexOf('--video');
+const videoProfilesIndex = args.indexOf('--video-profiles');
 const allowUnresolved = args.includes('--allow-unresolved');
 
 if (runDirIndex === -1 || !args[runDirIndex + 1]) {
-  console.error('Usage: check-e2e-run-artifacts.mjs --run-dir <docs/e2e/RUN_ID> [--video expected|optional|off] [--allow-unresolved]');
+  console.error('Usage: check-e2e-run-artifacts.mjs --run-dir <docs/e2e/RUN_ID> [--video expected|optional|off] [--video-profiles desktop,mobile|any] [--allow-unresolved]');
   process.exit(2);
 }
 
 const runDir = path.resolve(args[runDirIndex + 1]);
 const videoMode = videoModeIndex === -1 ? 'expected' : args[videoModeIndex + 1];
+const videoProfilesRaw = videoProfilesIndex === -1 ? 'desktop,mobile' : args[videoProfilesIndex + 1];
 const failures = [];
 const warnings = [];
+const requiredVideoProfiles = videoProfilesRaw === 'any'
+  ? []
+  : String(videoProfilesRaw || '')
+    .split(',')
+    .map((profile) => profile.trim().toLowerCase())
+    .filter(Boolean);
 
 function fail(message) {
   failures.push(message);
@@ -31,9 +39,10 @@ function readFile(rel) {
   return fs.readFileSync(fullPath, 'utf8');
 }
 
-function listFiles(rel, suffix) {
+function listFiles(rel, suffixes) {
   const dir = path.join(runDir, rel);
   if (!fs.existsSync(dir)) return [];
+  const acceptedSuffixes = Array.isArray(suffixes) ? suffixes : [suffixes].filter(Boolean);
   const result = [];
   const stack = [dir];
   while (stack.length) {
@@ -43,12 +52,22 @@ function listFiles(rel, suffix) {
       const stat = fs.statSync(fullPath);
       if (stat.isDirectory()) {
         stack.push(fullPath);
-      } else if (!suffix || name.endsWith(suffix)) {
+      } else if (!acceptedSuffixes.length || acceptedSuffixes.some((suffix) => name.endsWith(suffix))) {
         result.push(fullPath);
       }
     }
   }
   return result;
+}
+
+function filesForProfile(files, profile) {
+  const profilePattern = new RegExp(`(^|[-_./])${profile}($|[-_./])`, 'i');
+  return files.filter((file) => profilePattern.test(path.basename(file)));
+}
+
+function missingVideoMessage(kind, profile, fallbackMentioned) {
+  const suffix = fallbackMentioned ? ' (fallback noted in report)' : '';
+  return `${profile} ${kind} is expected but no ${kind} file exists${suffix}`;
 }
 
 function isExistingArtifact(candidate) {
@@ -169,19 +188,39 @@ if (!fs.existsSync(runDir)) {
     fail('issues.md contains unresolved issue checkboxes');
   }
 
-  const videos = listFiles('videos', '.mp4');
-  const recaps = listFiles('recaps', '.mp4');
+  const videos = listFiles('videos', ['.mp4', '.webm', '.mov']);
+  const recaps = listFiles('recaps', ['.mp4', '.webm', '.mov']);
   const reportMentionsVideoFallback = report ? /video.*(unavailable|unsupported|blocked|fallback|not supported)|no video/i.test(report) : false;
   const reportMentionsRecapFallback = report ? /recap.*(unavailable|unsupported|blocked|fallback|not supported)|no 2x|no recap/i.test(report) : false;
 
-  if (videoMode === 'expected') {
-    if (!videos.length && !reportMentionsVideoFallback) fail('video is expected but no video file or fallback reason exists');
-    if (!recaps.length && !reportMentionsRecapFallback) fail('2x recap is expected but no recap file or fallback reason exists');
-  } else if (videoMode === 'optional') {
-    if (!videos.length && !reportMentionsVideoFallback) warn('video missing without fallback reason');
-    if (!recaps.length && !reportMentionsRecapFallback) warn('2x recap missing without fallback reason');
-  } else if (videoMode !== 'off') {
+  if (!['expected', 'optional', 'off'].includes(videoMode)) {
     fail(`invalid --video value: ${videoMode}`);
+  }
+  if (videoProfilesIndex !== -1 && !args[videoProfilesIndex + 1]) {
+    fail('--video-profiles requires a value');
+  }
+  if (videoProfilesRaw !== 'any' && requiredVideoProfiles.length === 0) {
+    fail('no video profiles requested');
+  }
+
+  if (videoMode === 'expected') {
+    if (requiredVideoProfiles.length) {
+      for (const profile of requiredVideoProfiles) {
+        if (!filesForProfile(videos, profile).length) fail(missingVideoMessage('video', profile, reportMentionsVideoFallback));
+        if (!filesForProfile(recaps, profile).length) fail(missingVideoMessage('2x recap', profile, reportMentionsRecapFallback));
+      }
+    } else {
+      if (!videos.length) fail(`video is expected but no video file exists${reportMentionsVideoFallback ? ' (fallback noted in report)' : ''}`);
+      if (!recaps.length) fail(`2x recap is expected but no recap file exists${reportMentionsRecapFallback ? ' (fallback noted in report)' : ''}`);
+    }
+  } else if (videoMode === 'optional') {
+    const profiles = requiredVideoProfiles.length ? requiredVideoProfiles : ['any'];
+    for (const profile of profiles) {
+      const profileVideos = profile === 'any' ? videos : filesForProfile(videos, profile);
+      const profileRecaps = profile === 'any' ? recaps : filesForProfile(recaps, profile);
+      if (!profileVideos.length && !reportMentionsVideoFallback) warn(`${profile} video missing without fallback reason`);
+      if (!profileRecaps.length && !reportMentionsRecapFallback) warn(`${profile} 2x recap missing without fallback reason`);
+    }
   }
 }
 
@@ -190,6 +229,7 @@ const result = {
   runDir,
   failures,
   warnings,
+  requiredVideoProfiles,
 };
 
 console.log(JSON.stringify(result, null, 2));

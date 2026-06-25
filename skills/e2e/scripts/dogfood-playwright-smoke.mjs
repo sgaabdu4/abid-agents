@@ -21,8 +21,12 @@ const { chromium } = requireFromPlaywright('playwright');
 const skillDir = path.resolve(new URL('..', import.meta.url).pathname);
 const runDir = path.join(repoRoot, 'docs', 'e2e', runId);
 const flow = 'dogfood';
+const profiles = [
+  { name: 'desktop', viewport: { width: 960, height: 540 } },
+  { name: 'mobile', viewport: { width: 390, height: 844 } },
+];
 const dirs = {
-  screenshots: path.join(runDir, 'screenshots', flow),
+  screenshots: path.join(runDir, 'screenshots'),
   videos: path.join(runDir, 'videos'),
   recaps: path.join(runDir, 'recaps'),
   logs: path.join(runDir, 'logs'),
@@ -38,21 +42,23 @@ function rel(file) {
   return path.relative(runDir, file);
 }
 
-function event(row) {
+function event(profile, row) {
   eventIndex += 1;
-  events.push({
+  return {
     runId,
     flow,
     eventId: `evt-${String(eventIndex).padStart(2, '0')}`,
     ts: new Date().toISOString(),
     driver: 'playwright',
+    profile: profile.name,
+    viewport: profile.viewport,
     url: row.url || 'about:blank',
     ...row,
-  });
+  };
 }
 
-async function screenshot(page, name) {
-  const file = path.join(dirs.screenshots, `${String(eventIndex + 1).padStart(2, '0')}_${name}.png`);
+async function screenshot(page, profile, name) {
+  const file = path.join(dirs.screenshots, flow, profile.name, `${String(eventIndex + 1).padStart(2, '0')}_${name}.png`);
   await page.screenshot({ path: file, fullPage: true });
   return rel(file);
 }
@@ -91,18 +97,7 @@ function writeText(relPath, text) {
   fs.writeFileSync(file, text);
 }
 
-const browser = await chromium.launch({ headless: true });
-const context = await browser.newContext({
-  viewport: { width: 960, height: 540 },
-  recordVideo: { dir: dirs.videos, size: { width: 960, height: 540 } },
-});
-const page = await context.newPage();
-
-page.on('console', (message) => {
-  fs.appendFileSync(path.join(dirs.logs, `${flow}.log`), `${message.type()}: ${message.text()}\n`);
-});
-
-await page.setContent(`<!doctype html>
+const fixtureHtml = `<!doctype html>
 <html>
   <head>
     <meta charset="utf-8" />
@@ -137,84 +132,141 @@ await page.setContent(`<!doctype html>
       });
     </script>
   </body>
-</html>`);
+</html>`;
 
-event({
-  step: 'load fixture',
-  action: 'navigate',
-  target: 'inline dogfood fixture',
-  assertion: 'heading is visible',
-  status: 'pass',
-  screenshotPath: await screenshot(page, 'loaded'),
-});
+async function runProfile(browser, profile) {
+  const profileEvents = [];
+  const context = await browser.newContext({
+    viewport: profile.viewport,
+    recordVideo: { dir: dirs.videos, size: profile.viewport },
+  });
+  const page = await context.newPage();
 
-await moveCursor(page, '[data-testid="name"]');
-await page.locator('[data-testid="name"]').click();
-await page.locator('[data-testid="name"]').fill('seeded-user');
-event({
-  step: 'enter name',
-  action: 'input',
-  target: 'Name input',
-  x: 158,
-  y: 144,
-  valueRedacted: 'seeded-user',
-  assertion: 'input value is seeded-user',
-  status: 'pass',
-  screenshotPath: await screenshot(page, 'input'),
-});
+  page.on('console', (message) => {
+    fs.appendFileSync(path.join(dirs.logs, `${flow}_${profile.name}.log`), `${message.type()}: ${message.text()}\n`);
+  });
 
-const savePoint = await clickWithBloom(page, '[data-testid="save"]');
-await page.locator('[data-testid="status"]').waitFor({ state: 'visible' });
-event({
-  step: 'save form',
-  action: 'click',
-  target: 'Save button',
-  x: savePoint.x,
-  y: savePoint.y,
-  assertion: 'status says Saved seeded-user',
-  status: 'pass',
-  screenshotPath: await screenshot(page, 'saved'),
-});
+  await page.setContent(fixtureHtml);
 
-const deletePoint = await moveCursor(page, '[data-testid="delete"]');
-event({
-  step: 'block destructive action',
-  action: 'click-blocked',
-  target: 'Delete account button',
-  x: deletePoint.x,
-  y: deletePoint.y,
-  assertion: 'destructive action was not executed',
-  status: 'blocked',
-  screenshotPath: await screenshot(page, 'blocked_destructive'),
-});
+  profileEvents.push(event(profile, {
+    step: 'load fixture',
+    action: 'navigate',
+    target: 'inline dogfood fixture',
+    assertion: 'heading is visible',
+    status: 'pass',
+    screenshotPath: await screenshot(page, profile, 'loaded'),
+  }));
 
-const video = page.video();
-await context.close();
-await browser.close();
+  const inputPoint = await moveCursor(page, '[data-testid="name"]');
+  await page.locator('[data-testid="name"]').click();
+  await page.locator('[data-testid="name"]').fill('seeded-user');
+  profileEvents.push(event(profile, {
+    step: 'enter name',
+    action: 'input',
+    target: 'Name input',
+    x: inputPoint.x,
+    y: inputPoint.y,
+    valueRedacted: 'seeded-user',
+    assertion: 'input value is seeded-user',
+    status: 'pass',
+    screenshotPath: await screenshot(page, profile, 'input'),
+  }));
 
-const rawVideoPath = await video.path();
-const webmPath = path.join(dirs.videos, `${flow}.webm`);
-fs.renameSync(rawVideoPath, webmPath);
-const mp4Path = path.join(dirs.videos, `${flow}.mp4`);
-const convert = spawnSync('ffmpeg', [
-  '-hide_banner',
-  '-loglevel',
-  'error',
-  '-i',
-  webmPath,
-  '-movflags',
-  '+faststart',
-  mp4Path,
-], { encoding: 'utf8' });
+  const savePoint = await clickWithBloom(page, '[data-testid="save"]');
+  await page.locator('[data-testid="status"]').waitFor({ state: 'visible' });
+  profileEvents.push(event(profile, {
+    step: 'save form',
+    action: 'click',
+    target: 'Save button',
+    x: savePoint.x,
+    y: savePoint.y,
+    assertion: 'status says Saved seeded-user',
+    status: 'pass',
+    screenshotPath: await screenshot(page, profile, 'saved'),
+  }));
 
-let videoPath = rel(webmPath);
-let videoFallback = 'mp4 conversion unavailable';
-if (convert.status === 0) {
-  videoPath = rel(mp4Path);
-  videoFallback = '';
+  const deletePoint = await moveCursor(page, '[data-testid="delete"]');
+  profileEvents.push(event(profile, {
+    step: 'block destructive action',
+    action: 'click-blocked',
+    target: 'Delete account button',
+    x: deletePoint.x,
+    y: deletePoint.y,
+    assertion: 'destructive action was not executed',
+    status: 'blocked',
+    screenshotPath: await screenshot(page, profile, 'blocked_destructive'),
+  }));
+
+  const video = page.video();
+  await context.close();
+
+  const rawVideoPath = await video.path();
+  const webmPath = path.join(dirs.videos, `${flow}_${profile.name}.webm`);
+  fs.renameSync(rawVideoPath, webmPath);
+  const mp4Path = path.join(dirs.videos, `${flow}_${profile.name}.mp4`);
+  const convert = spawnSync('ffmpeg', [
+    '-hide_banner',
+    '-loglevel',
+    'error',
+    '-i',
+    webmPath,
+    '-movflags',
+    '+faststart',
+    mp4Path,
+  ], { encoding: 'utf8' });
+
+  let videoPath = rel(webmPath);
+  let videoFallback = 'mp4 conversion unavailable';
+  if (convert.status === 0) {
+    videoPath = rel(mp4Path);
+    videoFallback = '';
+  }
+
+  let recapPath = '';
+  let recapFallback = '2x recap unavailable: mp4 conversion unavailable';
+  if (convert.status === 0) {
+    const recapFile = path.join(dirs.recaps, `${flow}_${profile.name}_2x_cursor.mp4`);
+    const recap = spawnSync('node', [
+      path.join(skillDir, 'scripts', 'make-2x-recap.mjs'),
+      '--input',
+      mp4Path,
+      '--output',
+      recapFile,
+    ], { encoding: 'utf8' });
+    if (recap.status === 0) {
+      recapPath = rel(recapFile);
+      recapFallback = '';
+    } else {
+      recapFallback = `2x recap unavailable: ${recap.stderr.trim() || recap.stdout.trim()}`;
+    }
+  }
+
+  for (const row of profileEvents) {
+    row.videoPath = videoPath;
+    if (recapPath) row.recapPath = recapPath;
+  }
+  events.push(...profileEvents);
+
+  return {
+    profile: profile.name,
+    viewport: profile.viewport,
+    actions: profileEvents.length,
+    videoPath,
+    videoFallback,
+    recapPath,
+    recapFallback,
+  };
 }
 
-for (const row of events) row.videoPath = videoPath;
+const browser = await chromium.launch({ headless: true });
+const profileResults = [];
+try {
+  for (const profile of profiles) {
+    profileResults.push(await runProfile(browser, profile));
+  }
+} finally {
+  await browser.close();
+}
 
 fs.writeFileSync(path.join(runDir, 'events.jsonl'), `${events.map((row) => JSON.stringify(row)).join('\n')}\n`);
 writeText('plans/INDEX.md', '# Plans\n\n- dogfood\n');
@@ -225,28 +277,9 @@ writeText('state.json', `${JSON.stringify({
   runId,
   driver: 'playwright',
   flow,
+  profiles: profileResults,
   uiActions: events.length,
-  videoPath,
 }, null, 2)}\n`);
-
-let recapPath = '';
-let recapFallback = '2x recap unavailable: mp4 conversion unavailable';
-if (convert.status === 0) {
-  const recapFile = path.join(dirs.recaps, `${flow}_2x_cursor.mp4`);
-  const recap = spawnSync('node', [
-    path.join(skillDir, 'scripts', 'make-2x-recap.mjs'),
-    '--input',
-    mp4Path,
-    '--output',
-    recapFile,
-  ], { encoding: 'utf8' });
-  if (recap.status === 0) {
-    recapPath = rel(recapFile);
-    recapFallback = '';
-  } else {
-    recapFallback = `2x recap unavailable: ${recap.stderr.trim() || recap.stdout.trim()}`;
-  }
-}
 
 writeText('report.md', [
   '# E2E Dogfood Report',
@@ -254,8 +287,10 @@ writeText('report.md', [
   'Driver used: Playwright Chromium.',
   `UI action events: ${events.length}.`,
   'Issues: none unresolved.',
-  `Video: ${videoPath}${videoFallback ? ` (${videoFallback})` : ''}.`,
-  `2x cursor recap: ${recapPath || recapFallback}.`,
+  ...profileResults.flatMap((result) => [
+    `Video ${result.profile}: ${result.videoPath}${result.videoFallback ? ` (${result.videoFallback})` : ''}.`,
+    `2x cursor recap ${result.profile}: ${result.recapPath || result.recapFallback}.`,
+  ]),
   'Regression commands: node --test tests/skills/e2e/recap.test.mjs tests/skills/e2e/project-pack.test.mjs tests/skills/e2e/artifact-checker.test.mjs -> pass.',
   '',
 ].join('\n'));
@@ -276,6 +311,6 @@ console.log(JSON.stringify({
   runDir,
   report: path.join(runDir, 'report.md'),
   events: path.join(runDir, 'events.jsonl'),
-  video: path.join(runDir, videoPath),
-  recap: recapPath ? path.join(runDir, recapPath) : '',
+  videos: profileResults.map((result) => path.join(runDir, result.videoPath)),
+  recaps: profileResults.map((result) => result.recapPath ? path.join(runDir, result.recapPath) : ''),
 }, null, 2));

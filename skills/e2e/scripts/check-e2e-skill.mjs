@@ -87,16 +87,17 @@ assert(browser.includes('ensure-playwright.mjs'), 'browser-first policy must che
 assert(browser.includes('Computer Use'), 'browser-first policy must include Computer Use fallback');
 assert(browser.includes('check-ui-runtime.mjs'), 'browser-first policy must include runtime preflight');
 assert(capture.includes('events.jsonl'), 'capture policy must require events.jsonl');
-assert(capture.includes('videos/<flow>.mp4'), 'capture policy must define video artifacts');
-assert(capture.includes('2x speed recap video'), 'capture policy must require 2x recap video');
+assert(capture.includes('videos/<flow>_<desktop|mobile>.mp4'), 'capture policy must define desktop/mobile video artifacts');
+assert(capture.includes('desktop and mobile 2x speed recap videos'), 'capture policy must require desktop/mobile 2x recap videos');
 assert(capture.includes('make-2x-recap.mjs'), 'capture policy must link the 2x recap helper');
 assert(capture.includes('check-e2e-run-artifacts.mjs'), 'capture policy must link the run artifact checker');
 assert(capture.includes('click bloom'), 'capture policy must include mouse clicker/click bloom');
 assert(runbook.includes('event row'), 'runbook runner prompt must require event rows');
 assert(runbook.includes('regression commands'), 'runbook report must include regression commands');
-assert(runbook.includes('2x cursor recap'), 'runbook report must include 2x cursor recap');
+assert(runbook.includes('desktop/mobile 2x cursor recap'), 'runbook report must include desktop/mobile 2x cursor recap');
 assert(dogfood.includes('Artifact Checker'), 'dogfood must define artifact checker expectations');
 assert(dogfood.includes('check-e2e-run-artifacts.mjs'), 'dogfood must use the run artifact checker');
+assert(dogfood.includes('desktop and mobile 2x videos'), 'dogfood must require desktop/mobile 2x videos');
 assert(!/Skill Eval|gpt-5\\.4-mini|model eval/i.test(dogfood), 'dogfood reference must not contain skill-eval guidance');
 
 for (const rel of requiredTemplates) {

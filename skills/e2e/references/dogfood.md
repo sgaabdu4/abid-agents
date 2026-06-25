@@ -30,7 +30,7 @@ The checker should fail when:
 
 - a checked flow lacks `events.jsonl`;
 - an action row lacks status or target evidence;
-- video is expected but absent without a fallback reason;
+- desktop or mobile 2x video is expected but absent;
 - screenshots are missing for failed steps;
 - `report.md` omits driver fallback, unresolved issues, or regression commands.
 
@@ -39,7 +39,7 @@ The checker should fail when:
 The dogfood report should prove:
 
 - the fixture or target app produced at least one UI action row;
-- screenshots or video exist for checked steps;
+- screenshots plus desktop and mobile 2x videos exist for checked steps;
 - blocked destructive actions are recorded without executing them;
 - console/log capture ran when available;
 - regression commands and remaining gaps are listed.

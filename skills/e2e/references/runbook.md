@@ -11,16 +11,16 @@ docs/e2e/<RUN_ID>/
   plans/<flow>.md
   events.jsonl
   issues.md
-  screenshots/<flow>/<step>_<status>.png
-  videos/<flow>.mp4
-  recaps/<flow>_2x_cursor.mp4
+  screenshots/<flow>/<profile>/<step>_<status>.png
+  videos/<flow>_<desktop|mobile>.mp4
+  recaps/<flow>_<desktop|mobile>_2x_cursor.mp4
   traces/<flow>.zip
   logs/<flow>.log
   regression.md
   report.md
 ```
 
-`state.json` tracks run id, scope, stack, mode, fix policy, capture policy, risk limits, device/url/session/process ids, driver choice, fallback reason, flow statuses, UI action counts, artifact counts, and retry counts.
+`state.json` tracks run id, scope, stack, mode, fix policy, capture policy, risk limits, desktop/mobile targets, device/url/session/process ids, driver choice, fallback reason, flow statuses, UI action counts, artifact counts, and retry counts.
 `events.jsonl` records every click, input, navigation, wait, assertion, issue, fallback, and fix verification.
 
 ## Setup
@@ -62,14 +62,14 @@ issues-file: <ARTIFACTS>/issues.md
 screenshot-dir: <ARTIFACTS>/screenshots/<flow>/
 capture-policy: <default|audit|report-only>
 events-file: <ARTIFACTS>/events.jsonl
-video-path: <ARTIFACTS>/videos/<flow>.mp4
+video-paths: <ARTIFACTS>/videos/<flow>_desktop.mp4, <ARTIFACTS>/videos/<flow>_mobile.mp4
 run-id: <RUN_ID>
 device-id/dev-url/session-name: <value>
 risk-limits: <limits>
 
 Drive real UI only. Per step: action -> settle -> verify -> event row -> screenshot/video timestamp.
-At flow end, produce a 2x cursor/click recap video when video is supported.
-Tick [x] only with UI evidence. Halt on first FAIL inside the flow, append issue, and return <=150 words: status, action count, event count, artifacts, and fallback reason if any.
+At flow end, produce desktop and mobile 2x cursor/click recap videos when video is supported.
+Tick [x] only with UI evidence. On FAIL, append issue; in auto mode return for fix/rerun before continuing, and in guided/report-only mode halt. Return <=150 words: status, action count, event count, artifacts, and fallback reason if any.
 ```
 
 ## Issue Block
@@ -96,11 +96,11 @@ Regression: <command/result or pending>
 - Spec-gap: expected UI absent and no app error.
 - Flake: timing/network; one retry passes without code.
 
-Guided mode asks before category/fix. Auto mode uses the heuristic, patches regressions, marks spec gaps, retries flakes once, then escalates after 3 failed loops.
+Guided mode asks before category/fix. Auto mode uses the heuristic; for click-time violations, patch actionable regressions within risk limits, rerun the failing step/flow, then continue. Mark spec gaps, retry flakes once, then escalate after 3 failed loops.
 After any fix, rerun the impacted flow and the smallest existing regression command that could catch the breakage.
 
 ## Report
 
-Include status, driver used and fallback chain, totals, per-flow summary, UI action audit, fixes, risk controls, artifact paths, 2x cursor recap path or fallback reason, regression commands and results, skipped checks, and cleanup result.
+Include status, driver used and fallback chain, totals, per-flow summary, UI action audit, fixes, risk controls, artifact paths, desktop/mobile 2x cursor recap paths or fallback reasons, regression commands and results, skipped checks, and cleanup result.
 Any flow with zero UI calls makes the run invalid unless the report clearly marks UI proof blocked by tool failure.
 Run `scripts/check-e2e-run-artifacts.mjs --run-dir <docs/e2e/RUN_ID>` before marking the report complete.

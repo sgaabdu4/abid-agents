@@ -26,14 +26,17 @@ function runChecker(runDir, extraArgs = []) {
 
 function writeCompleteRun(runDir, overrides = {}) {
   writeFile(runDir, 'screenshots/login/01_pass.png', 'png');
-  writeFile(runDir, 'videos/login.mp4', 'video');
-  writeFile(runDir, 'recaps/login_2x_cursor.mp4', 'recap');
+  writeFile(runDir, 'videos/login_desktop.mp4', 'desktop video');
+  writeFile(runDir, 'videos/login_mobile.mp4', 'mobile video');
+  writeFile(runDir, 'recaps/login_desktop_2x_cursor.mp4', 'desktop recap');
+  writeFile(runDir, 'recaps/login_mobile_2x_cursor.mp4', 'mobile recap');
   writeFile(runDir, 'issues.md', overrides.issues ?? 'No unresolved issues.\n');
   writeFile(runDir, 'report.md', overrides.report ?? [
     'Driver used: Codex Browser. No fallback.',
     'Issues: none unresolved.',
     'Regression commands: npm test -> pass.',
-    '2x cursor recap: recaps/login_2x_cursor.mp4.',
+    '2x cursor recap desktop: recaps/login_desktop_2x_cursor.mp4.',
+    '2x cursor recap mobile: recaps/login_mobile_2x_cursor.mp4.',
   ].join('\n'));
   if (overrides.events !== null) {
     writeFile(runDir, 'events.jsonl', overrides.events ?? `${JSON.stringify({
@@ -43,6 +46,7 @@ function writeCompleteRun(runDir, overrides = {}) {
       eventId: 'evt-1',
       ts: '2026-06-22T00:00:00Z',
       driver: 'browser',
+      profile: 'desktop',
       action: 'click',
       target: 'button[name=Sign in]',
       assertion: 'dashboard is visible',
@@ -66,10 +70,14 @@ test('artifact checker rejects a run with missing action evidence', () => {
     'Driver used: Codex Browser. No fallback.',
     'Issues: none unresolved.',
     'Regression commands: npm test -> pass.',
-    '2x cursor recap unavailable: video unsupported.',
-    'No video: unsupported.',
+    '2x cursor recap desktop: recaps/login_desktop_2x_cursor.mp4.',
+    '2x cursor recap mobile: recaps/login_mobile_2x_cursor.mp4.',
   ].join('\n'));
   writeFile(runDir, 'issues.md', 'No unresolved issues.\n');
+  writeFile(runDir, 'videos/login_desktop.mp4', 'desktop video');
+  writeFile(runDir, 'videos/login_mobile.mp4', 'mobile video');
+  writeFile(runDir, 'recaps/login_desktop_2x_cursor.mp4', 'desktop recap');
+  writeFile(runDir, 'recaps/login_mobile_2x_cursor.mp4', 'mobile recap');
   writeFile(runDir, 'events.jsonl', `${JSON.stringify({
     runId: 'run-1',
     flow: 'login',
@@ -163,7 +171,8 @@ const failureCases = [
     report: [
       'Driver used: Codex Browser. No fallback.',
       'Issues: none unresolved.',
-      '2x cursor recap: recaps/login_2x_cursor.mp4.',
+      '2x cursor recap desktop: recaps/login_desktop_2x_cursor.mp4.',
+      '2x cursor recap mobile: recaps/login_mobile_2x_cursor.mp4.',
     ].join('\n'),
     expected: /omits regression/,
   },
@@ -195,7 +204,7 @@ for (const item of failureCases) {
   });
 }
 
-test('artifact checker accepts explicit video fallback when video is unsupported', () => {
+test('artifact checker rejects missing required videos even with fallback text', () => {
   const runDir = makeRunDir('video-fallback');
   writeFile(runDir, 'screenshots/login/01_pass.png', 'png');
   writeFile(runDir, 'issues.md', 'No unresolved issues.\n');
@@ -221,5 +230,48 @@ test('artifact checker accepts explicit video fallback when video is unsupported
   })}\n`);
 
   const result = runChecker(runDir);
+  assert.notEqual(result.status, 0);
+  assert.match(result.stdout, /desktop video is expected/);
+  assert.match(result.stdout, /mobile 2x recap is expected/);
+});
+
+test('artifact checker accepts optional video fallback for incomplete visual proof reports', () => {
+  const runDir = makeRunDir('video-optional-fallback');
+  writeFile(runDir, 'screenshots/login/01_pass.png', 'png');
+  writeFile(runDir, 'issues.md', 'No unresolved issues.\n');
+  writeFile(runDir, 'report.md', [
+    'Driver used: local script fallback.',
+    'Issues: none unresolved.',
+    'Regression commands: npm test -> pass.',
+    'Video unavailable: driver unsupported.',
+    '2x recap unavailable: encoder unsupported.',
+  ].join('\n'));
+  writeFile(runDir, 'events.jsonl', `${JSON.stringify({
+    runId: 'run-1',
+    flow: 'login',
+    step: 'submit credentials',
+    eventId: 'evt-1',
+    ts: '2026-06-22T00:00:00Z',
+    driver: 'local-script',
+    action: 'click',
+    target: 'button[name=Sign in]',
+    assertion: 'dashboard is visible',
+    status: 'pass',
+    screenshotPath: 'screenshots/login/01_pass.png',
+  })}\n`);
+
+  const result = runChecker(runDir, ['--video', 'optional']);
   assert.equal(result.status, 0, result.stdout + result.stderr);
+});
+
+test('artifact checker rejects missing mobile video from an otherwise captured run', () => {
+  const runDir = makeRunDir('missing-mobile');
+  writeCompleteRun(runDir);
+  fs.unlinkSync(path.join(runDir, 'videos/login_mobile.mp4'));
+  fs.unlinkSync(path.join(runDir, 'recaps/login_mobile_2x_cursor.mp4'));
+
+  const result = runChecker(runDir);
+  assert.notEqual(result.status, 0);
+  assert.match(result.stdout, /mobile video is expected/);
+  assert.match(result.stdout, /mobile 2x recap is expected/);
 });

@@ -25,12 +25,13 @@ Read the focused reference that matches the task:
 - Stop only the failed UI driver after one denied/non-profile-lock probe; continue through `references/browser-first.md` fallbacks before accepting missing visual evidence.
 - Before first-run setup or saved auth/flow reuse, check the project pack when the helper script is available; saved auth reuse still needs an automated E2E command.
 - Never mark resolved from screenshots alone; reproduce, patch only after cause/ripple checks, and rerun impacted E2E plus regression checks.
+- In auto mode, fix actionable click-time violations within risk limits, rerun that step/flow, and continue; stop only for unsafe side effects or unclear ownership.
 - Every checked action needs UI evidence: action event, settled assertion, screenshot or video frame, and artifact path.
 - Every checked flow must use or leave a runnable automated E2E command; manual-only runs are incomplete.
 - Confirm data mode before running flows when it is unknown: mock/seeded test data is default; prod data requires explicit approval and must be read-only unless exact writes are separately approved.
 - No prod writes/deletes, email/SMS, payments, or sharing unless explicitly approved.
-- UI or phone E2E requires a video artifact at 2x speed so exact appearance is reviewable.
-- Capture by default: `events.jsonl`, cursor/click video, step screenshots, supported logs/traces, and a final 2x cursor recap video. If video is blocked after driver fallbacks, report it as an artifact limit instead of a clean pass.
+- UI E2E requires desktop and mobile 2x video artifacts so exact appearance is reviewable; native phone counts as mobile.
+- Capture by default: `events.jsonl`, desktop+mobile cursor/click videos, step screenshots, supported logs/traces, and desktop+mobile 2x cursor recaps. If video is blocked after driver fallbacks, report it as an artifact limit instead of a clean pass.
 - Artifacts go under `docs/e2e/<RUN_ID>/`; never overwrite prior runs and never count zero UI calls as a pass.
 - Keep plans short; split flows across agents only when independent.
 

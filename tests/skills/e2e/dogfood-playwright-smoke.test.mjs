@@ -20,14 +20,23 @@ test('dogfood Playwright smoke creates checked screenshots, video, recap, and ev
 
   const parsed = JSON.parse(result.stdout);
   assert.equal(parsed.status, 'pass');
-  for (const file of [parsed.report, parsed.events, parsed.video, parsed.recap]) {
+  for (const file of [parsed.report, parsed.events, ...parsed.videos, ...parsed.recaps]) {
     assert.equal(fs.existsSync(file), true, `${file} missing`);
     assert.ok(fs.statSync(file).size > 0, `${file} empty`);
   }
+  assert.equal(parsed.videos.length, 2);
+  assert.equal(parsed.recaps.length, 2);
+  assert.deepEqual(
+    parsed.videos.map((file) => path.basename(file)).sort(),
+    ['dogfood_desktop.mp4', 'dogfood_mobile.mp4'],
+  );
 
   const runDir = path.join(root, 'docs/e2e', runId);
-  const screenshots = fs.readdirSync(path.join(runDir, 'screenshots/dogfood')).filter((name) => name.endsWith('.png'));
-  assert.equal(screenshots.length, 4);
+  const screenshotRoot = path.join(runDir, 'screenshots/dogfood');
+  const screenshots = ['desktop', 'mobile'].flatMap((profile) => (
+    fs.readdirSync(path.join(screenshotRoot, profile)).filter((name) => name.endsWith('.png'))
+  ));
+  assert.equal(screenshots.length, 8);
   assert.doesNotMatch(fs.readFileSync(parsed.report, 'utf8'), /\/Users\/|[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}/);
   assert.doesNotMatch(fs.readFileSync(parsed.events, 'utf8'), /\/Users\/|[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}/);
 });

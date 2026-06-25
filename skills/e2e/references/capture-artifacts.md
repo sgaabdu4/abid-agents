@@ -11,9 +11,9 @@ docs/e2e/<RUN_ID>/
   plans/<flow>.md
   events.jsonl
   issues.md
-  screenshots/<flow>/<step>_<status>.png
-  videos/<flow>.mp4
-  recaps/<flow>_2x_cursor.mp4
+  screenshots/<flow>/<profile>/<step>_<status>.png
+  videos/<flow>_<desktop|mobile>.mp4
+  recaps/<flow>_<desktop|mobile>_2x_cursor.mp4
   traces/<flow>.zip
   logs/<flow>.log
   regression.md
@@ -39,8 +39,8 @@ If the driver cannot render an overlay, record coordinates in `events.jsonl` and
 
 Default capture:
 
-- continuous video for UI or phone flows;
-- final 2x speed recap video with visible cursor and click bloom;
+- continuous desktop and mobile video for UI flows; native phone video counts as mobile;
+- final desktop and mobile 2x speed recap videos with visible cursor and click bloom;
 - `events.jsonl` for every click, input, navigation, wait, assertion, fallback, issue, and fix verification;
 - screenshot after each verified step or on every failure;
 - console/network logs when available;
@@ -54,7 +54,7 @@ Audit capture:
 - final artifact linter before claiming the run is complete.
 
 Never claim a click, input, or navigation was tested if no event row or UI artifact proves it.
-If video or a 2x recap cannot be produced because every viable driver or encoder is unsupported, unavailable, or blocked, record the fallback reason in `report.md` and list the run as incomplete for visual proof.
+If desktop or mobile video or a 2x recap cannot be produced because every viable driver or encoder is unsupported, unavailable, or blocked, record the fallback reason in `report.md` and list the run as incomplete for visual proof.
 For an existing cursor/click-layer MP4, create the recap with:
 
 ```bash
