@@ -152,6 +152,12 @@
       "expectFalse": ["usesNoMistakesBeforeImplementation", "skipsWorktreeReadyGuard", "treatsDryRunAsSufficientAlone"]
     },
     {
+      "id": "gh_fix_ci_cost_control",
+      "prompt": "gh-fix-ci: Fix failing GitHub Actions on this PR, but Actions cost money. What should the agent do before pushing reruns?",
+      "expectTrue": ["usesNoMistakes", "usesCostAwareGhCi"],
+      "expectFalse": ["wastesGithubActions", "runsNoMistakesBeforeCleanLoop"]
+    },
+    {
       "id": "worktree_ready_before_dry_run",
       "prompt": "I created a Treehouse worktree and no-mistakes says an explicit refspec git push --dry-run passed. Can we treat that as the local gate, or what must happen first?",
       "expectTrue": ["usesTreehouseWorkspace", "usesWorktreeReadyGuard", "requiresProjectHooksBeforeDryRun"],

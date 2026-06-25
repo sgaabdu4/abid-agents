@@ -82,6 +82,13 @@ closed` while GitHub PR checks are green and findings are empty, treat the run
 as PR-ready: do not wait for human merge, and do not abort solely because the
 status still says `ci,running`.
 
+## GitHub Actions Cost
+
+For GitHub Actions or `gh` CI failures, inspect all failing checks/logs before
+editing. Fetch independent run/job logs in parallel where possible, batch fixes
+into one local verify loop, and rerun only the needed workflows/checks. Do not
+push one speculative commit per failing check.
+
 ## Inspecting state
 
 ```sh

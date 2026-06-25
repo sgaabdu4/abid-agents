@@ -101,6 +101,20 @@ if (loadedChars > 64000) {
   errors.push(`loaded skill chars ${loadedChars} exceeds 64000 budget`);
 }
 
+const questionsText = fs.readFileSync(path.join(skillRoot, "modules/questions.md"), "utf8");
+const normalizedQuestionsText = questionsText.replace(/\s+/g, " ");
+for (const required of [
+  "request_user_input",
+  "instead of markdown",
+  "2-3 exclusive options",
+  "autoResolutionMs",
+  "tool question/options"
+]) {
+  if (!normalizedQuestionsText.includes(required)) {
+    errors.push(`questions.md missing request_user_input contract: ${required}`);
+  }
+}
+
 if (errors.length) {
   console.error("FAIL");
   for (const error of errors) console.error(`- ${error}`);

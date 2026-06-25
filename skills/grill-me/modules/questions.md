@@ -2,9 +2,18 @@
 
 Use before asking any user-facing interview question.
 
+## Delivery
+
+- If `request_user_input` is available, use it for interview Qs instead of
+  markdown. One call, one question, 2-3 exclusive options; recommended option
+  first with `(Recommended)`. Put tradeoffs in option descriptions.
+- Omit `autoResolutionMs` for blocking/high-risk choices; use it only when a
+  default can safely continue. Persist the tool question/options before calling.
+- If the tool is unavailable, use the visible fallback block below.
+
 ## Visible question block
 
-Default visible format:
+Fallback visible format:
 
 ```text
 Q<N>: <plain question>
@@ -31,8 +40,8 @@ Reply: A/B/C, "use default", "not sure", "skip for now", or your own answer.
 ## Rules
 
 - Clarity beats terseness. Normal prompt target: 12-24 lines; max 220 words.
-- Use one `text` code fence containing the plain question block; no prose
-  outside it during interview.
+- Fallback replies use one `text` code fence containing the plain question
+  block; no prose outside it during interview.
 - Before replying, persist the exact block in `session_state.md`.
 - Do not use box drawing, table borders, vertical bars, horizontal rules, or
   decorative lines.

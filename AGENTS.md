@@ -1,7 +1,7 @@
 # Agent Rules
 
 ## Stops
-- Destructive state needs explicit approval. Concrete delete/remove/cleanup approves only that scope. Native delete; no quarantine. Broad cleanup, DB writes, reset/checkout, deletion scripts, and temp/build cleanup outside scope need fresh approval.
+- Destructive state needs explicit approval. Concrete delete/remove/cleanup approves only that scope. Native delete; no quarantine. Broad cleanup, DB writes, reset/checkout, deletion scripts, temp/build cleanup need fresh approval.
 - Never edit `CHANGELOG.md`, `generated/`, or `AUTO-GENERATED`; fix source.
 - Pre-commit: inspect `git status --short`; if `.env*`, keys/tokens/secret-like files appear, stop.
 - No pure pass-through wrappers. Adapters need validation, transform, owner boundary, or platform integration.
@@ -9,14 +9,14 @@
 - Touched/connected files >700 lines must end <700.
 - `SKILL.md`: no 3+ step workflows; move to `references/*.md` or scripts.
 - UI edits with no design SSOT: create/import token/theme/style owner first.
-- Browser/E2E driver fail/deny -> stop after one isolated-profile retry; use E2E fallbacks or target-app `computer-use`.
+- Browser/E2E driver fail/deny -> one isolated-profile retry, then E2E fallback or target-app `computer-use`.
 
 ## Core
 - Read before claim/edit; uncited=unknown. Tool absent -> say once; fallback.
 - Fix root owner. Prefer canonical behavior; delete concepts before modes/wrappers.
-- Validation >= scope; repeated deterministic work -> run/add script, test, hook, or eval.
-- Commit msgs: no co-author, em dash, dash-only prefix, decorative dash punctuation.
-- Project AGENTS.md overrides global; repo facts only, <=600 o200k_base tokens.
+- Validation >= scope; repeat work -> run/add script/test/hook/eval; GH CI -> parallel logs/jobs, batch fixes, rerun least.
+- Commit msgs: no co-author, em dash, dash-only prefix, decorative dashes.
+- Project AGENTS.md overrides global; repo facts only, <=600 o200k.
 
 ## Tools
 - `codebase-memory`, `context-mode`, `terse` are support tools, not stages.
@@ -30,7 +30,7 @@
 ## Evidence
 - Code/diff/PR/commit/log/doc/review/summary: read evidence pre claim.
 - Diffs need hunks/functions/classes, not only stat/name/subject/oneline.
-- Long summaries split `Verified`/`Inferred`/`Unknown`; cite path/line/quote.
+- Long summaries split `Verified`/`Inferred`/`Unknown`; cite path/line.
 - Semantic edits: blast radius + surrounding issues; check callers, cross-pkg, schema/index, cache/storage, tests, routes. Docs-only: runtime trace N/A.
 
 ## Skills

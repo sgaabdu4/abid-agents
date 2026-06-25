@@ -22,7 +22,8 @@ assert.ok(text.startsWith('# Agent Rules\n\n## Stops\n'), 'AGENTS.md must start 
 assertIncludes(text, 'Touched/connected files >700 lines must end <700');
 assertIncludes(text, '`SKILL.md`: no 3+ step workflows');
 assertIncludes(text, '`codebase-memory`, `context-mode`, `terse` are support tools, not stages.');
-assertIncludes(text, 'repeated deterministic work -> run/add script, test, hook, or eval.');
+assertIncludes(text, 'repeat work -> run/add script/test/hook/eval');
+assertIncludes(text, 'GH CI -> parallel logs/jobs, batch fixes, rerun least.');
 assertIncludes(text, "codebase-memory-mcp cli <tool> '<json>'");
 assertIncludes(text, 'Logs/output/docs/data -> sandbox/index; no raw dumps.');
 assertIncludes(text, 'Semantic edits: blast radius + surrounding issues');
@@ -45,7 +46,7 @@ assertIncludes(text, 'Why: root cause/evidence.');
 assertIncludes(text, 'What: files/behavior.');
 assertIncludes(text, 'Risk: Direct callers; Cross-package; Schema/index; Cache/storage keys; Tests/fixtures; Routes/endpoints; Docs/config/agent assets.');
 assertIncludes(text, 'Proof: tests/gaps.');
-assertIncludes(text, 'Project AGENTS.md overrides global; repo facts only, <=600 o200k_base tokens.');
+assertIncludes(text, 'Project AGENTS.md overrides global; repo facts only, <=600 o200k.');
 assertIncludes(text, 'User-facing replies -> `terse`.');
 assertIncludes(text, 'React/Next/perf/dupes -> `react-doctor` + `fallow` dupes + `vercel-react-best-practices`.');
 assertIncludes(text, 'Sentry/observability/issues/setup -> `sentry-workflow` only.');
@@ -141,6 +142,7 @@ assertIncludes(routeMapText, 'if recurring and missing, add script/test/hook/eva
 assertIncludes(routeMapText, 'known repeat work skips an existing deterministic owner');
 assertIncludes(routeMapText, 'ensure-worktree-ready.sh');
 assertIncludes(routeMapText, 'Dry-run push only counts after project hooks are active.');
+assertIncludes(routeMapText, 'For GitHub Actions/`gh` CI, parallelize independent log reads/jobs where possible, batch fixes locally, and rerun the fewest checks.');
 assertIncludes(routeMapText, 'For UI choices that cannot be judged from text, inspect the project design SSOT and use a local component/state artifact inside Grill Me.');
 assertIncludes(routeMapText, '`to-issues` only for missing agent-ready slices');
 assertIncludes(routeMapText, 'when the accepted `plan.md` already has vertical slices or task waves');
@@ -272,7 +274,10 @@ assertIncludes(worktreeReadyText, 'hook_path_is_private_or_gate');
 assertIncludes(worktreeReadyText, 'npm --prefix "$repo" run prepare --if-present');
 assertIncludes(treehouseSkillText, 'ensure-worktree-ready.sh');
 assertIncludes(noMistakesSkillText, 'ensure-worktree-ready.sh');
+assertIncludes(noMistakesSkillText, 'For GitHub Actions/`gh` CI failures, inspect logs in parallel where possible');
 assertIncludes(noMistakesAxiText, 'explicit refspec');
+assertIncludes(noMistakesAxiText, 'For GitHub Actions or `gh` CI failures, inspect all failing checks/logs before');
+assertIncludes(noMistakesAxiText, 'batch fixes into one local verify loop, and rerun only the needed workflows/checks');
 
 assertIncludes(autoSyncText, 'refresh_local_install', 'auto-sync must refresh installed scripts after pulls');
 assertIncludes(autoSyncText, 'ABID_AGENTS_SKIP_NPM_INSTALL=1', 'auto-sync refresh must not run package updates');

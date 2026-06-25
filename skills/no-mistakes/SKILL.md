@@ -26,6 +26,8 @@ Read `references/pr-evidence.md` before finalizing any PR-backed run.
   instead of manually editing while the run is waiting.
 - Escalate `ask-user` findings verbatim unless the user gave clear unattended
   consent such as `--yes`.
+- For GitHub Actions/`gh` CI failures, inspect logs in parallel where possible,
+  batch fixes locally, and rerun the fewest checks.
 - On `checks-passed` or `passed`, report what was validated, what was found,
   and every pipeline fix applied.
 - Before finalizing a PR-backed run, repair the PR evidence section so it has hosted screenshots, required 2x E2E video links, no local paths, and clear screenshot/video and no-mistakes status.

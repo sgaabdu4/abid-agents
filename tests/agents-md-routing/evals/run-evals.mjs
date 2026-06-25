@@ -28,7 +28,7 @@ const policyFiles = [
   'skills/workflow-help/references/route-map.md',
 ];
 
-const policyDigestPattern = /workflow-help|grill-me|to-prd|to-issues|readiness|ensure-worktree-ready|worktree readiness|project hooks|push dry-run|PASS|CONCERNS|FAIL|correct course|scope expands|deterministic|repeat work|script\/test\/hook\/eval|codebase-memory|context-mode|support tools|not stages|project `AGENTS\.md`|repo-specific|global|canonical|root owner|wrappers|duplicat|local gate|AGENTS hygiene|budget|tokens|o200k_base|600|component\/state|component library|visual review|UI choices|UI\/components|design-system|design SSOT|atomic-ui|theme|hardcoded|react-doctor|fallow|clone groups|dupes|duplication|vercel-react-best-practices|sentry-workflow|sentry-cli|sentry-sdk-setup|sentry-feature-setup|security-review|performance-rescue|e2e|real UI|screenshots|events|regression command|thermo-nuclear-code-quality-review|maintainability|no-mistakes|committed|BMAD|menu codes|Treehouse|700|blast radius|surrounding issues|Report:|Why:|What:|Risk:|Proof:/i;
+const policyDigestPattern = /workflow-help|grill-me|to-prd|to-issues|readiness|ensure-worktree-ready|worktree readiness|project hooks|push dry-run|PASS|CONCERNS|FAIL|correct course|scope expands|deterministic|repeat work|script\/test\/hook\/eval|codebase-memory|context-mode|support tools|not stages|project `AGENTS\.md`|repo-specific|global|canonical|root owner|wrappers|duplicat|local gate|AGENTS hygiene|budget|tokens|o200k|600|component\/state|component library|visual review|UI choices|UI\/components|design-system|design SSOT|atomic-ui|theme|hardcoded|react-doctor|fallow|clone groups|dupes|duplication|vercel-react-best-practices|sentry-workflow|sentry-cli|sentry-sdk-setup|sentry-feature-setup|security-review|performance-rescue|e2e|real UI|screenshots|events|regression command|thermo-nuclear-code-quality-review|maintainability|no-mistakes|committed|GitHub Actions|gh.*CI|GH CI|parallel|batch fixes|rerun|fewest|least|BMAD|menu codes|Treehouse|700|blast radius|surrounding issues|Report:|Why:|What:|Risk:|Proof:/i;
 
 const policyText = policyFiles
   .map((rel) => {
@@ -107,10 +107,10 @@ const keyDefinitions = [
   'keepsProjectAgentsRepoSpecific: keeps project AGENTS.md limited to repo-specific additions instead of restating global workflow, hygiene, or token-budget policy',
   'reusesGlobalAgentsHygieneOwner: recognizes that global .agents owns general AGENTS.md hygiene, compactness, and token-budget enforcement unless a project-only gap is proven',
   'allowsProjectSpecificAgentsFacts: allows project AGENTS.md to keep concrete repo-specific facts such as project keys, setup commands, out-of-scope paths, local CLI wrappers, or backend invariants',
-  'requiresProjectAgentsTokenCap: requires project AGENTS.md to stay at or under the global repo-specific cap of 600 o200k_base tokens',
+  'requiresProjectAgentsTokenCap: requires project AGENTS.md to stay at or under the global repo-specific cap of 600 o200k tokens',
   'duplicatesGlobalPolicyInProjectAgents: incorrectly copies or restates global workflow, skill routing, AGENTS hygiene, token-budget, or generic best-practice policy into a project AGENTS.md',
   'wouldAddProjectLocalAgentsGate: incorrectly chooses to add a project-local AGENTS budget/check script, package hook, or token gate when global .agents already owns the rule and no project-only gap was proven',
-  'acceptsOverBudgetProjectAgents: incorrectly allows a project AGENTS.md to exceed the global 600 o200k_base token cap',
+  'acceptsOverBudgetProjectAgents: incorrectly allows a project AGENTS.md to exceed the global 600 o200k token cap',
   'runsThermoBeforeE2E: runs thermo-nuclear-code-quality-review before expensive E2E in the local verify loop',
   'runsE2ELastWhenNeeded: runs E2E last when a user-visible flow changed',
   'loopsBackAfterVerificationFailure: sends tests, review, or E2E failures back to implementation and reruns affected proof',
@@ -130,6 +130,8 @@ const keyDefinitions = [
   'routesBackToPlanning: uses grill-me, to-prd, to-issues, or codebase-design for expanded or unclear scope',
   'silentlyExpandsScope: continues implementation after scope expansion without rerouting',
   'usesNoMistakes: routes committed validation, push, PR, or CI to no-mistakes',
+  'usesCostAwareGhCi: for GitHub Actions or gh CI, inspects failing checks/logs, parallelizes independent log reads or jobs where possible, batches local fixes, and reruns the fewest checks',
+  'wastesGithubActions: incorrectly pushes speculative commits, reruns checks repeatedly, or serializes independent GitHub Actions work when the policy says to batch and parallelize where possible',
   'endsAtNoMistakes: feature-to-PR flow ends at no-mistakes after implementation/review proof',
   'requiresCommittedWorkBeforeNoMistakes: states no-mistakes validates committed implementation work',
   'usesNoMistakesBeforeImplementation: incorrectly starts no-mistakes before implementation proof',
