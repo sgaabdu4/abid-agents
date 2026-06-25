@@ -45,7 +45,7 @@ assertIncludes(text, 'Why: root cause/evidence.');
 assertIncludes(text, 'What: files/behavior.');
 assertIncludes(text, 'Risk: Direct callers; Cross-package; Schema/index; Cache/storage keys; Tests/fixtures; Routes/endpoints; Docs/config/agent assets.');
 assertIncludes(text, 'Proof: tests/gaps.');
-assertIncludes(text, 'Project `AGENTS.md` overrides global.');
+assertIncludes(text, 'Project AGENTS.md overrides global; repo facts only, <=600 o200k_base tokens.');
 assertIncludes(text, 'User-facing replies -> `terse`.');
 assertIncludes(text, 'React/Next/perf/dupes -> `react-doctor` + `fallow` dupes + `vercel-react-best-practices`.');
 assertIncludes(text, 'Sentry/observability/issues/setup -> `sentry-workflow` only.');

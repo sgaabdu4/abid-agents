@@ -16,7 +16,7 @@
 - Fix root owner. Prefer canonical behavior; delete concepts before modes/wrappers.
 - Validation >= scope; repeated deterministic work -> run/add script, test, hook, or eval.
 - Commit msgs: no co-author, em dash, dash-only prefix, decorative dash punctuation.
-- Project `AGENTS.md` overrides global.
+- Project AGENTS.md overrides global; repo facts only, <=600 o200k_base tokens.
 
 ## Tools
 - `codebase-memory`, `context-mode`, `terse` are support tools, not stages.
@@ -51,7 +51,7 @@
 - User-facing replies -> `terse`.
 
 ## Impl
-- Scope repo/root, `AGENTS.md`, skills, constraints, owner, blast radius, proof, risk.
+- Scope repo/root, rules, skills, owner, blast radius, proof, risk.
 - Non-trivial impl readiness: `PASS`/`CONCERNS`/`FAIL`.
 - Scope expands -> `grill-me`/`to-prd`/`to-issues`/`codebase-design`.
 - Tests -> `test-quality`; smallest verify; fix root cause.

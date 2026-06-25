@@ -28,7 +28,7 @@ const policyFiles = [
   'skills/workflow-help/references/route-map.md',
 ];
 
-const policyDigestPattern = /workflow-help|grill-me|to-prd|to-issues|readiness|ensure-worktree-ready|worktree readiness|project hooks|push dry-run|PASS|CONCERNS|FAIL|correct course|scope expands|deterministic|repeat work|script\/test\/hook\/eval|codebase-memory|context-mode|support tools|not stages|lavish|visual review|UI choices|UI\/components|design-system|design SSOT|atomic-ui|tokens|theme|hardcoded|react-doctor|fallow|clone groups|dupes|duplication|vercel-react-best-practices|sentry-workflow|sentry-cli|sentry-sdk-setup|sentry-feature-setup|security-review|performance-rescue|e2e|real UI|screenshots|events|regression command|thermo-nuclear-code-quality-review|maintainability|no-mistakes|committed|BMAD|menu codes|Treehouse|700|blast radius|surrounding issues|Report:|Why:|What:|Risk:|Proof:/i;
+const policyDigestPattern = /workflow-help|grill-me|to-prd|to-issues|readiness|ensure-worktree-ready|worktree readiness|project hooks|push dry-run|PASS|CONCERNS|FAIL|correct course|scope expands|deterministic|repeat work|script\/test\/hook\/eval|codebase-memory|context-mode|support tools|not stages|project `AGENTS\.md`|repo-specific|global|canonical|root owner|wrappers|duplicat|local gate|AGENTS hygiene|budget|tokens|o200k_base|600|lavish|visual review|UI choices|UI\/components|design-system|design SSOT|atomic-ui|theme|hardcoded|react-doctor|fallow|clone groups|dupes|duplication|vercel-react-best-practices|sentry-workflow|sentry-cli|sentry-sdk-setup|sentry-feature-setup|security-review|performance-rescue|e2e|real UI|screenshots|events|regression command|thermo-nuclear-code-quality-review|maintainability|no-mistakes|committed|BMAD|menu codes|Treehouse|700|blast radius|surrounding issues|Report:|Why:|What:|Risk:|Proof:/i;
 
 const policyText = policyFiles
   .map((rel) => {
@@ -104,6 +104,13 @@ const keyDefinitions = [
   'createsDeterministicOwnerForRecurringWork: adds a script, test, hook, or eval when a recurring deterministic process has no owner yet',
   'skipsDeterministicOwner: incorrectly uses fresh LLM-only reasoning while an existing deterministic owner should run',
   'createsPassThroughWrapper: incorrectly adds a wrapper that only passes through to another command without validation, transformation, owner boundary, or integration',
+  'keepsProjectAgentsRepoSpecific: keeps project AGENTS.md limited to repo-specific additions instead of restating global workflow, hygiene, or token-budget policy',
+  'reusesGlobalAgentsHygieneOwner: recognizes that global .agents owns general AGENTS.md hygiene, compactness, and token-budget enforcement unless a project-only gap is proven',
+  'allowsProjectSpecificAgentsFacts: allows project AGENTS.md to keep concrete repo-specific facts such as project keys, setup commands, out-of-scope paths, local CLI wrappers, or backend invariants',
+  'requiresProjectAgentsTokenCap: requires project AGENTS.md to stay at or under the global repo-specific cap of 600 o200k_base tokens',
+  'duplicatesGlobalPolicyInProjectAgents: incorrectly copies or restates global workflow, skill routing, AGENTS hygiene, token-budget, or generic best-practice policy into a project AGENTS.md',
+  'wouldAddProjectLocalAgentsGate: incorrectly chooses to add a project-local AGENTS budget/check script, package hook, or token gate when global .agents already owns the rule and no project-only gap was proven',
+  'acceptsOverBudgetProjectAgents: incorrectly allows a project AGENTS.md to exceed the global 600 o200k_base token cap',
   'runsThermoBeforeE2E: runs thermo-nuclear-code-quality-review before expensive E2E in the local verify loop',
   'runsE2ELastWhenNeeded: runs E2E last when a user-visible flow changed',
   'loopsBackAfterVerificationFailure: sends tests, review, or E2E failures back to implementation and reruns affected proof',
