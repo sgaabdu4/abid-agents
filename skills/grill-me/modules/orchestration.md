@@ -14,6 +14,9 @@ closing a stage, or writing the final plan.
 - Existing code path: use CBM first (`list_projects` -> status/index ->
   architecture -> search/trace), load `modules/domain-docs.md` when domain docs
   may matter, then read relevant code/docs before asking.
+- For PR/recovery sessions, `session_state.md`/`plan_draft.md` are not enough:
+  check nearby `plan.md`, decision/open-question docs, and route/design docs
+  before treating a question as open or final.
 - For understanding/codebase-understanding requests, map current owners,
   behavior, routes, data, constraints, and unknowns before proposing a build
   path. Ask only what evidence cannot answer.
@@ -216,9 +219,9 @@ Each turn:
   + approved prototype when prototype runs.
 - No backend/API/auth/storage/realtime integration before the mock-data prototype
   is approved.
-- No final plan until every `run`/`brief` stage is fully clarified: acceptance
-  criteria + verification strategy + risky edge cases, or an explicit
-  user-approved parked unknown.
+- No final plan until every `run`/`brief` stage is clarified or parked. If
+  synthesis is requested early, reset to the next unresolved stage. Product docs
+  do not close UI flow/visual design without accepted screen-flow/look choices.
 - Final plan must be self-contained: summary, decisions, Q&A, artifact refs,
   acceptance checks, verification, risks, unknowns, traceability.
 - Do not write `99-final-plan.md`; write `plan.md` only.

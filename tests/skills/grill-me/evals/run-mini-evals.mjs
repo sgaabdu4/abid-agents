@@ -4,7 +4,12 @@ import path from "node:path";
 import { spawn } from "node:child_process";
 
 const skillRoot = path.resolve(path.dirname(new URL(import.meta.url).pathname), "..");
-const evals = JSON.parse(fs.readFileSync(path.join(skillRoot, "evals", "evals.json"), "utf8")).evals;
+const evalFiles = ["evals.json", "session-regression-evals.json"];
+const evals = evalFiles.flatMap((file) => {
+  const fullPath = path.join(skillRoot, "evals", file);
+  if (!fs.existsSync(fullPath)) return [];
+  return JSON.parse(fs.readFileSync(fullPath, "utf8")).evals;
+});
 const schemaPath = path.join(skillRoot, "evals", "eval-output-schema.json");
 const runRoot = process.env.GRILL_ME_EVAL_ROOT || "/tmp/grill-me-eval-run";
 const model = process.env.GRILL_ME_EVAL_MODEL || "gpt-5.4-mini";

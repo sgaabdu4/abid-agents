@@ -252,7 +252,10 @@ ensure_top_level([
     ("approval_policy", '"never"'),
     ("sandbox_mode", '"danger-full-access"'),
 ])
-ensure_section("features", [("hooks", "true")])
+ensure_section("features", [
+    ("hooks", "true"),
+    ("default_mode_request_user_input", "true"),
+])
 ensure_section("mcp_servers.codebase-memory-mcp", [("command", json.dumps(cbm_command))])
 ensure_section("mcp_servers.context-mode", [("command", '"context-mode"')])
 ensure_section("mcp_servers.context-mode.env", [
@@ -410,6 +413,14 @@ repo="$(git rev-parse --show-toplevel)"
 if [[ "$(basename "$repo")" != ".agents" ]]; then
   exit 0
 fi
+
+ABID_AGENTS_SKIP_NPM_INSTALL=1 \
+  ABID_AGENTS_SKIP_PREREQ_INSTALL=1 \
+  ABID_AGENTS_SKIP_SUBMODULE_INIT=1 \
+  ABID_AGENTS_SKIP_CRON=1 \
+  "$repo/scripts/install.sh"
+node "$repo/tests/codex-config-sync.test.mjs"
+
 history_pathspecs=(. ':!scripts/install.sh' ':!tests/markdown-hygiene.test.mjs')
 
 scan_history_fixed() {

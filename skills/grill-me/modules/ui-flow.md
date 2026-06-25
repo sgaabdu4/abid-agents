@@ -11,7 +11,7 @@ Map:
 - Empty/loading/error/success states.
 - Permissions/auth gates.
 - Back/cancel/retry paths.
-- Low-fi Lavish review when text cannot resolve the flow.
+- Low-fi route/component/state artifact when route/state choices need to be seen.
 
 Out of scope:
 - Visual layout details.
@@ -26,7 +26,7 @@ At stage close/final synthesis, `02-ui-flow.md` includes only relevant decisions
 - Primary journey steps.
 - Required states: empty/loading/error/success/permission.
 - Navigation rules.
-- Lavish/wireflow path + status when used.
+- Route/component/state artifact path + status when used.
 - Next-stage handoff for visual design only when useful.
 
 Clarity gate:
@@ -39,20 +39,26 @@ Clarity gate:
 ## Q pattern
 
 Use `modules/questions.md`. Ask one route/state/permission/recovery decision at
-a time. If text is insufficient, create a low-fi Lavish wireflow first; show
-artifact/status, then ask one flow Q.
+a time. If the user needs to see/compare the flow, or the choice affects parent
+screens, routes, or states that are hard to judge in prose, inspect existing
+routes/components/tokens and create a low-fi project-local route/component/state
+artifact first. Show artifact/status, then ask one flow Q through or against
+that artifact.
 
 ## Rules
 
 - Parent routes/screens before child components.
+- Parent screen choices are UI-flow decisions, not product cleanup, when the
+  user asks how it looks, how it flows, or cannot choose from text.
 - Name exact route/screen/state.
 - Include empty/loading/error/permission states before visual design.
-- Lavish UI-flow artifacts are wireflows/maps, not visual direction or
+- UI-flow artifacts are wireflows/maps/state boards, not visual direction or
   prototype. Use existing routes/components/tokens when available; otherwise
   mark them representative.
-- For Lavish wireflows, read
-  `vendor/skill-upstreams/lavish-axi/skills/lavish/SKILL.md` and playbooks
-  `diagram`, `comparison`, and `input`.
-- Fix Lavish `layout_warnings` before asking the user to review.
+- For component/state artifacts, load `atomic-ui` and `impeccable`, inspect the
+  design SSOT, and keep artifacts in `docs/planning/<slug>/` or the repo's
+  planning artifact owner.
+- Fix visible layout, state-label, and responsive issues before asking the user
+  to review.
 - Do not update `02-ui-flow.md` per Q; record answers in `plan_draft.md` and summarize only at stage close/final synthesis.
 - No tech-stack/backend choices here except route/runtime facts from existing code.

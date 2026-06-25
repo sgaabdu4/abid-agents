@@ -7,6 +7,7 @@ unneeded UI/design/prototype work.
 ## Files
 
 - `evals.json` - task-level behavior evals.
+- `session-regression-evals.json` - focused regressions from real sessions.
 - `trigger-evals.json` - should-trigger and should-not-trigger prompt set for
   description tuning.
 - `validate-evals.mjs` - deterministic suite checks.

@@ -128,10 +128,10 @@
       "expectFalse": ["treatsRiskReviewsAsDefaultStages", "runsNoMistakesBeforeCleanLoop"]
     },
     {
-      "id": "grill_me_lavish_visual_ui_decision",
-      "prompt": "I invoked grill-me for a UI flow. We need to decide between two onboarding routes and I cannot judge it from text alone. Where does Lavish fit in the Plan / Implement / Verify flow?",
-      "expectTrue": ["usesGrillMeWhenAmbiguous", "usesLavishForVisualUiDecisions", "keepsLavishAsSupportTool"],
-      "expectFalse": ["treatsLavishAsRequiredStage", "usesNoMistakesBeforeImplementation", "runsNoMistakesBeforeCleanLoop"]
+      "id": "grill_me_component_visual_ui_decision",
+      "prompt": "I invoked grill-me for a UI flow. We need to decide between two onboarding routes and I cannot judge it from text alone. Where do component/state artifacts fit in the Plan / Implement / Verify flow?",
+      "expectTrue": ["usesGrillMeWhenAmbiguous", "usesComponentArtifactsForVisualUiDecisions", "keepsVisualArtifactsInsideGrillMe", "usesAtomicUi", "checksDesignSsot"],
+      "expectFalse": ["treatsVisualArtifactAsRequiredStage", "usesNoMistakesBeforeImplementation", "runsNoMistakesBeforeCleanLoop"]
     },
     {
       "id": "readiness_gate_blocks_weak_feature",

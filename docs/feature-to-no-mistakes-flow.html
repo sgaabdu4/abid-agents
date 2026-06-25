@@ -302,7 +302,7 @@
     </header>
 
     <section class="summary" aria-label="Workflow summary">
-      <div><strong>1. Plan</strong><span>Treehouse and the worktree readiness guard gate non-trivial work; Lavish helps UI choices when text is not enough.</span></div>
+      <div><strong>1. Plan</strong><span>Treehouse and the worktree readiness guard gate non-trivial work; component/state artifacts help UI choices when text is not enough.</span></div>
       <div><strong>2. Implement</strong><span>Change the real owner with only needed specialist skills.</span></div>
       <div><strong>3. Verify Loop</strong><span>Test, review, fix, then run E2E last when needed.</span></div>
       <div><strong>4. Final Gate</strong><span>No-mistakes runs after the local loop is clean and committed.</span></div>
@@ -312,7 +312,7 @@
       <li class="step">
         <div>
           <h2>Plan the work</h2>
-          <p>For non-trivial feature work, start in Treehouse, run the worktree readiness guard, and use Grill Me when outcome, scope, proof, or risk is unclear. For UI flow or visual choices that need to be seen, use Lavish inside Grill Me. Pick the lightest planning artifact that makes the work buildable.</p>
+          <p>For non-trivial feature work, start in Treehouse, run the worktree readiness guard, and use Grill Me when outcome, scope, proof, or risk is unclear. For UI flow or visual choices that need to be seen, inspect the design SSOT and use a project-local component/state artifact inside Grill Me. Pick the lightest planning artifact that makes the work buildable.</p>
         </div>
         <pre class="terminal" aria-label="Plan commands"><code>$ treehouse &lt;feature-name&gt;
 "$HOME/.agents/scripts/ensure-worktree-ready.sh" &lt;path&gt;
@@ -324,7 +324,7 @@
           <div class="choice"><strong>Need missing slices</strong><span>Use <code>/to-issues</code>.</span></div>
           <div class="choice"><strong>Plan has slices</strong><span>Go to readiness, then implement the first slice.</span></div>
           <div class="choice"><strong>Big feature</strong><span>Use <code>/to-prd</code>, then <code>/to-issues</code>.</span></div>
-          <div class="choice"><strong>Need UI review</strong><span>Use Lavish inside <code>/grill-me</code>.</span></div>
+          <div class="choice"><strong>Need UI review</strong><span>Use <code>atomic-ui</code> and <code>impeccable</code> inside <code>/grill-me</code>.</span></div>
         </div>
       </li>
 
@@ -389,7 +389,7 @@ fallow dupes --format json --quiet 2&gt;/dev/null || true</code></pre>
       <ul>
         <li>Treehouse and Grill Me gate was used or explicitly skipped for small clear work.</li>
         <li><code>ensure-worktree-ready.sh</code> passed for the active checkout.</li>
-        <li>Planning artifact decision is explicit: skipped, PRD, issues, Lavish UI review, or a combination.</li>
+        <li>Planning artifact decision is explicit: skipped, PRD, issues, component/state UI review, or a combination.</li>
         <li>If the plan already has accepted slices, do not rerun <code>/to-issues</code> unless publishing issue cards.</li>
         <li>Canonical owner, blast radius, and UI design SSOT were checked.</li>
         <li>React app changes ran React Doctor and Fallow; duplication used dupes or clone-group checks.</li>

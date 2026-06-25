@@ -4,7 +4,7 @@
 
 | Stage | When | Do | Exit |
 | --- | --- | --- | --- |
-| Plan | New feature or unclear work starts. | Create a Treehouse worktree before planning/coding, then run `"$HOME/.agents/scripts/ensure-worktree-ready.sh" <path>`. Use `grill-me` when outcome, scope, proof, or risk is unclear. For UI choices that cannot be judged from text, use Lavish inside Grill Me as a visual review surface. Pick the lightest artifact: none, `to-prd`, `to-issues` only for missing agent-ready slices, or both. State `PASS`, `CONCERNS`, or `FAIL`. | Owner, blast radius, proof path, risk routing, and next action are known. |
+| Plan | New feature or unclear work starts. | Create a Treehouse worktree before planning/coding, then run `"$HOME/.agents/scripts/ensure-worktree-ready.sh" <path>`. Use `grill-me` when outcome, scope, proof, or risk is unclear. For UI choices that cannot be judged from text, inspect the project design SSOT and use a local component/state artifact inside Grill Me. Pick the lightest artifact: none, `to-prd`, `to-issues` only for missing agent-ready slices, or both. State `PASS`, `CONCERNS`, or `FAIL`. | Owner, blast radius, proof path, risk routing, and next action are known. |
 | Implement | Readiness is `PASS` and code changes are needed. | Change the canonical owner. Repeat work runs its deterministic owner first; if recurring and missing, add script/test/hook/eval. Use `codebase-design` when owner/abstraction is unclear. Add exact specialist skills by touched area. | Root owner changed, not wrappers, temporary modes, hidden fallbacks, or weak validation. |
 | Verify loop | Implementation or review fixes changed behavior. | Run targeted tests and use `test-quality` for test design or gap review. Run `security-review` or `performance-rescue` when requested or when those risks were touched, then `thermo-nuclear-code-quality-review`, then `e2e` last when a user-visible flow changed. Loop back to Implement until tests, reviews, and required E2E are clean. | Affected proof was rerun, no known blockers remain, and required artifacts exist. |
 | Final gate | Local verify loop is clean and work is committed. | Run `"$HOME/.agents/scripts/ensure-worktree-ready.sh" .`, then use `no-mistakes`; respond to its findings through its own loop. Dry-run push only counts after project hooks are active. | Automated review, checks, PR, and CI evidence. |
@@ -14,7 +14,7 @@
 | Touched area | Use |
 | --- | --- |
 | UI/components/design polish | `atomic-ui` + `impeccable` |
-| UI flow or visual decision artifact | `lavish-axi` as a support tool inside `grill-me`; load `vendor/skill-upstreams/lavish-axi/skills/lavish/SKILL.md` |
+| UI flow or visual decision artifact | `grill-me` with `atomic-ui` + `impeccable`; inspect existing tokens/theme/primitives/component library and create a project-local route/component/state artifact |
 | React app/Next.js | `react-doctor` + `fallow` for JS/TS health; include `fallow dupes` / clone-group checks for duplication or copy-paste; use `vercel-react-best-practices` for performance/composition |
 | Flutter/Dart app | `building-flutter-apps` |
 | Appwrite | `appwrite-backend` |

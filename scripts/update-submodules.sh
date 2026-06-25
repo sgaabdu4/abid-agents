@@ -14,7 +14,6 @@ configure_sparse_checkouts() {
     "vendor/skill-upstreams/fallow-skills:fallow/skills/fallow"
     "vendor/skill-upstreams/react-doctor:skills/react-doctor"
     "vendor/skill-upstreams/anthropic-skills:skills/skill-creator"
-    "vendor/skill-upstreams/lavish-axi:skills/lavish"
     "vendor/skill-upstreams/tavily-skills:skills/tavily-cli"
     "vendor/skill-upstreams/sentry-cli:plugins/sentry-cli/skills/sentry-cli"
     "vendor/skill-upstreams/sentry-for-ai:skills"

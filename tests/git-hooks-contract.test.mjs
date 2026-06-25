@@ -31,6 +31,15 @@ assert.ok(installScript.includes('config --local pull.ff only'), 'installer must
 assert.ok(installScript.includes('ABID_AGENTS_SKIP_SUBMODULE_INIT'), 'installer must support skipping submodule init');
 assert.ok(installScript.includes('ABID_AGENTS_SKIP_SUBMODULE_UPDATE'), 'pull hooks must support skipping submodule updates');
 assert.ok(installScript.includes('ABID_AGENTS_CHECK_SUBMODULES_BEFORE_PUSH'), 'pre-push submodule status must be opt-in');
+assert.ok(installScript.includes('default_mode_request_user_input'), 'installer must sync request-user-input feature into Codex config');
+assert.ok(
+  installScript.includes('ABID_AGENTS_SKIP_NPM_INSTALL=1 \\\n  ABID_AGENTS_SKIP_PREREQ_INSTALL=1 \\\n  ABID_AGENTS_SKIP_SUBMODULE_INIT=1 \\\n  ABID_AGENTS_SKIP_CRON=1 \\\n  "$repo/scripts/install.sh"'),
+  'pre-push hook must refresh the local installer-managed Codex config before pushing'
+);
+assert.ok(
+  installScript.includes('node "$repo/tests/codex-config-sync.test.mjs"'),
+  'pre-push hook must test live Codex config sync before pushing'
+);
 assert.ok(installScript.includes('install_codex_watchdog'), 'installer must install the Codex watchdog');
 assert.ok(installScript.includes('dev.abid-agents.codex-watchdog'), 'installer must install the Codex watchdog LaunchAgent');
 assert.ok(installScript.includes('launchctl bootstrap'), 'installer must load the Codex watchdog when missing');
@@ -142,6 +151,7 @@ if (fs.existsSync(prePushHook)) {
   const stat = fs.statSync(prePushHook);
   const text = fs.readFileSync(prePushHook, 'utf8');
   assert.ok((stat.mode & 0o111) !== 0, 'installed pre-push hook must be executable');
+  assert.ok(text.includes('node "$repo/tests/codex-config-sync.test.mjs"'), 'installed pre-push hook must test live Codex config sync');
   assert.ok(text.includes('ABID_AGENTS_CHECK_SUBMODULES_BEFORE_PUSH'), 'installed pre-push hook must keep submodule status opt-in');
   assert.ok(text.includes('Blocked push: reachable git history contains private path or secret-like references.'));
   assert.ok(text.includes("':!scripts/install.sh'"), 'installed pre-push hook must ignore installer policy literals');

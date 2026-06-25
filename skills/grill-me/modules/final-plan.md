@@ -20,7 +20,8 @@ controls, risks, domain/ADR changes, and parked unknowns.
    if present.
 2. Infer artifact depth from the request and gathered answers.
 3. If output shape is still unclear, ask one Q: decision summary, implementation plan, visual design/prototype, or full spec.
-4. Check active stages are fully clarified or unknowns are explicitly parked by the user.
+4. Check active stages are clarified or parked. Docs may accept product/domain
+   decisions only; UI/visual need documented screen-flow/look approval.
 5. Detect conflicts between draft, handoffs, artifacts, and user answers.
 6. If conflict/blocker exists, ask one Q; do not finalize.
 7. Write `docs/planning/<slug>/plan.md` as the canonical artifact, sized to need.
@@ -82,8 +83,8 @@ Omit irrelevant sections; no skipped/n/a boilerplate.
 - Use `modules/domain-docs.md` before writing glossary or ADR updates.
 - Do not put implementation decisions in `CONTEXT.md`.
 - Do not finish while a relevant handoff/artifact is `draft` or `blocked`.
-- Do not finish until active stages have needed checks/proof, or a parked
-  blocker/unknown.
+- Do not finish just because product questions are answered; unresolved `run` or
+  `brief` stages need checks/proof or parked unknowns.
 - Trace requirements -> slices/tasks -> acceptance criteria -> verification.
 - High-risk schema/data/auth/security/deploy/stateful work needs human review,
   rollback/migration notes, telemetry/audit expectations.

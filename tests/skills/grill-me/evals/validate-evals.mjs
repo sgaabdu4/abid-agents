@@ -5,9 +5,15 @@ import path from "node:path";
 const evalRoot = path.resolve(path.dirname(new URL(import.meta.url).pathname));
 const repoRoot = path.resolve(evalRoot, "../../../..");
 const skillRoot = path.join(repoRoot, "skills/grill-me");
-const evalsPath = path.join(evalRoot, "evals.json");
+const taskEvalFiles = ["evals.json", "session-regression-evals.json"];
 const triggersPath = path.join(evalRoot, "trigger-evals.json");
-const evals = JSON.parse(fs.readFileSync(evalsPath, "utf8"));
+const evalGroups = taskEvalFiles.map((file) => ({
+  file,
+  data: JSON.parse(fs.readFileSync(path.join(evalRoot, file), "utf8"))
+}));
+const taskEvals = evalGroups.flatMap(({ file, data }) =>
+  (data.evals || []).map((item) => ({ ...item, __file: file }))
+);
 const triggers = JSON.parse(fs.readFileSync(triggersPath, "utf8"));
 
 const errors = [];
@@ -18,12 +24,15 @@ function requireText(value, label) {
   if (typeof value !== "string" || !value.trim()) errors.push(`${label} missing text`);
 }
 
-if (evals.skill_name !== "grill-me") errors.push("skill_name must be grill-me");
-if (!Array.isArray(evals.evals) || evals.evals.length < 30) {
+for (const group of evalGroups) {
+  if (group.data.skill_name !== "grill-me") errors.push(`${group.file} skill_name must be grill-me`);
+  if (!Array.isArray(group.data.evals)) errors.push(`${group.file} evals must be array`);
+}
+if (taskEvals.length < 30) {
   errors.push("expected at least 30 task evals");
 }
 
-for (const item of evals.evals || []) {
+for (const item of taskEvals) {
   if (!Number.isInteger(item.id)) errors.push(`eval id ${item.id} is not integer`);
   if (ids.has(item.id)) errors.push(`duplicate eval id ${item.id}`);
   ids.add(item.id);
@@ -33,11 +42,11 @@ for (const item of evals.evals || []) {
   prompts.add(item.prompt);
   if (!Array.isArray(item.files)) errors.push(`eval ${item.id} files must be array`);
   if (!Array.isArray(item.expectations) || item.expectations.length < 4) {
-    errors.push(`eval ${item.id} needs at least 4 expectations`);
+    errors.push(`eval ${item.id} in ${item.__file} needs at least 4 expectations`);
   }
 }
 
-const suiteText = JSON.stringify(evals).toLowerCase();
+const suiteText = JSON.stringify(taskEvals).toLowerCase();
 const requiredCoverage = [
   ["greenfield", 2],
   ["brownfield", 4],
@@ -99,6 +108,6 @@ if (errors.length) {
 }
 
 console.log("PASS");
-console.log(`task_evals=${evals.evals.length}`);
+console.log(`task_evals=${taskEvals.length} files=${taskEvalFiles.length}`);
 console.log(`trigger_evals=${triggers.length} should=${should} should_not=${shouldNot}`);
 console.log(`loaded_chars=${loadedChars}`);

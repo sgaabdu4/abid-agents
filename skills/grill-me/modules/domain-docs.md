@@ -9,6 +9,10 @@ final synthesis touching docs.
   `CONTEXT-MAP.md`, `CONTEXT.md`, relevant `docs/adr/`, and context-local ADRs
   near the touched area. Missing docs are not a blocker; do not ask to create
   them up front.
+- Treat `plan.md`, decision docs, PRDs, and open-question docs as evidence; do
+  not re-ask answered product/domain Qs.
+- Docs close only covered stages. "No remaining product questions" accepts
+  product plan only unless screen flow/look + review status are documented.
 - Use glossary vocabulary in questions, plans, titles, tests, and artifacts.
   Respect `_Avoid_` synonyms.
 - If user claims, code, glossary, or ADRs conflict, surface the conflict with

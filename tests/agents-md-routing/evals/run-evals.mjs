@@ -28,7 +28,7 @@ const policyFiles = [
   'skills/workflow-help/references/route-map.md',
 ];
 
-const policyDigestPattern = /workflow-help|grill-me|to-prd|to-issues|readiness|ensure-worktree-ready|worktree readiness|project hooks|push dry-run|PASS|CONCERNS|FAIL|correct course|scope expands|deterministic|repeat work|script\/test\/hook\/eval|codebase-memory|context-mode|support tools|not stages|project `AGENTS\.md`|repo-specific|global|canonical|root owner|wrappers|duplicat|local gate|AGENTS hygiene|budget|tokens|o200k_base|600|lavish|visual review|UI choices|UI\/components|design-system|design SSOT|atomic-ui|theme|hardcoded|react-doctor|fallow|clone groups|dupes|duplication|vercel-react-best-practices|sentry-workflow|sentry-cli|sentry-sdk-setup|sentry-feature-setup|security-review|performance-rescue|e2e|real UI|screenshots|events|regression command|thermo-nuclear-code-quality-review|maintainability|no-mistakes|committed|BMAD|menu codes|Treehouse|700|blast radius|surrounding issues|Report:|Why:|What:|Risk:|Proof:/i;
+const policyDigestPattern = /workflow-help|grill-me|to-prd|to-issues|readiness|ensure-worktree-ready|worktree readiness|project hooks|push dry-run|PASS|CONCERNS|FAIL|correct course|scope expands|deterministic|repeat work|script\/test\/hook\/eval|codebase-memory|context-mode|support tools|not stages|project `AGENTS\.md`|repo-specific|global|canonical|root owner|wrappers|duplicat|local gate|AGENTS hygiene|budget|tokens|o200k_base|600|component\/state|component library|visual review|UI choices|UI\/components|design-system|design SSOT|atomic-ui|theme|hardcoded|react-doctor|fallow|clone groups|dupes|duplication|vercel-react-best-practices|sentry-workflow|sentry-cli|sentry-sdk-setup|sentry-feature-setup|security-review|performance-rescue|e2e|real UI|screenshots|events|regression command|thermo-nuclear-code-quality-review|maintainability|no-mistakes|committed|BMAD|menu codes|Treehouse|700|blast radius|surrounding issues|Report:|Why:|What:|Risk:|Proof:/i;
 
 const policyText = policyFiles
   .map((rel) => {
@@ -72,9 +72,9 @@ const keyDefinitions = [
   'usesToIssuesForMissingSlices: routes to-issues when the post-grill-me plan lacks vertical slices, task waves, or agent-ready issue breakdown',
   'usesToIssuesForRequestedIssueCards: routes to-issues when the user explicitly asks to turn accepted slices into separate issue or tracker cards',
   'usesToPrdAndToIssuesForBigWork: routes broad unsliced work through to-prd and then to-issues before build',
-  'usesLavishForVisualUiDecisions: uses Lavish or lavish-axi for UI flow or visual choices that cannot be judged from text',
-  'keepsLavishAsSupportTool: treats Lavish as a support tool inside grill-me, not as its own Plan/Implement/Verify stage',
-  'treatsLavishAsRequiredStage: incorrectly requires Lavish for every feature or makes it a standalone workflow stage',
+  'usesComponentArtifactsForVisualUiDecisions: uses project-local component/state artifacts for UI flow or visual choices that cannot be judged from text',
+  'keepsVisualArtifactsInsideGrillMe: treats visual decision artifacts as support inside grill-me, not as their own Plan/Implement/Verify stage',
+  'treatsVisualArtifactAsRequiredStage: incorrectly requires a visual artifact for every feature or makes it a standalone workflow stage',
   'usesAtomicUi: includes atomic-ui for UI components, reusable controls, design-system, token, or styling work',
   'checksDesignSsot: the policy explicitly requires locating or creating the UI design SSOT, such as tokens, theme, primitives, component library, or atomic hierarchy, before reusable UI styling edits',
   'skipsDesignSsot: incorrectly allows UI styling or reusable component work without checking or creating the project-local design SSOT',

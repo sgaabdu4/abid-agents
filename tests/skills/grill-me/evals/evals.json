@@ -609,7 +609,7 @@
     {
       "id": 45,
       "prompt": "Continue a grill-me UI-flow session. We know the onboarding goal and the two candidate routes, but the user says they cannot choose without seeing the flow. Decide the next move.",
-      "expected_output": "Uses a low-fidelity Lavish wireflow/state-map review before asking the route choice, keeps visual design/prototype out of UI flow, and references the vendored Lavish skill.",
+      "expected_output": "Uses a low-fidelity route/component/state artifact before asking the route choice, keeps visual design/prototype out of UI flow, and grounds it in the project's existing design SSOT.",
       "files": [
         {
           "path": "docs/planning/onboarding/session_state.md",
@@ -619,14 +619,12 @@
           "path": "docs/planning/onboarding/plan_draft.md",
           "content": "# Onboarding Draft\n\n## Decisions\n- Goal: improve first-run activation.\n- Candidate routes: checklist-first and guided wizard.\n- User needs to see the flow before choosing.\n"
         },
-        {
-          "path": "vendor/skill-upstreams/lavish-axi/skills/lavish/SKILL.md",
-          "content": "# Lavish Editor\n\nUse `npx -y lavish-axi <html-file>` for reviewable HTML artifacts. Read matching playbooks before writing HTML. Fix `layout_warnings` before asking the user to review.\n"
-        }
+        { "path": "src/design/tokens.ts", "content": "export const tokens = { spacing: { sm: 8, md: 12 }, color: { surface: '#fff', accent: '#2563eb' } };\n" },
+        { "path": "src/components/OnboardingCard.tsx", "content": "export function OnboardingCard({ title, state }) { return <section data-state={state}>{title}</section>; }\n" }
       ],
       "expectations": [
-        "The response treats Lavish as a UI-flow visual review surface, not a new workflow stage.",
-        "The response references `vendor/skill-upstreams/lavish-axi/skills/lavish/SKILL.md` or equivalent vendored Lavish guidance before using Lavish.",
+        "The response uses `atomic-ui` and `impeccable` or equivalent UI/design SSOT guidance for the artifact.",
+        "The response inspects or references existing tokens/components before creating the artifact.",
         "The artifact is described as a low-fidelity wireflow/state map, not visual design or a prototype.",
         "The next visible decision remains one route/state question after the visual artifact or review status."
       ]
