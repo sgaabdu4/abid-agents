@@ -384,6 +384,7 @@ assertIncludes(contextProbeText, 'ctx_stats');
 assertIncludes(routingEvalText, 'AGENTS_ROUTING_EVAL_OUT_DIR');
 assertIncludes(routingEvalText, "path.join('/tmp', 'agents-md-routing-evals')");
 assertIncludes(markdownHygieneText, 'free prose; use a bullet, heading, or fenced template');
+assertIncludes(markdownHygieneText, 'bullet must not end with a full stop');
 assertIncludes(markdownHygieneText, 'must stay at or under ${maxAgentsLines} lines');
 assertIncludes(markdownHygieneText, 'must stay at or under ${maxAgentsTokens} tokens');
 assertIncludes(markdownHygieneText, 'requires explicit markdown-hygiene:');
