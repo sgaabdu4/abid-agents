@@ -14,6 +14,7 @@ const findingStatuses = new Set(['open', 'owned', 'fixed', 'blocked', 'accepted'
 const guardrailKinds = new Set(['script', 'test', 'lint', 'scanner', 'hook', 'eval', 'ci', 'manual']);
 const guardrailStatuses = new Set(['planned', 'active', 'passed', 'failed', 'blocked', 'skipped']);
 const contextStatuses = new Set(['current', 'updated', 'created']);
+const legacyCommandPattern = /(^|[^A-Za-z0-9_])\/?aa:[a-z][a-z-]*/i;
 
 function template() {
   return {
@@ -53,9 +54,29 @@ function expectedTargets(stage) {
   return stage.nextTargets.join(' or ');
 }
 
+function collectLegacyCommands(value, pointer = '$', hits = []) {
+  if (typeof value === 'string') {
+    if (legacyCommandPattern.test(value)) hits.push(pointer);
+    return hits;
+  }
+  if (Array.isArray(value)) {
+    value.forEach((item, index) => collectLegacyCommands(item, `${pointer}[${index}]`, hits));
+    return hits;
+  }
+  if (isObject(value)) {
+    for (const [key, item] of Object.entries(value)) {
+      collectLegacyCommands(item, `${pointer}.${key}`, hits);
+    }
+  }
+  return hits;
+}
+
 function validate(state) {
   const errors = [];
   if (!isObject(state)) return ['state must be a JSON object'];
+  for (const pointer of collectLegacyCommands(state)) {
+    errors.push(`legacy /aa command must not appear in state at ${pointer}; use /he:*`);
+  }
   if (state.schema !== 'he-state/v1') errors.push('schema must be he-state/v1');
   if (typeof state.feature !== 'string' || !state.feature.trim()) errors.push('feature is required');
   if (typeof state.updatedAt !== 'string' || !state.updatedAt.trim()) errors.push('updatedAt is required');

@@ -13,6 +13,7 @@ Read `../workflow-help/references/route-map.md`, `../treehouse/SKILL.md`, and `.
 
 - Create/update `he-state.json`; every internal step updates `steps[]`; every concern/failure updates `findings[]`; validate it before any ready-yes handoff
 - Before `PASS`, run `check-project-context-gates.mjs --require-all`; ensure `PRODUCT.md`, `DESIGN.md`, and the token/design-system owner exist and are current. Product changes update `PRODUCT.md`; design/UI/token changes update `DESIGN.md` and the token owner. Put their paths/status in the plan artifact and `he-state.json.context`
+- Reduce context rot by treating `he-state.json` as the resume source. Record only current state, receipts, open findings, guardrails, artifacts, and next-stage readiness; do not depend on transcript memory
 - Treehouse + `ensure-worktree-ready.sh` gate non-trivial work; skip only small clear work
 - Use `grill-me` when outcome, scope, proof, risk, UI flow, or visual direction is unclear; do not duplicate its workflow. Let Grill Me own `session_state.md`, stage map, and one-question loop, then record only the decision, blocker, or artifact path in `he-state.json`
 - For unclear UI, use Grill Me UI flow or visual design stages with `atomic-ui` + `impeccable`; ask as many one-by-one Qs as needed until aligned or explicitly parked

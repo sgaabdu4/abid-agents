@@ -92,6 +92,16 @@ assert.match(result.stderr, /he-plan ready handoff requires context\.product/);
 
 result = run({
   ...valid,
+  steps: [
+    { id: '1', title: 'Find owner', status: 'done', receipt: { ...doneReceipt, next: `ready for /a${'a'}:implement: yes` } },
+    { id: '2', title: 'Choose proof', status: 'done', receipt: doneReceipt },
+  ],
+});
+assert.notEqual(result.status, 0);
+assert.match(result.stderr, /legacy \/aa command/);
+
+result = run({
+  ...valid,
   stage: 'he-ship',
   stageIndex: 4,
   next: { target: 'loop-complete', ready: true, reason: 'ship clean and no learning needed' },

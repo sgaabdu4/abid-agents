@@ -433,6 +433,7 @@ HARD_ENG_SKIP_NPM_INSTALL=1 \
   HARD_ENG_SKIP_CRON=1 \
   "$repo/scripts/install.sh"
 node "$repo/tests/codex-config-sync.test.mjs"
+node "$repo/scripts/check-project-naming.mjs" "$repo"
 node "$repo/scripts/check-generated-assets.mjs" "$repo"
 node "$repo/scripts/check-project-context-gates.mjs" --require-all "$repo"
 node "$repo/scripts/check-project-quality-gates.mjs" --require-push-gate "$repo"
@@ -482,6 +483,7 @@ if [[ "$(basename "$repo")" != ".agents" ]]; then
 fi
 
 "$repo/scripts/check-markdown-hygiene.mjs"
+node "$repo/scripts/check-project-naming.mjs" "$repo"
 node "$repo/scripts/check-generated-assets.mjs" "$repo"
 
 grep_pathspecs=(. ':!scripts/install.sh' ':!scripts/check-markdown-hygiene.mjs' ':!tests/markdown-hygiene.test.mjs')
