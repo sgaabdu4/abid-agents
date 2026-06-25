@@ -13,6 +13,8 @@ from pathlib import Path
 HOME = Path(os.environ.get("HOME", "")).expanduser()
 CODEX_HOME = HOME / ".codex"
 CHECK_ONLY = "--check" in sys.argv
+REPAIR_GLOBAL_STATE = os.environ.get("CODEX_CLEANUP_REPAIR_GLOBAL_STATE") == "1"
+DELETE_STALE_THREAD_ROWS = os.environ.get("CODEX_CLEANUP_DELETE_STALE_THREAD_ROWS") == "1"
 
 
 def emit(event, **fields):
@@ -61,6 +63,10 @@ def prune_mapping(value, valid):
 
 
 def repair_global_state(valid):
+    if not REPAIR_GLOBAL_STATE:
+        emit("global_state", status="skip_disabled", check=CHECK_ONLY)
+        return
+
     path = CODEX_HOME / ".codex-global-state.json"
     data = read_json(path)
     if not isinstance(data, dict):
@@ -125,8 +131,13 @@ def repair_rollout_rows():
     if not stale:
         emit("rollout_rows", removed=0, check=CHECK_ONLY)
         return
-    if CHECK_ONLY:
-        emit("rollout_rows", removable=len(stale), check=True)
+    if CHECK_ONLY or not DELETE_STALE_THREAD_ROWS:
+        emit(
+            "rollout_rows",
+            removable=len(stale),
+            check=CHECK_ONLY,
+            delete_enabled=DELETE_STALE_THREAD_ROWS,
+        )
         return
 
     db = CODEX_HOME / "state_5.sqlite"

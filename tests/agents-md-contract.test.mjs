@@ -219,6 +219,8 @@ assertIncludes(watchdogText, 'codex-stack-signature.json', 'codex-watchdog must 
 assertIncludes(cleanupText, 'SkyComputerUseClient', 'codex-cleanup must trim duplicate computer-use MCP children');
 assertIncludes(cleanupText, '/node_repl', 'codex-cleanup must trim duplicate node_repl children');
 assertIncludes(cleanupText, 'CODEX_CLEANUP_MCP_CHILD_LIMIT', 'codex-cleanup must cap duplicate MCP children per helper kind');
+assertIncludes(cleanupText, 'CODEX_CLEANUP_REPAIR_GLOBAL_STATE', 'codex-cleanup must keep Codex global-state repair opt-in');
+assertIncludes(cleanupText, 'CODEX_CLEANUP_DELETE_STALE_THREAD_ROWS', 'codex-cleanup must keep stale thread row deletion opt-in');
 assertIncludes(cleanupText, 'stale_codex_cli_groups', 'codex-cleanup must report stale Codex CLI group cleanup');
 assertIncludes(cleanupText, 'CODEX_CLEANUP_STALE_CLI_CWDS', 'codex-cleanup must keep stale CLI cleanup scoped by cwd');
 assertIncludes(cleanupText, 'CODEX_CLEANUP_STALE_CLI_MAX_AGE_SECONDS', 'codex-cleanup must keep stale CLI cleanup age-gated');
