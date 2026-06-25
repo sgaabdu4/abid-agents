@@ -153,30 +153,32 @@ assertIncludes(routeMapText, 'Run `security-review` or `performance-rescue` when
 assertIncludes(routeMapText, 'Loop back to Implement until tests, reviews, and required E2E are clean.');
 assertIncludes(routeMapText, 'React app/Next.js');
 assertIncludes(routeMapText, 'include `fallow dupes` / clone-group checks for duplication or copy-paste');
-assertIncludes(projectWorkflowGatesHtml, 'component/state artifacts help UI choices when text is not enough');
-assertIncludes(projectWorkflowGatesHtml, 'ensure-worktree-ready.sh');
-assertIncludes(projectWorkflowGatesHtml, 'push dry-run only counts after project hooks are active');
-assertIncludes(projectWorkflowGatesHtml, 'Need missing slices');
-assertIncludes(projectWorkflowGatesHtml, 'Plan has slices');
-assertIncludes(projectWorkflowGatesHtml, 'do not rerun <code>/to-issues</code>');
-assertIncludes(projectWorkflowGatesHtml, 'Need UI review');
-assertIncludes(projectWorkflowGatesHtml, 'Use <code>atomic-ui</code> and <code>impeccable</code> inside <code>/grill-me</code>.');
-assertIncludes(projectWorkflowGatesHtml, 'Implement with touched-area skills');
-assertIncludes(projectWorkflowGatesHtml, 'guardrail triad');
-assertIncludes(projectWorkflowGatesHtml, 'fallow dupes --format json --quiet');
-assertIncludes(projectWorkflowGatesHtml, 'locate or create the design SSOT before reusable styling');
-assertIncludes(projectWorkflowGatesHtml, 'React app touched');
-assertIncludes(projectWorkflowGatesHtml, 'duplication used dupes or clone-group checks');
-assertIncludes(projectWorkflowGatesHtml, 'Run tests, requested or touched risk reviews, thermo review, then E2E.');
-assertIncludes(projectWorkflowGatesHtml, '/security-review');
-assertIncludes(projectWorkflowGatesHtml, '/performance-rescue');
-assertIncludes(projectWorkflowGatesHtml, '3b. Risk reviews');
-assertIncludes(projectWorkflowGatesHtml, 'Security/perf if requested or touched.');
-assertIncludes(projectWorkflowGatesHtml, '3c. Thermo review');
-assertIncludes(projectWorkflowGatesHtml, '3d. E2E');
-assertIncludes(projectWorkflowGatesHtml, 'If any fail: back to 2. Implement, then rerun Verify.');
-assertIncludes(projectWorkflowGatesHtml, 'Pass: go to 4. Final Gate.');
-assertIncludes(projectWorkflowGatesHtml, 'local verify loop is clean');
+for (const needle of [
+  'component/state artifacts help UI choices when text is not enough',
+  'ensure-worktree-ready.sh',
+  'push dry-run only counts after project hooks are active',
+  'Need missing slices',
+  'Plan has slices',
+  'do not rerun <code>/to-issues</code>',
+  'Need UI review',
+  'Use <code>atomic-ui</code> and <code>impeccable</code> inside <code>/grill-me</code>.',
+  'Implement with touched-area skills',
+  'guardrail triad',
+  'fallow dupes --format json --quiet',
+  'locate or create the design SSOT before reusable styling',
+  'React app touched',
+  'duplication used dupes or clone-group checks',
+  'Run tests, requested or touched risk reviews, thermo review, then E2E.',
+  '/security-review',
+  '/performance-rescue',
+  '3b. Risk reviews',
+  'Security/perf if requested or touched.',
+  '3c. Thermo review',
+  '3d. E2E',
+  'If any fail: back to 2. Implement, then rerun Verify.',
+  'Pass: go to 4. Final Gate.',
+  'local verify loop is clean',
+]) assertIncludes(projectWorkflowGatesHtml, needle);
 assertIncludes(grillFinalPlanText, 'Sliced plan -> readiness');
 assertIncludes(grillFinalPlanText, '`to-issues` only for missing');
 assertNotIncludes(fs.readFileSync(path.join(repo, '.gitmodules'), 'utf8'), 'vendor/skill-upstreams/lavish-axi');
