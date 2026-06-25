@@ -28,7 +28,7 @@ const policyFiles = [
   'skills/workflow-help/references/route-map.md',
 ];
 
-const policyDigestPattern = /workflow-help|grill-me|to-prd|to-issues|readiness|ensure-worktree-ready|project hooks|push dry-run|PASS|CONCERNS|FAIL|correct course|scope expands|deterministic|repeat work|lint|scanner|gate|script\/test\/hook\/eval|codebase-memory|context-mode|support tools|not stages|AGENTS\.md|repo-specific|global|canonical|root owner|wrappers|duplicat|budget|tokens|o200k|600|component\/state|visual review|UI choices|design-system|design SSOT|atomic-ui|theme|hardcoded|react-doctor|fallow|dupes|duplication|vercel-react-best-practices|sentry|security-review|performance-rescue|e2e|real UI|screenshots|events|regression command|thermo|maintainability|no-mistakes|committed|GitHub Actions|gh.*CI|GH CI|parallel|batch fixes|rerun|fewest|least|BMAD|menu codes|Treehouse|700|blast radius|surrounding issues|Report:|Why:|What:|Risk:|Proof:/i;
+const policyDigestPattern = /workflow-help|he-plan|he-implement|he-verify|he-ship|he-learn|he-state|state file|stateful|resume source|steps\[\]|findings\[\]|guardrails\[\]|next\.ready|\/he:|stage|receipt|transcript|context rot|Stage:|Decision:|Owner\/proof|Artifacts:|Blocker:|Next:|ready for|grill-me|Grill Me|session_state|one-question|aligned|to-prd|to-issues|readiness|ensure-worktree-ready|check-project-quality-gates|quality gate|push-blocking|project hooks|push dry-run|PASS|CONCERNS|FAIL|correct course|scope expands|deterministic|repeat work|lint|scanner|gate|script\/test\/hook\/eval|codebase-memory|context-mode|support tools|not stages|AGENTS\.md|repo-specific|global|canonical|root owner|wrappers|duplicat|budget|tokens|o200k|600|component\/state|visual review|visual direction|UI choices|design-system|design SSOT|atomic-ui|theme|hardcoded|react-doctor|React Doctor|fallow|dupes|duplication|vercel-react-best-practices|flutter_skill_lints|dart analyze|Flutter|sentry|security-review|performance-rescue|e2e|real UI|screenshots|events|regression command|thermo|maintainability|no-mistakes|committed|GitHub Actions|gh.*CI|GH CI|parallel|batch fixes|rerun|fewest|least|BMAD|menu codes|Treehouse|700|blast radius|surrounding issues|Report:|Why:|What:|Risk:|Proof:/i;
 
 const policyText = policyFiles
   .map((rel) => {
@@ -61,6 +61,34 @@ fs.writeFileSync(schemaPath, `${JSON.stringify({
 }, null, 2)}\n`);
 
 const keyDefinitions = [
+  'usesHePlan: routes stage 1 planning/readiness to he-plan or /he:plan',
+  'usesHeImplement: routes stage 2 owner-changing implementation to he-implement or /he:implement',
+  'usesHeVerify: routes stage 3 proof/review/E2E loop to he-verify or /he:verify',
+  'usesHeShip: routes stage 4 committed final gate to he-ship or /he:ship',
+  'usesHeLearn: routes stage 5 durable learning to he-learn or /he:learn when repeated misses, review gaps, or ship findings exist',
+  'keepsHeStageOrder: preserves the order he-plan -> he-implement -> he-verify -> he-ship -> he-learn when needed',
+  'skipsAaStageOrder: incorrectly skips or reorders aa stages',
+  'usesStageReceipt: uses, reads, or requires the compact stage receipt with Stage, State, Decision, Owner/proof, Artifacts, Blocker, and Next',
+  'usesHeStateFile: requires each feature to keep an he-state.json state file',
+  'recordsFindingsInHeState: records failures, review findings, planning concerns, or blockers in he-state.json findings[] with owner repair stage',
+  'recordsGuardrailsInHeState: records deterministic scripts/tests/lints/scanners/hooks/evals in he-state.json guardrails[] with command, status, evidence, and push-blocking status',
+  'usesProjectQualityGate: runs or requires check-project-quality-gates.mjs --require-push-gate for React/Next, JS/TS, or Flutter push-blocking gates',
+  'requiresPushBlockingGuardrails: requires project hooks or push-blocking guardrails to be active and passed before ship, no-mistakes, or push dry-run trust',
+  'startsFreshStageThread: prefers each HE stage to start in a fresh thread using the prior he-state.json path',
+  'updatesAaStepsStatefully: requires internal steps to update steps[] before and after work, with receipts for done or blocked steps',
+  'validatesHeStateBeforeReady: runs he-state.mjs validate before any ready-yes next-stage handoff',
+  'blocksReadyYesWithoutValidState: blocks a ready-yes handoff when state is missing, invalid, or has pending/in_progress/blocked steps',
+  'treatsChatAsSourceOfTruth: incorrectly treats chat transcript or memory as the authoritative state instead of he-state.json',
+  'avoidsTranscriptDump: avoids relying on long transcript dumps for stage handoff or resume',
+  'dumpsTranscriptForHandoff: incorrectly asks to carry or paste the whole transcript instead of a compact receipt',
+  'blocksHeImplementWithoutPass: blocks he-implement unless he-plan readiness is PASS',
+  'runsHeImplementWithoutPass: incorrectly starts he-implement from CONCERNS, FAIL, unknown owner, or weak readiness',
+  'blocksHeShipBeforeVerifyClean: blocks he-ship until he-verify/local proof is clean and work is committed',
+  'runsHeShipBeforeVerifyClean: incorrectly starts he-ship before verification is clean or committed',
+  'usesHeLearnOnlyWhenNeeded: treats he-learn as conditional for repeated misses, review gaps, or ship findings rather than mandatory every time',
+  'runsHeLearnAlways: incorrectly runs he-learn after every ship even when no durable learning is needed',
+  'usesStageFailureLoop: routes failed stages back to the owning repair stage before retrying handoff',
+  'skipsStageFailureLoop: incorrectly treats a stage failure as final or jumps to the next stage without repair',
   'usesWorkflowHelp: route unclear workflow or next-step questions to workflow-help',
   'keepsSupportToolsAsTools: treats codebase-memory, context-mode, and terse as support tools, not workflow stages',
   'treatsSupportToolsAsStages: incorrectly presents support tools as standalone workflow stages',
@@ -75,12 +103,12 @@ const keyDefinitions = [
   'usesComponentArtifactsForVisualUiDecisions: uses project-local component/state artifacts for UI flow or visual choices that cannot be judged from text',
   'keepsVisualArtifactsInsideGrillMe: treats visual decision artifacts as support inside grill-me, not as their own Plan/Implement/Verify stage',
   'treatsVisualArtifactAsRequiredStage: incorrectly requires a visual artifact for every feature or makes it a standalone workflow stage',
-  'usesAtomicUi: includes atomic-ui for UI components, reusable controls, design-system, token, or styling work',
+  'usesAtomicUi: includes atomic-ui for UI components, reusable controls, design-system, token, styling work, or project-local UI component/state decision artifacts',
   'checksDesignSsot: requires locating or creating the UI design SSOT before reusable UI styling edits',
   'skipsDesignSsot: incorrectly allows UI styling or reusable component work without checking or creating the project-local design SSOT',
   'usesReactDoctor: includes react-doctor for React or Next.js implementation/review',
   'usesFallow: includes fallow for JS/TS code health, cleanup, risk, or architecture checks',
-  'usesFallowCloneGroups: requires fallow dupes, clone groups, or duplication checks for React/JS/TS code health',
+  'usesFallowCloneGroups: requires fallow dupes, Fallow audit/dupes, clone groups, or duplication checks as part of React/JS/TS code health or push guardrails',
   'usesReactDoctorWithoutFallow: incorrectly runs React Doctor alone for React app code health when fallow is also required',
   'skipsFallowCloneGroups: incorrectly omits fallow duplication or clone-group checks when duplication or copy-paste is part of the React/JS/TS request',
   'usesVercelReactBestPractices: includes Vercel React best-practices for React/Next performance guidance',
@@ -119,8 +147,10 @@ const keyDefinitions = [
   'usesReadinessGate: requires readiness before implementation',
   'readinessConcernsOrFail: marks weak readiness as CONCERNS or FAIL instead of PASS',
   'usesGrillMeWhenAmbiguous: routes ambiguous feature scope to grill-me',
-  'startsImplementationWithUnknowns: starts coding despite missing outcome, owner, blast radius, proof path, or risk routing',
-  'usesTreehouseWorkspace: names Treehouse worktree or isolated branch as the place for feature planning/coding before implementation proceeds',
+  'usesGrillMeUntilAligned: says Grill Me asks one question at a time as many times as needed until aligned or explicitly parked',
+  'usesGrillMeUiStagesWhenUnclear: sends unclear UI flow or visual direction through Grill Me UI flow or visual design stages instead of guessing in implementation',
+  'startsImplementationWithUnknowns: true only when the answer explicitly permits coding or implementation to start despite missing outcome, owner, blast radius, proof path, or risk routing; false when it blocks implementation',
+  'usesTreehouseWorkspace: for feature planning/coding or next implementation after an accepted plan, names Treehouse worktree or isolated branch before implementation proceeds',
   'skipsWorkspaceIsolation: incorrectly starts feature implementation without Treehouse/worktree/branch isolation',
   'usesWorktreeReadyGuard: runs or requires scripts/ensure-worktree-ready.sh after worktree creation or before final gate validation',
   'skipsWorktreeReadyGuard: incorrectly trusts a worktree, no-mistakes checkout, or push dry-run without the worktree readiness guard',

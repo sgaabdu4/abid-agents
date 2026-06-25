@@ -1,5 +1,5 @@
 #!/bin/sh
-# Managed by abid-agents installer.
+# Managed by hard-eng installer.
 set -eu
 
 echo "codex health: $(date '+%Y-%m-%d %H:%M:%S %Z')"

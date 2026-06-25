@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-# Managed by abid-agents installer.
+# Managed by hard-eng installer.
 import json
 import os
 import signal

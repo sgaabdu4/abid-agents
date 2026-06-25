@@ -50,7 +50,7 @@ assertIncludes(text, 'Project AGENTS.md overrides global; repo facts only, <=600
 assertIncludes(text, 'User-facing replies -> `terse`.');
 assertIncludes(text, 'React/Next/perf/dupes -> `react-doctor` + `fallow` dupes + `vercel-react-best-practices`.');
 assertIncludes(text, 'Sentry/observability/issues/setup -> `sentry-workflow` only.');
-assertIncludes(text, 'Features -> Treehouse/`grill-me`, plan, build/verify loop; PR -> `no-mistakes`.');
+assertIncludes(text, 'Features -> `he-plan`/`he-implement`/`he-verify`; ship:`he-ship`; learn:`he-learn`.');
 assertIncludes(text, 'Post-`grill-me`: clear skip; brief `to-prd`; missing -> `to-issues`; sliced -> build; big -> both.');
 
 const tokenCheck = spawnSync('python3', ['-c', `
@@ -127,11 +127,26 @@ for (const executable of [cleanupPath, updateStackPath, contextHealthPath, cbmPr
 }
 
 assertIncludes(setupText, '--prereqs-only', 'setup.sh must expose a prerequisite-only mode');
-assertIncludes(setupText, 'ABID_AGENTS_ALLOW_HOMEBREW_BOOTSTRAP');
-assertNotIncludes(setupText, 'ABID_AGENTS_SKIP_HOMEBREW_INSTALL');
-assertIncludes(readmeText, 'curl -fsSLO https://raw.githubusercontent.com/sgaabdu4/abid-agents/main/scripts/setup.sh && bash setup.sh');
+assertIncludes(setupText, '--full', 'setup.sh must expose full setup mode');
+assertIncludes(setupText, '--skills-only', 'setup.sh must expose skills-only setup mode');
+assertIncludes(setupText, '--uninstall', 'setup.sh must expose uninstall delegation mode');
+assertIncludes(setupText, 'HARD_ENG_ALLOW_HOMEBREW_BOOTSTRAP');
+assertNotIncludes(setupText, 'HARD_ENG_SKIP_HOMEBREW_INSTALL');
+assertIncludes(readmeText, '<a id="tested-scope"></a>');
+assertIncludes(readmeText, 'only been tested on Codex running on macOS');
+assertIncludes(readmeText, 'docs/images/hard-eng-hero.png');
+assertIncludes(readmeText, 'docs/images/project-workflow-gates.png');
+assertIncludes(readmeText, 'curl -fsSLO https://raw.githubusercontent.com/sgaabdu4/hard-eng/main/scripts/setup.sh');
+assertIncludes(readmeText, 'bash setup.sh --full');
+assertIncludes(readmeText, 'bash setup.sh --skills-only');
+assertIncludes(readmeText, './scripts/uninstall.sh --yes');
+assertIncludes(readmeText, 'bash setup.sh --uninstall --yes');
 assertNotIncludes(readmeText, 'less setup.sh && bash setup.sh');
-assertNotIncludes(readmeText, 'curl -fsSL https://raw.githubusercontent.com/sgaabdu4/abid-agents/main/scripts/setup.sh | bash');
+assertNotIncludes(readmeText, 'curl -fsSL https://raw.githubusercontent.com/sgaabdu4/hard-eng/main/scripts/setup.sh | bash');
+assertNotIncludes(readmeText, 'Abid Agents');
+assertNotIncludes(readmeText, 'ABID_AGENTS');
+assertNotIncludes(readmeText, '/aa:');
+assertNotIncludes(readmeText, 'aa-state');
 assertIncludes(readmeText, 'scripts/ensure-worktree-ready.sh');
 assertIncludes(readmeText, 'when slices are missing or should be published as work items');
 assertIncludes(readmeText, 'React app or Next.js implementation/review');
@@ -141,43 +156,104 @@ assertIncludes(routeMapText, 'Repeat work runs its deterministic owner first');
 assertIncludes(routeMapText, 'Every violation gets lint/scanner/gate');
 assertIncludes(routeMapText, 'known repeat work skips an owner or violation lacks lint/scanner/gate');
 assertIncludes(routeMapText, 'ensure-worktree-ready.sh');
-assertIncludes(routeMapText, 'Dry-run push only counts after project hooks are active.');
+assertIncludes(routeMapText, 'Dry-run push only counts after project hooks are active and quality gates pass.');
 assertIncludes(routeMapText, 'For GitHub Actions/`gh` CI, parallelize independent logs/jobs, batch fixes locally, rerun fewest checks.');
-assertIncludes(routeMapText, 'For UI choices that cannot be judged from text, inspect the project design SSOT and use a local component/state artifact inside Grill Me.');
+assertIncludes(routeMapText, 'Use `grill-me` when outcome, scope, proof, risk, UI flow, or visual direction is unclear.');
+assertIncludes(routeMapText, 'Let Grill Me own `session_state.md`, its stage map, and one-question loop');
+assertIncludes(routeMapText, 'it asks as many one-by-one Qs as needed until aligned or explicitly parked');
+assertIncludes(routeMapText, 'use the Grill Me UI flow or visual design stages');
 assertIncludes(routeMapText, '`to-issues` only for missing agent-ready slices');
 assertIncludes(routeMapText, 'when the accepted `plan.md` already has vertical slices or task waves');
 assertIncludes(routeMapText, '`grill-me` with `atomic-ui` + `impeccable`');
 assertIncludes(routeMapText, 'Create the Treehouse worktree before feature planning/coding.');
-assertIncludes(routeMapText, 'Reroute to `no-mistakes` only after committed implementation work is ready for the gate.');
+assertIncludes(routeMapText, 'Reroute to `he-ship`/`no-mistakes` only after committed implementation work is ready for the gate.');
 assertIncludes(routeMapText, 'Run `security-review` or `performance-rescue` when requested or when those risks were touched, then `thermo-nuclear-code-quality-review`, then `e2e` last');
 assertIncludes(routeMapText, 'Loop back to Implement until tests, reviews, and required E2E are clean.');
+assertIncludes(routeMapText, 'Add or wire deterministic guardrails in `guardrails[]`');
+assertIncludes(routeMapText, 'React/Next changes need React Doctor + Fallow audit/dupes + lint/typecheck gate');
+assertIncludes(routeMapText, 'Flutter changes need package-root `dart analyze` with `flutter_skill_lints` plus tests when present');
+assertIncludes(routeMapText, 'Run every guardrail command in `guardrails[]`; missing or failing guard routes to `he-implement`.');
+assertIncludes(routeMapText, 'node "$HOME/.agents/scripts/check-project-quality-gates.mjs" --require-push-gate .');
+assertIncludes(routeMapText, 'Order is fixed: 1 `he-plan` -> 2 `he-implement` -> 3 `he-verify` -> 4 `he-ship` -> 5 `he-learn` when needed.');
+assertIncludes(routeMapText, 'Each stage runs until its exit is true or blocked');
+assertIncludes(routeMapText, 'Prefer a fresh thread for each stage.');
+assertIncludes(routeMapText, 'Start the new thread with the next `/he:*` command and the `he-state.json` path from the prior receipt.');
+assertIncludes(routeMapText, 'The visible command is one `he-*` command per stage.');
+assertIncludes(routeMapText, 'uses parallel subagents only for independent work that can merge back through the active stage.');
+assertIncludes(routeMapText, 'State is required: each feature keeps an `he-state.json` in the plan/worktree.');
+assertIncludes(routeMapText, 'every finding from Plan onward updates `findings[]` with owner repair stage');
+assertIncludes(routeMapText, 'every deterministic guard updates `guardrails[]` with owner, command, status, evidence, and whether it blocks push');
+assertIncludes(routeMapText, 'Return to `he-plan` only when a finding changes scope, owner, proof path, risk route, artifact choice, or Grill Me stage map.');
+assertIncludes(routeMapText, 'Before any `Next: ... yes`, run `node "$HOME/.agents/scripts/he-state.mjs" validate <he-state.json>`.');
+assertIncludes(routeMapText, 'To avoid context rot, every stage exits with a receipt, not a transcript');
+assertIncludes(routeMapText, '`Stage:` current stage; `State:` path to `he-state.json`; `Decision:` pass/blocker; `Owner/proof:` paths or commands; `Artifacts:` links/paths; `Blocker:` none or exact ask; `Next:` ready/not-ready.');
+assertIncludes(routeMapText, 'Update state before and after each internal step, not only at stage end.');
+assertIncludes(routeMapText, 'New stage threads read `he-state.json` first; they do not need the previous chat transcript.');
+assertIncludes(routeMapText, '`next.ready: true` is invalid while any step is pending, in progress, or blocked.');
+assertIncludes(routeMapText, '`next.ready: true` is invalid while blocking findings or push-blocking guardrails are unresolved.');
+assertIncludes(routeMapText, 'Auto-fix loop: diagnose failures, route code changes back through `he-implement`, update state, rerun affected proof only, repeat until clean or blocked.');
+assertIncludes(routeMapText, 'Every failed stage records a finding in `he-state.json`, loops to the owning repair stage');
+assertIncludes(routeMapText, '| `he-ship` | Use the no-mistakes response loop; code changes return through `he-implement`, proof gaps through `he-verify`, gate/evidence fixes stay in `he-ship`. |');
+assertIncludes(routeMapText, '`/he:plan` is human shorthand for `he-plan`');
+assertIncludes(routeMapText, '`/he:ship` | `he-ship` | Stage 4. Ends by saying if `/he:learn` is needed or if the loop is complete.');
+assertIncludes(routeMapText, 'Skip this stage when learning is empty.');
 assertIncludes(routeMapText, 'React app/Next.js');
 assertIncludes(routeMapText, 'include `fallow dupes` / clone-group checks for duplication or copy-paste');
 for (const needle of [
-  'component/state artifacts help UI choices when text is not enough',
-  'ensure-worktree-ready.sh',
-  'push dry-run only counts after project hooks are active',
-  'Need missing slices',
-  'Plan has slices',
-  'do not rerun <code>/to-issues</code>',
-  'Need UI review',
-  'Use <code>atomic-ui</code> and <code>impeccable</code> inside <code>/grill-me</code>.',
-  'Implement with touched-area skills',
-  'guardrail triad',
-  'fallow dupes --format json --quiet',
-  'locate or create the design SSOT before reusable styling',
-  'React app touched',
-  'duplication used dupes or clone-group checks',
-  'Run tests, requested or touched risk reviews, thermo review, then E2E.',
-  '/security-review',
-  '/performance-rescue',
-  '3b. Risk reviews',
-  'Security/perf if requested or touched.',
-  '3c. Thermo review',
-  '3d. E2E',
-  'If any fail: back to 2. Implement, then rerun Verify.',
-  'Pass: go to 4. Final Gate.',
-  'local verify loop is clean',
+  'Plan, Implement, Verify, Ship, Learn',
+  'Run one <code>/he:*</code> command per stage.',
+  'Start each stage in a fresh thread with the prior <code>he-state.json</code>',
+  'supporting skills, state updates, validation, receipts, and parallel subagents',
+  '<strong>Invokes automatically</strong>',
+  'Treehouse and worktree readiness for isolation',
+  '<code>grill-me</code> for unclear outcome, scope, proof, risk, UI flow, or visual direction',
+  '<strong>Grill Me behavior</strong>',
+  'It asks as many one-by-one questions as needed until aligned or the user parks the unknown.',
+  '<code>to-prd</code> or <code>to-issues</code> only when the plan needs that artifact',
+  '<code>codebase-design</code> when ownership is unclear',
+  'touched-area skills such as React, Flutter, Appwrite, UI, Sentry, security, or performance',
+  '<strong>Guardrails</strong>',
+  'React/Next gets React Doctor, Fallow audit/dupes, lint, and typecheck.',
+  'Flutter gets package-root <code>dart analyze</code> with <code>flutter_skill_lints</code>',
+  '<code>test-quality</code> for assertions and gaps',
+  'thermo review before expensive UI proof',
+  '<code>check-project-quality-gates.mjs --require-push-gate</code>',
+  '<code>repeated-failure-learning</code> captures the pattern',
+  '<code>skill-creator</code> updates stage skills when they are the owner',
+  '<h2>Automatic Work</h2>',
+  'Loads the required specialist skills for the touched area.',
+  'Records findings with an owner repair stage and guardrails with command, status, evidence, and push-blocking status.',
+  'Uses parallel subagents when tasks are independent.',
+  'Validates state before any ready-yes handoff.',
+  'compact receipt: stage, state path, decision, owner/proof, artifacts, blocker, next',
+  '<strong>Auto-fix loop</strong>',
+  'Diagnose failures, route code changes back through <code>/he:implement</code>',
+  'rerun only affected proof',
+  'Verify failures loop back through <code>/he:implement</code>; proof reruns after each fix.',
+  '<h2>Failure Loops</h2>',
+  '<code>/he:plan</code> stays in planning until missing owner, scope, proof, risk, or Grill Me alignment is resolved.',
+  '<code>/he:implement</code> loops in implementation unless owner or scope changed',
+  '<code>/he:ship</code> uses the no-mistakes loop',
+  '<code>/he:learn</code> stays in learning until the durable guard owner exists and passes.',
+  '<code>/he:implement</code> starts only after <code>/he:plan</code> is <code>PASS</code>.',
+  'Parallel subagents are used only for independent work and merge back through the active <code>he-*</code> stage.',
+  'Decide owner, proof, risk, and readiness.',
+  '/he:plan',
+  'Next: ready for /he:implement: yes/no',
+  'Next: ready for /he:verify: yes/no',
+  'Next: ready for /he:ship: yes/no',
+  'Next: ready for /he:learn: yes',
+  'OR Next: loop complete: yes',
+  'Next: loop complete: yes/no',
+  'Change the canonical owner',
+  '/he:implement',
+  'Runs the proof loop',
+  '/he:verify',
+  'Runs status/secrets checks',
+  '/he:ship',
+  'Learn and tighten',
+  '/he:learn',
+  'Visual quick reference derived from <code>skills/workflow-help/references/route-map.md</code>',
 ]) assertIncludes(projectWorkflowGatesHtml, needle);
 assertIncludes(grillFinalPlanText, 'Sliced plan -> readiness');
 assertIncludes(grillFinalPlanText, '`to-issues` only for missing');
@@ -193,15 +269,15 @@ assertIncludes(grillVisualDesignText, 'tokens/components/CSS vars');
 assertIncludes(grillVisualDesignText, 'project-local token/component owner');
 assertIncludes(setupText, 'install_or_update_treehouse');
 assertIncludes(setupText, 'ensure_worktree_ready_repo');
-assertIncludes(setupText, 'ABID_AGENTS_SKIP_WORKTREE_READY');
-assertIncludes(setupText, 'ABID_AGENTS_WORKTREE_READY_INSTALL');
-assertIncludes(setupText, 'ABID_AGENTS_SETUP_TREEHOUSE');
-assertIncludes(setupText, 'ABID_AGENTS_SKIP_TREEHOUSE');
+assertIncludes(setupText, 'HARD_ENG_SKIP_WORKTREE_READY');
+assertIncludes(setupText, 'HARD_ENG_WORKTREE_READY_INSTALL');
+assertIncludes(setupText, 'HARD_ENG_SETUP_TREEHOUSE');
+assertIncludes(setupText, 'HARD_ENG_SKIP_TREEHOUSE');
 assertIncludes(setupText, 'https://kunchenguid.github.io/treehouse/install.sh');
 assertIncludes(readmeText, '[`Treehouse`](https://github.com/kunchenguid/treehouse)');
 assertIncludes(setupText, 'install_python_prerequisites');
 assertIncludes(setupText, 'python3 -m pip install --user tiktoken');
-assertIncludes(setupText, 'ABID_AGENTS_SKIP_NPM_INSTALL=1 ABID_AGENTS_SKIP_SUBMODULE_INIT=1 "$ROOT/scripts/install.sh"');
+assertIncludes(setupText, 'HARD_ENG_SKIP_NPM_INSTALL=1 HARD_ENG_SKIP_SUBMODULE_INIT=1 "$ROOT/scripts/install.sh"');
 assertIncludes(installText, '"$ROOT/scripts/setup.sh" --prereqs-only');
 assertIncludes(installText, 'codex-context-mode-health', 'install.sh must install the no-hooks context-mode health check');
 assertIncludes(installText, 'ensure_claude_stub', 'install.sh must keep Claude reduced to AGENTS.md plus CLAUDE.md');
@@ -212,11 +288,11 @@ assertIncludes(installText, 'resolve_codebase_memory_mcp_command', 'install.sh m
 assertIncludes(installText, 'default_mode_request_user_input', 'install.sh must sync Codex request-user-input feature into ~/.codex/config.toml');
 assertIncludes(installText, 'mcp_servers.context-mode', 'install.sh must keep context-mode MCP registered');
 assertIncludes(installText, 'CONTEXT_MODE_DIR', 'install.sh must pin context-mode storage outside ~/.claude');
-assertIncludes(mcpInstallText, 'ABID_AGENTS_CONTEXT_MODE_VERSION');
+assertIncludes(mcpInstallText, 'HARD_ENG_CONTEXT_MODE_VERSION');
 assertIncludes(mcpInstallText, '"context-mode@$context_mode_version"');
 assertIncludes(mcpInstallText, '"codebase-memory-mcp@$cbm_version"');
 assertIncludes(mcpInstallText, '"@openai/codex@$codex_version"');
-assertIncludes(setupText, 'ABID_AGENTS_NO_MISTAKES_VERSION');
+assertIncludes(setupText, 'HARD_ENG_NO_MISTAKES_VERSION');
 assertIncludes(mcpInstallText, 'ln -s "$npm_bin" "$candidate"', 'CBM setup must link to npm binary');
 assert.ok(!mcpInstallText.includes('.backup.'), 'CBM setup must not keep backup binaries');
 
@@ -282,16 +358,16 @@ assertIncludes(noMistakesAxiText, 'batch fixes');
 assertIncludes(noMistakesAxiText, 'rerun only the needed workflows/checks');
 
 assertIncludes(autoSyncText, 'refresh_local_install', 'auto-sync must refresh installed scripts after pulls');
-assertIncludes(autoSyncText, 'ABID_AGENTS_SKIP_NPM_INSTALL=1', 'auto-sync refresh must not run package updates');
-assertIncludes(autoSyncText, 'ABID_AGENTS_SKIP_PREREQ_INSTALL=1', 'auto-sync refresh must not run prerequisite installers from cron');
+assertIncludes(autoSyncText, 'HARD_ENG_SKIP_NPM_INSTALL=1', 'auto-sync refresh must not run package updates');
+assertIncludes(autoSyncText, 'HARD_ENG_SKIP_PREREQ_INSTALL=1', 'auto-sync refresh must not run prerequisite installers from cron');
 assertIncludes(autoSyncText, 'update_treehouse', 'auto-sync must update Treehouse when installed');
 assertNotIncludes(fs.readFileSync(path.join(repo, 'scripts', 'update-submodules.sh'), 'utf8'), 'vendor/skill-upstreams/lavish-axi:skills/lavish', 'submodule updater must not manage removed Lavish sparse checkout');
-assertIncludes(autoSyncText, 'ABID_AGENTS_SKIP_TREEHOUSE_UPDATE', 'auto-sync must allow skipping Treehouse update');
-assertIncludes(autoSyncText, 'ABID_AGENTS_TREEHOUSE_BIN', 'auto-sync must allow overriding Treehouse binary');
+assertIncludes(autoSyncText, 'HARD_ENG_SKIP_TREEHOUSE_UPDATE', 'auto-sync must allow skipping Treehouse update');
+assertIncludes(autoSyncText, 'HARD_ENG_TREEHOUSE_BIN', 'auto-sync must allow overriding Treehouse binary');
 assertIncludes(autoSyncText, '"$binary" update', 'auto-sync must call treehouse update through the resolved binary');
 assertIncludes(autoSyncText, 'git diff --name-only -- .gitmodules vendor/skill-upstreams', 'auto-sync private-path scans must stay scoped to submodule update outputs');
 assertIncludes(cronText, 'codex-update-stack', 'cron installer must schedule codex stack updates');
-assertIncludes(cronText, 'ABID_AGENTS_CODEX_STACK_CRON_SCHEDULE', 'codex stack cron schedule must be configurable');
-assertIncludes(cronText, 'ABID_AGENTS_SKIP_CODEX_STACK_CRON', 'codex stack cron must be skippable');
+assertIncludes(cronText, 'HARD_ENG_CODEX_STACK_CRON_SCHEDULE', 'codex stack cron schedule must be configurable');
+assertIncludes(cronText, 'HARD_ENG_SKIP_CODEX_STACK_CRON', 'codex stack cron must be skippable');
 
 console.log('agents-md-contract: pass');

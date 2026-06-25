@@ -1,10 +1,10 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-REPO_URL="${ABID_AGENTS_REPO_URL:-https://github.com/sgaabdu4/abid-agents.git}"
-ROOT="${ABID_AGENTS_HOME:-$HOME/.agents}"
+REPO_URL="${HARD_ENG_REPO_URL:-https://github.com/sgaabdu4/hard-eng.git}"
+ROOT="${HARD_ENG_HOME:-$HOME/.agents}"
 NO_MISTAKES_HOME="${NO_MISTAKES_HOME:-$HOME/.no-mistakes}"
-TREEHOUSE_INSTALL_URL="${ABID_AGENTS_TREEHOUSE_INSTALL_URL:-https://kunchenguid.github.io/treehouse/install.sh}"
+TREEHOUSE_INSTALL_URL="${HARD_ENG_TREEHOUSE_INSTALL_URL:-https://kunchenguid.github.io/treehouse/install.sh}"
 
 require_command() {
   local command="$1"
@@ -16,7 +16,6 @@ require_command() {
 
 load_homebrew_shellenv() {
   local brew_bin=""
-
   if command -v brew >/dev/null 2>&1; then
     brew_bin="$(command -v brew)"
   elif [[ -x /opt/homebrew/bin/brew ]]; then
@@ -24,7 +23,6 @@ load_homebrew_shellenv() {
   elif [[ -x /usr/local/bin/brew ]]; then
     brew_bin="/usr/local/bin/brew"
   fi
-
   if [[ -n "$brew_bin" ]]; then
     eval "$("$brew_bin" shellenv)"
   fi
@@ -40,16 +38,13 @@ ensure_xcode_cli_tools() {
   if [[ "$(uname -s)" != "Darwin" ]]; then
     return 0
   fi
-
   if xcode-select -p >/dev/null 2>&1; then
     return 0
   fi
-
-  if [[ "${ABID_AGENTS_SKIP_XCODE_SELECT_INSTALL:-0}" == "1" ]]; then
+  if [[ "${HARD_ENG_SKIP_XCODE_SELECT_INSTALL:-0}" == "1" ]]; then
     echo "Xcode Command Line Tools are missing; install them with: xcode-select --install" >&2
     exit 1
   fi
-
   echo "Requesting Xcode Command Line Tools install..."
   xcode-select --install >/dev/null 2>&1 || true
   echo "Finish the Xcode Command Line Tools installer, then rerun setup." >&2
@@ -61,22 +56,18 @@ ensure_homebrew() {
   if command -v brew >/dev/null 2>&1; then
     return 0
   fi
-
   if [[ "$(uname -s)" != "Darwin" ]]; then
     echo "Homebrew is missing; install it before running setup on this platform." >&2
     exit 1
   fi
-
-  if [[ "${ABID_AGENTS_ALLOW_HOMEBREW_BOOTSTRAP:-0}" != "1" ]]; then
-    echo "Homebrew is missing; install it manually or set ABID_AGENTS_ALLOW_HOMEBREW_BOOTSTRAP=1 to run the upstream bootstrap." >&2
+  if [[ "${HARD_ENG_ALLOW_HOMEBREW_BOOTSTRAP:-0}" != "1" ]]; then
+    echo "Homebrew is missing; install it manually or set HARD_ENG_ALLOW_HOMEBREW_BOOTSTRAP=1 to run the upstream bootstrap." >&2
     exit 1
   fi
-
   require_command curl
   echo "Installing Homebrew..."
   NONINTERACTIVE=1 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
   prepend_agent_paths
-
   if ! command -v brew >/dev/null 2>&1; then
     echo "Homebrew install completed but brew is not on PATH." >&2
     exit 1
@@ -85,47 +76,52 @@ ensure_homebrew() {
 
 print_shell_path_block() {
   cat <<'EOF'
-# BEGIN abid-agents bootstrap path
+# BEGIN hard-eng bootstrap path
 if [ -x /opt/homebrew/bin/brew ]; then
   eval "$(/opt/homebrew/bin/brew shellenv)"
 elif [ -x /usr/local/bin/brew ]; then
   eval "$(/usr/local/bin/brew shellenv)"
 fi
 export PATH="$HOME/.npm-global/bin:$HOME/.local/bin:$HOME/flutter/bin:$HOME/Workspaces/flutter/bin:$HOME/.pub-cache/bin:$PATH"
-# END abid-agents bootstrap path
+# END hard-eng bootstrap path
 EOF
 }
 
 install_shell_path_block() {
-  if [[ "${ABID_AGENTS_SKIP_SHELL_PATH_UPDATE:-0}" == "1" ]]; then
+  if [[ "${HARD_ENG_SKIP_SHELL_PATH_UPDATE:-0}" == "1" ]]; then
     return 0
   fi
 
-  local target begin end tmp
-  target="${ABID_AGENTS_SHELL_ENV_FILE:-$HOME/.zshenv}"
-  begin="# BEGIN abid-agents bootstrap path"
-  end="# END abid-agents bootstrap path"
+  local target begin end old_owner old_begin old_end tmp
+  target="${HARD_ENG_SHELL_ENV_FILE:-$HOME/.zshenv}"
+  begin="# BEGIN hard-eng bootstrap path"
+  end="# END hard-eng bootstrap path"
+  old_owner="abid""-agents"
+  old_begin="# BEGIN ${old_owner} bootstrap path"
+  old_end="# END ${old_owner} bootstrap path"
   mkdir -p "$(dirname "$target")"
-
   if [[ -f "$target" ]] && grep -q "$begin" "$target" && ! grep -q "$end" "$target"; then
     echo "Preserving malformed managed PATH block in $target; missing end marker." >&2
     return 0
   fi
-
-  if [[ -f "$target" ]] && grep -q "$begin" "$target"; then
-    tmp="${target}.abid-agents.$$"
-    awk -v begin="$begin" -v end="$end" '
+  if [[ -f "$target" ]] && grep -q "$old_begin" "$target" && ! grep -q "$old_end" "$target"; then
+    echo "Preserving malformed old managed PATH block in $target; missing end marker." >&2
+    return 0
+  fi
+  if [[ -f "$target" ]] && { grep -q "$begin" "$target" || grep -q "$old_begin" "$target"; }; then
+    tmp="${target}.hard-eng.$$"
+    awk -v begin="$begin" -v end="$end" -v old_begin="$old_begin" -v old_end="$old_end" '
       function print_block() {
-        print "# BEGIN abid-agents bootstrap path"
+        print "# BEGIN hard-eng bootstrap path"
         print "if [ -x /opt/homebrew/bin/brew ]; then"
         print "  eval \"$(/opt/homebrew/bin/brew shellenv)\""
         print "elif [ -x /usr/local/bin/brew ]; then"
         print "  eval \"$(/usr/local/bin/brew shellenv)\""
         print "fi"
         print "export PATH=\"$HOME/.npm-global/bin:$HOME/.local/bin:$HOME/flutter/bin:$HOME/Workspaces/flutter/bin:$HOME/.pub-cache/bin:$PATH\""
-        print "# END abid-agents bootstrap path"
+        print "# END hard-eng bootstrap path"
       }
-      $0 == begin {
+      $0 == begin || $0 == old_begin {
         if (!done) {
           print_block()
         }
@@ -133,7 +129,7 @@ install_shell_path_block() {
         skipping = 1
         next
       }
-      $0 == end && skipping {
+      ($0 == end || $0 == old_end) && skipping {
         skipping = 0
         next
       }
@@ -164,20 +160,16 @@ needs_brew_prerequisites() {
 
 install_brew_packages() {
   local packages=()
-
   if ! command -v git >/dev/null 2>&1; then
     packages+=("git")
   fi
-
   if ! command -v node >/dev/null 2>&1 || ! command -v npm >/dev/null 2>&1; then
     packages+=("node")
   fi
-
   if ! command -v dart >/dev/null 2>&1; then
     brew tap dart-lang/dart
     packages+=("dart")
   fi
-
   if [[ "${#packages[@]}" -gt 0 ]]; then
     echo "Installing prerequisite packages: ${packages[*]}"
     brew install "${packages[@]}"
@@ -190,23 +182,19 @@ install_flutter_if_missing() {
   if command -v flutter >/dev/null 2>&1; then
     return 0
   fi
-
-  if [[ "${ABID_AGENTS_SKIP_FLUTTER_INSTALL:-0}" == "1" ]]; then
-    echo "Flutter is missing; skipped because ABID_AGENTS_SKIP_FLUTTER_INSTALL=1."
+  if [[ "${HARD_ENG_SKIP_FLUTTER_INSTALL:-0}" == "1" ]]; then
+    echo "Flutter is missing; skipped because HARD_ENG_SKIP_FLUTTER_INSTALL=1."
     return 0
   fi
-
   require_command git
-  local flutter_home="${ABID_AGENTS_FLUTTER_HOME:-$HOME/flutter}"
-
+  local flutter_home="${HARD_ENG_FLUTTER_HOME:-$HOME/flutter}"
   if [[ -x "$flutter_home/bin/flutter" ]]; then
     export PATH="$flutter_home/bin:$PATH"
     return 0
   fi
-
   if [[ -e "$flutter_home" ]]; then
     echo "Flutter target exists but $flutter_home/bin/flutter is missing: $flutter_home" >&2
-    echo "Set ABID_AGENTS_FLUTTER_HOME to another path or fix the existing checkout." >&2
+    echo "Set HARD_ENG_FLUTTER_HOME to another path or fix the existing checkout." >&2
     exit 1
   fi
 
@@ -224,20 +212,18 @@ PY
   then
     return 0
   fi
-
-  if [[ "${ABID_AGENTS_SKIP_PYTHON_DEPS:-0}" == "1" ]]; then
-    echo "Python package tiktoken is missing; unset ABID_AGENTS_SKIP_PYTHON_DEPS to install it." >&2
+  if [[ "${HARD_ENG_SKIP_PYTHON_DEPS:-0}" == "1" ]]; then
+    echo "Python package tiktoken is missing; unset HARD_ENG_SKIP_PYTHON_DEPS to install it." >&2
     exit 1
   fi
   python3 -m pip install --user tiktoken
 }
 
 install_prerequisites() {
-  if [[ "${ABID_AGENTS_SKIP_PREREQ_INSTALL:-0}" == "1" ]]; then
+  if [[ "${HARD_ENG_SKIP_PREREQ_INSTALL:-0}" == "1" ]]; then
     prepend_agent_paths
     return 0
   fi
-
   prepend_agent_paths
   ensure_xcode_cli_tools
   if needs_brew_prerequisites; then
@@ -247,7 +233,7 @@ install_prerequisites() {
   install_python_prerequisites
   install_flutter_if_missing
   install_shell_path_block
-  export ABID_AGENTS_PREREQS_READY=1
+  export HARD_ENG_PREREQS_READY=1
 }
 
 is_interactive() {
@@ -310,9 +296,9 @@ ask_yes_no() {
 ask_extra_repos() {
   local answer
 
-  if [[ -n "${ABID_AGENTS_NO_MISTAKES_REPOS:-}" ||
-    "${ABID_AGENTS_SKIP_NO_MISTAKES:-}" == "1" ||
-    "${ABID_AGENTS_SKIP_NO_MISTAKES_INIT:-}" == "1" ]]; then
+  if [[ -n "${HARD_ENG_NO_MISTAKES_REPOS:-}" ||
+    "${HARD_ENG_SKIP_NO_MISTAKES:-}" == "1" ||
+    "${HARD_ENG_SKIP_NO_MISTAKES_INIT:-}" == "1" ]]; then
     return 0
   fi
 
@@ -322,30 +308,71 @@ ask_extra_repos() {
 
   read -r -p "Extra repos to initialize with no-mistakes, colon-separated, blank to skip: " answer
   if [[ -n "$answer" ]]; then
-    export ABID_AGENTS_NO_MISTAKES_REPOS="$answer"
+    export HARD_ENG_NO_MISTAKES_REPOS="$answer"
   fi
 }
 
 choose_setup_options() {
-  if ask_yes_no ABID_AGENTS_SETUP_NO_MISTAKES "Install or update no-mistakes and initialize .agents?" yes; then
-    unset ABID_AGENTS_SKIP_NO_MISTAKES
+  if ask_yes_no HARD_ENG_SETUP_NO_MISTAKES "Install or update no-mistakes and initialize .agents?" yes; then
+    unset HARD_ENG_SKIP_NO_MISTAKES
   else
-    export ABID_AGENTS_SKIP_NO_MISTAKES=1
+    export HARD_ENG_SKIP_NO_MISTAKES=1
   fi
 
-  if ask_yes_no ABID_AGENTS_SETUP_TREEHOUSE "Install or update Treehouse?" yes; then
-    unset ABID_AGENTS_SKIP_TREEHOUSE
+  if ask_yes_no HARD_ENG_SETUP_TREEHOUSE "Install or update Treehouse?" yes; then
+    unset HARD_ENG_SKIP_TREEHOUSE
   else
-    export ABID_AGENTS_SKIP_TREEHOUSE=1
+    export HARD_ENG_SKIP_TREEHOUSE=1
   fi
 
-  if ask_yes_no ABID_AGENTS_ENABLE_CRON "Enable auto-sync cron for .agents?" no; then
-    export ABID_AGENTS_ENABLE_CRON=1
+  if ask_yes_no HARD_ENG_ENABLE_CRON "Enable auto-sync cron for .agents?" no; then
+    export HARD_ENG_ENABLE_CRON=1
   else
-    unset ABID_AGENTS_ENABLE_CRON
+    unset HARD_ENG_ENABLE_CRON
   fi
 
   ask_extra_repos
+}
+
+usage() {
+  cat <<'EOF'
+Usage:
+  setup.sh [--full|--skills-only|--prereqs-only|--uninstall]
+Modes:
+  --full         Fully automatic workstation setup.
+  --skills-only  Link repo configs/skills only; skip tools, watchdog, cron, repair.
+  --prereqs-only Install only prerequisite tools needed by setup.
+  --uninstall    Remove Hard Eng-managed links, hooks, cron, watchdog, bins, caches, and shell PATH blocks.
+Default:
+  Interactive terminals ask optional tools; non-interactive keeps Treehouse/no-mistakes on and cron off.
+EOF
+}
+
+apply_full_mode() {
+  export HARD_ENG_ALLOW_HOMEBREW_BOOTSTRAP="${HARD_ENG_ALLOW_HOMEBREW_BOOTSTRAP:-1}"
+  export HARD_ENG_SETUP_NO_MISTAKES="${HARD_ENG_SETUP_NO_MISTAKES:-1}"
+  export HARD_ENG_SETUP_TREEHOUSE="${HARD_ENG_SETUP_TREEHOUSE:-1}"
+  export HARD_ENG_ENABLE_CRON="${HARD_ENG_ENABLE_CRON:-1}"
+  unset HARD_ENG_SKIP_NPM_INSTALL
+  unset HARD_ENG_SKIP_NO_MISTAKES
+  unset HARD_ENG_SKIP_NO_MISTAKES_INIT
+  unset HARD_ENG_SKIP_TREEHOUSE
+  unset HARD_ENG_SKIP_WATCHDOG
+  unset HARD_ENG_SKIP_WORKTREE_READY
+}
+
+apply_skills_only_mode() {
+  export HARD_ENG_SKIP_PREREQ_INSTALL=1
+  export HARD_ENG_SKIP_NPM_INSTALL=1
+  export HARD_ENG_SKIP_NO_MISTAKES=1
+  export HARD_ENG_SKIP_NO_MISTAKES_INIT=1
+  export HARD_ENG_SKIP_TREEHOUSE=1
+  export HARD_ENG_SKIP_WATCHDOG=1
+  export HARD_ENG_SKIP_CRON=1
+  export HARD_ENG_SKIP_WORKTREE_READY=1
+  export HARD_ENG_SETUP_NO_MISTAKES=0
+  export HARD_ENG_SETUP_TREEHOUSE=0
+  unset HARD_ENG_ENABLE_CRON
 }
 
 clone_or_update_repo() {
@@ -354,12 +381,10 @@ clone_or_update_repo() {
     git -C "$ROOT" pull --ff-only origin main
     return 0
   fi
-
   if [[ -e "$ROOT" ]]; then
     echo "Refusing setup: $ROOT exists but is not a git checkout." >&2
     exit 1
   fi
-
   echo "Cloning .agents into $ROOT"
   git clone --recurse-submodules "$REPO_URL" "$ROOT"
 }
@@ -367,28 +392,24 @@ clone_or_update_repo() {
 install_or_update_no_mistakes() {
   local binary version os arch filename url download_dir install_dir link_dir link_path
 
-  if [[ "${ABID_AGENTS_SKIP_NO_MISTAKES:-}" == "1" ]]; then
+  if [[ "${HARD_ENG_SKIP_NO_MISTAKES:-}" == "1" ]]; then
     return 0
   fi
-
   if command -v no-mistakes >/dev/null 2>&1; then
     NO_MISTAKES_TELEMETRY="${NO_MISTAKES_TELEMETRY:-0}" \
       NO_MISTAKES_NO_UPDATE_CHECK=1 \
       no-mistakes update --yes
     return 0
   fi
-
   if [[ -x "$NO_MISTAKES_HOME/bin/no-mistakes" ]]; then
     NO_MISTAKES_TELEMETRY="${NO_MISTAKES_TELEMETRY:-0}" \
       NO_MISTAKES_NO_UPDATE_CHECK=1 \
       "$NO_MISTAKES_HOME/bin/no-mistakes" update --yes
     return 0
   fi
-
   require_command curl
   require_command tar
-
-  version="${ABID_AGENTS_NO_MISTAKES_VERSION:-v1.30.1}"
+  version="${HARD_ENG_NO_MISTAKES_VERSION:-v1.30.1}"
   if [[ "$version" == "latest" ]]; then
     version="$(curl -fsSL "https://api.github.com/repos/kunchenguid/no-mistakes/releases/latest" |
       sed -n 's/.*"tag_name"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/p')"
@@ -397,7 +418,6 @@ install_or_update_no_mistakes() {
     echo "Could not determine latest no-mistakes release." >&2
     exit 1
   fi
-
   os="$(uname -s | tr '[:upper:]' '[:lower:]')"
   arch="$(uname -m)"
   case "$os" in
@@ -423,7 +443,6 @@ install_or_update_no_mistakes() {
   install_dir="$NO_MISTAKES_HOME/bin"
   link_dir="${NO_MISTAKES_LINK_DIR:-$HOME/.local/bin}"
   link_path="$link_dir/no-mistakes"
-
   mkdir -p "$download_dir" "$install_dir" "$link_dir"
   curl -fsSL "$url" -o "$download_dir/$filename"
   tar xzf "$download_dir/$filename" -C "$download_dir"
@@ -433,28 +452,24 @@ install_or_update_no_mistakes() {
   if [[ ! -e "$link_path" ]]; then
     ln -s "$install_dir/no-mistakes" "$link_path"
   fi
-
   NO_MISTAKES_TELEMETRY="${NO_MISTAKES_TELEMETRY:-0}" \
     NO_MISTAKES_NO_UPDATE_CHECK=1 \
     "$install_dir/no-mistakes" daemon restart
 }
 
 install_or_update_treehouse() {
-  if [[ "${ABID_AGENTS_SKIP_TREEHOUSE:-}" == "1" ]]; then
+  if [[ "${HARD_ENG_SKIP_TREEHOUSE:-}" == "1" ]]; then
     return 0
   fi
-
   if command -v treehouse >/dev/null 2>&1; then
     if ! treehouse update; then
       echo "Treehouse update failed; continuing setup." >&2
     fi
     return 0
   fi
-
   require_command curl
   curl -fsSL "$TREEHOUSE_INSTALL_URL" | sh
   prepend_agent_paths
-
   if ! command -v treehouse >/dev/null 2>&1; then
     echo "Treehouse install completed but treehouse is not on PATH." >&2
     exit 1
@@ -475,14 +490,13 @@ run_no_mistakes_with_isolated_agent_home() {
   local binary="$1"
   shift
   local isolated_home cleanup status
-  isolated_home="${ABID_AGENTS_NO_MISTAKES_AGENT_HOME:-}"
+  isolated_home="${HARD_ENG_NO_MISTAKES_AGENT_HOME:-}"
   cleanup=0
 
   if [[ -z "$isolated_home" ]]; then
-    isolated_home="$(mktemp -d "${TMPDIR:-/tmp}/abid-agents-no-mistakes-home.XXXXXX")"
+    isolated_home="$(mktemp -d "${TMPDIR:-/tmp}/hard-eng-no-mistakes-home.XXXXXX")"
     cleanup=1
   fi
-
   mkdir -p "$isolated_home"
   set +e
   HOME="$isolated_home" \
@@ -497,7 +511,6 @@ run_no_mistakes_with_isolated_agent_home() {
   if [[ "$cleanup" == "1" ]]; then
     rm -rf "$isolated_home"
   fi
-
   return "$status"
 }
 
@@ -506,19 +519,17 @@ ensure_worktree_ready_repo() {
   local script="$ROOT/scripts/ensure-worktree-ready.sh"
   local args=()
 
-  if [[ "${ABID_AGENTS_SKIP_WORKTREE_READY:-}" == "1" ]]; then
+  if [[ "${HARD_ENG_SKIP_WORKTREE_READY:-}" == "1" ]]; then
     return 0
   fi
-
   if [[ ! -x "$script" ]]; then
     echo "Skipping worktree readiness for $repo: $script is missing or not executable." >&2
     return 0
   fi
 
-  if [[ "${ABID_AGENTS_WORKTREE_READY_INSTALL:-}" == "1" ]]; then
+  if [[ "${HARD_ENG_WORKTREE_READY_INSTALL:-}" == "1" ]]; then
     args+=("--install")
   fi
-
   if [[ "${#args[@]}" -gt 0 ]]; then
     "$script" "${args[@]}" "$repo"
   else
@@ -529,9 +540,8 @@ ensure_worktree_ready_repo() {
 init_no_mistakes_repo() {
   local repo="$1"
   local binary
-
-  if [[ "${ABID_AGENTS_SKIP_NO_MISTAKES:-}" == "1" ||
-    "${ABID_AGENTS_SKIP_NO_MISTAKES_INIT:-}" == "1" ]]; then
+  if [[ "${HARD_ENG_SKIP_NO_MISTAKES:-}" == "1" ||
+    "${HARD_ENG_SKIP_NO_MISTAKES_INIT:-}" == "1" ]]; then
     return 0
   fi
 
@@ -550,19 +560,16 @@ init_no_mistakes_repo() {
     echo "Skipping no-mistakes init for $repo: no origin remote." >&2
     return 0
   fi
-
   (
     cd "$repo"
     run_no_mistakes_with_isolated_agent_home "$binary" init
   )
-
   ensure_worktree_ready_repo "$repo"
 }
 
 init_extra_no_mistakes_repos() {
   local extra_repos repo
-
-  extra_repos="${ABID_AGENTS_NO_MISTAKES_REPOS:-}"
+  extra_repos="${HARD_ENG_NO_MISTAKES_REPOS:-}"
   if [[ -z "$extra_repos" ]]; then
     return 0
   fi
@@ -581,7 +588,6 @@ wait_for_job() {
   if wait "$pid"; then
     return 0
   fi
-
   echo "$label failed." >&2
   return 1
 }
@@ -589,48 +595,63 @@ wait_for_job() {
 run_parallel_install() {
   local install_pid no_mistakes_pid treehouse_pid root_init_pid extra_init_pid
   local status=0
-
   "$ROOT/scripts/install.sh" &
   install_pid=$!
-
   install_or_update_no_mistakes &
   no_mistakes_pid=$!
-
   install_or_update_treehouse &
   treehouse_pid=$!
-
   wait_for_job "$install_pid" "Agent install" || status=1
   wait_for_job "$no_mistakes_pid" "no-mistakes install" || status=1
   wait_for_job "$treehouse_pid" "Treehouse install" || status=1
-
   if [[ "$status" != "0" ]]; then
     exit 1
   fi
-
   init_no_mistakes_repo "$ROOT" &
   root_init_pid=$!
-
   init_extra_no_mistakes_repos &
   extra_init_pid=$!
-
   wait_for_job "$root_init_pid" "no-mistakes root init" || status=1
   wait_for_job "$extra_init_pid" "no-mistakes extra repo init" || status=1
-
   if [[ "$status" != "0" ]]; then
     exit 1
   fi
 }
 
-if [[ "${1:-}" == "--prereqs-only" ]]; then
-  install_prerequisites
-  exit 0
-fi
-
+case "${1:-}" in
+  -h|--help)
+    usage
+    exit 0
+    ;;
+  --prereqs-only)
+    install_prerequisites
+    exit 0
+    ;;
+  --uninstall)
+    if [[ -x "$ROOT/scripts/uninstall.sh" ]]; then
+      "$ROOT/scripts/uninstall.sh" "${@:2}"
+      exit "$?"
+    fi
+    echo "Missing uninstall script: $ROOT/scripts/uninstall.sh" >&2
+    exit 1
+    ;;
+  --full)
+    apply_full_mode
+    ;;
+  --skills-only)
+    apply_skills_only_mode
+    ;;
+  "")
+    ;;
+  *)
+    usage >&2
+    exit 2
+    ;;
+esac
 install_prerequisites
 require_command git
 choose_setup_options
 clone_or_update_repo
 run_parallel_install
-ABID_AGENTS_SKIP_NPM_INSTALL=1 ABID_AGENTS_SKIP_SUBMODULE_INIT=1 "$ROOT/scripts/install.sh"
-
-echo "Abid Agents setup complete: $ROOT"
+HARD_ENG_SKIP_NPM_INSTALL=1 HARD_ENG_SKIP_SUBMODULE_INIT=1 "$ROOT/scripts/install.sh"
+echo "Hard Eng setup complete: $ROOT"

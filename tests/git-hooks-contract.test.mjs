@@ -6,6 +6,7 @@ import path from 'node:path';
 const repo = path.join(process.env.HOME, '.agents');
 const installScript = fs.readFileSync(path.join(repo, 'scripts', 'install.sh'), 'utf8');
 const setupScript = fs.readFileSync(path.join(repo, 'scripts', 'setup.sh'), 'utf8');
+const uninstallScript = fs.readFileSync(path.join(repo, 'scripts', 'uninstall.sh'), 'utf8');
 const setupNewUserScript = fs.readFileSync(path.join(repo, 'scripts', 'setup-new-user.sh'), 'utf8');
 const worktreeReadyScript = fs.readFileSync(path.join(repo, 'scripts', 'ensure-worktree-ready.sh'), 'utf8');
 const autoSyncScript = fs.readFileSync(path.join(repo, 'scripts', 'auto-sync.sh'), 'utf8');
@@ -28,50 +29,64 @@ assert.ok(
 assert.ok(installScript.includes('scripts/update-submodules.sh'), 'installer and hooks must update submodules');
 assert.ok(installScript.includes('config --local pull.rebase false'), 'installer must disable pull rebases for this repo');
 assert.ok(installScript.includes('config --local pull.ff only'), 'installer must force fast-forward-only pulls for this repo');
-assert.ok(installScript.includes('ABID_AGENTS_SKIP_SUBMODULE_INIT'), 'installer must support skipping submodule init');
-assert.ok(installScript.includes('ABID_AGENTS_SKIP_SUBMODULE_UPDATE'), 'pull hooks must support skipping submodule updates');
-assert.ok(installScript.includes('ABID_AGENTS_CHECK_SUBMODULES_BEFORE_PUSH'), 'pre-push submodule status must be opt-in');
+assert.ok(installScript.includes('HARD_ENG_SKIP_SUBMODULE_INIT'), 'installer must support skipping submodule init');
+assert.ok(installScript.includes('HARD_ENG_SKIP_SUBMODULE_UPDATE'), 'pull hooks must support skipping submodule updates');
+assert.ok(installScript.includes('HARD_ENG_CHECK_SUBMODULES_BEFORE_PUSH'), 'pre-push submodule status must be opt-in');
 assert.ok(installScript.includes('default_mode_request_user_input'), 'installer must sync request-user-input feature into Codex config');
 assert.ok(
-  installScript.includes('ABID_AGENTS_SKIP_NPM_INSTALL=1 \\\n  ABID_AGENTS_SKIP_PREREQ_INSTALL=1 \\\n  ABID_AGENTS_SKIP_SUBMODULE_INIT=1 \\\n  ABID_AGENTS_SKIP_CRON=1 \\\n  "$repo/scripts/install.sh"'),
+  installScript.includes('HARD_ENG_SKIP_NPM_INSTALL=1 \\\n  HARD_ENG_SKIP_PREREQ_INSTALL=1 \\\n  HARD_ENG_SKIP_SUBMODULE_INIT=1 \\\n  HARD_ENG_SKIP_CRON=1 \\\n  "$repo/scripts/install.sh"'),
   'pre-push hook must refresh the local installer-managed Codex config before pushing'
 );
 assert.ok(
   installScript.includes('node "$repo/tests/codex-config-sync.test.mjs"'),
   'pre-push hook must test live Codex config sync before pushing'
 );
+assert.ok(
+  installScript.includes('node "$repo/scripts/check-project-quality-gates.mjs" --require-push-gate "$repo"'),
+  'pre-push hook must run deterministic project quality gate checks before pushing'
+);
 assert.ok(installScript.includes('install_codex_watchdog'), 'installer must install the Codex watchdog');
-assert.ok(installScript.includes('dev.abid-agents.codex-watchdog'), 'installer must install the Codex watchdog LaunchAgent');
+assert.ok(installScript.includes('dev.hard-eng.codex-watchdog'), 'installer must install the Codex watchdog LaunchAgent');
+assert.ok(installScript.includes('HARD_ENG_SKIP_WATCHDOG'), 'installer must allow skipping the Codex watchdog');
 assert.ok(installScript.includes('launchctl bootstrap'), 'installer must load the Codex watchdog when missing');
 assert.ok(installScript.includes('replace_with_link_file "$ROOT/AGENTS.md" "$HOME/.codex/AGENTS.md"'), 'installer must link Codex AGENTS.md to the canonical file');
 assert.ok(installScript.includes('replace_with_link_file "$ROOT/AGENTS.md" "$HOME/.claude/AGENTS.md"'), 'installer must link Claude AGENTS.md to the canonical file');
 assert.ok(installScript.includes('replace_with_link_file "$ROOT/AGENTS.md" "$HOME/.copilot/AGENTS.md"'), 'installer must link Copilot AGENTS.md to the canonical file');
 assert.ok(installScript.includes('replace_with_link_file "$ROOT/AGENTS.md" "$HOME/.pi/AGENTS.md"'), 'installer must link Pi AGENTS.md to the canonical file');
 assert.ok(!installScript.includes('install_managed_block'), 'installer must not install copied AGENTS.md managed blocks');
+assert.ok(installScript.includes('remove_stale_skill_links'), 'installer must remove stale managed skill symlinks after skill renames');
 assert.ok(installScript.includes('scripts/check-markdown-hygiene.mjs'), 'pre-commit hook must run Markdown hygiene');
 assert.ok(installScript.includes('Blocked commit: staged forbidden files must not be edited.'), 'pre-commit hook must block forbidden edited files');
 assert.ok(installScript.includes('Blocked commit: staged files over 700 lines must be split below 700.'), 'pre-commit hook must block staged files over 700 lines');
 assert.ok(installScript.includes('Blocked commit: staged content contains secret-like values.'), 'pre-commit hook must block secret-like staged values');
 assert.ok(installScript.includes('generated_marker="AUTO""-GENERATED"'), 'pre-commit hook must define generated marker under set -u');
 assert.ok(installScript.includes('[[ "$mode" == "160000" ]]'), 'pre-commit hook must skip staged submodule gitlinks');
+assert.ok(installScript.includes('is_binary_staged'), 'pre-commit hook must identify staged binary files');
+assert.ok(installScript.includes('git diff --cached --numstat -- "$1"'), 'pre-commit hook must use git binary detection');
+assert.ok(installScript.includes('if is_binary_staged "$file"; then'), 'pre-commit hook must skip binary blobs for text scans');
+assert.ok(installScript.includes('git grep --cached -I -l -i -E "$pattern"'), 'pre-commit private-path scan must ignore binary blobs');
 assert.ok(installScript.includes("':!scripts/check-markdown-hygiene.mjs'"), 'pre-commit private-path scan must not flag the checker pattern');
 assert.ok(installScript.includes("':!tests/markdown-hygiene.test.mjs'"), 'pre-commit private-path scan must not flag the hygiene test fixture');
 assert.ok(installScript.includes('Preserving existing file'), 'installer must preserve existing non-managed config files');
 assert.ok(!installScript.includes('rm "$target"'), 'installer must not remove existing linked targets');
 assert.ok(setupScript.includes('git clone --recurse-submodules'), 'new-user setup must clone with submodules');
 assert.ok(setupScript.includes('scripts/install.sh'), 'new-user setup must run the main installer');
+assert.ok(setupScript.includes('--full'), 'setup must expose full mode');
+assert.ok(setupScript.includes('--skills-only'), 'setup must expose skills-only mode');
+assert.ok(setupScript.includes('--uninstall'), 'setup must expose uninstall mode');
+assert.ok(setupScript.includes('"$ROOT/scripts/uninstall.sh" "${@:2}"'), 'setup uninstall mode must delegate to scripts/uninstall.sh');
 assert.ok(setupScript.includes('no-mistakes'), 'new-user setup must install or initialize no-mistakes');
 assert.ok(setupScript.includes('install_or_update_treehouse'), 'setup must install or update Treehouse');
-assert.ok(setupScript.includes('ABID_AGENTS_SETUP_TREEHOUSE'), 'setup must allow non-interactive Treehouse choice');
-assert.ok(setupScript.includes('ABID_AGENTS_SKIP_TREEHOUSE'), 'setup must allow skipping Treehouse install');
+assert.ok(setupScript.includes('HARD_ENG_SETUP_TREEHOUSE'), 'setup must allow non-interactive Treehouse choice');
+assert.ok(setupScript.includes('HARD_ENG_SKIP_TREEHOUSE'), 'setup must allow skipping Treehouse install');
 assert.ok(setupScript.includes('https://kunchenguid.github.io/treehouse/install.sh'), 'setup must use Treehouse upstream installer');
 assert.ok(setupScript.includes('ask_yes_no'), 'setup must ask questions when interactive');
-assert.ok(setupScript.includes('ABID_AGENTS_SETUP_NO_MISTAKES'), 'setup must allow non-interactive no-mistakes choice');
-assert.ok(setupScript.includes('ABID_AGENTS_ENABLE_CRON'), 'setup must allow cron choice');
-assert.ok(setupScript.includes('ABID_AGENTS_NO_MISTAKES_REPOS'), 'new-user setup must support extra no-mistakes repo init');
+assert.ok(setupScript.includes('HARD_ENG_SETUP_NO_MISTAKES'), 'setup must allow non-interactive no-mistakes choice');
+assert.ok(setupScript.includes('HARD_ENG_ENABLE_CRON'), 'setup must allow cron choice');
+assert.ok(setupScript.includes('HARD_ENG_NO_MISTAKES_REPOS'), 'new-user setup must support extra no-mistakes repo init');
 assert.ok(setupScript.includes('ensure_worktree_ready_repo'), 'setup must run the shared worktree readiness guard');
-assert.ok(setupScript.includes('ABID_AGENTS_SKIP_WORKTREE_READY'), 'setup must allow skipping worktree readiness only by explicit env');
-assert.ok(setupScript.includes('ABID_AGENTS_WORKTREE_READY_INSTALL'), 'setup must make dependency install for readiness explicit');
+assert.ok(setupScript.includes('HARD_ENG_SKIP_WORKTREE_READY'), 'setup must allow skipping worktree readiness only by explicit env');
+assert.ok(setupScript.includes('HARD_ENG_WORKTREE_READY_INSTALL'), 'setup must make dependency install for readiness explicit');
 assert.ok(setupScript.includes('if [[ "${#args[@]}" -gt 0 ]]'), 'setup must avoid empty array expansion under macOS Bash 3 set -u');
 assert.ok(setupScript.includes('"$script" "$repo"'), 'setup must call worktree readiness with no empty array when no flags are set');
 assert.ok(setupScript.includes('run_no_mistakes_with_isolated_agent_home'), 'setup must isolate no-mistakes skill writes from repo-owned skill symlinks');
@@ -82,6 +97,15 @@ assert.ok(worktreeReadyScript.includes('/.no-mistakes/repos/'), 'worktree readin
 assert.ok(worktreeReadyScript.includes('.githooks'), 'worktree readiness must support generic tracked hook dirs');
 assert.ok(worktreeReadyScript.includes('.husky/_'), 'worktree readiness must support Husky hook shims');
 assert.ok(setupNewUserScript.includes('exec "$SCRIPT_DIR/setup.sh" "$@"'), 'legacy setup-new-user script must delegate to canonical setup');
+assert.ok(uninstallScript.includes('HARD_ENG_UNINSTALL_YES'), 'uninstall must support non-interactive confirmation');
+assert.ok(uninstallScript.includes('--dry-run'), 'uninstall must support dry-run proof');
+assert.ok(uninstallScript.includes('dev.hard-eng.codex-watchdog'), 'uninstall must remove the Hard Eng watchdog LaunchAgent');
+assert.ok(uninstallScript.includes('# BEGIN hard-eng auto-sync'), 'uninstall must remove managed cron blocks');
+assert.ok(uninstallScript.includes('# BEGIN hard-eng bootstrap path'), 'uninstall must remove the managed shell PATH block');
+assert.ok(uninstallScript.includes('.cache/hard-eng'), 'uninstall must remove the Hard Eng cache');
+assert.ok(!uninstallScript.includes('brew uninstall'), 'uninstall must not remove shared Homebrew packages');
+assert.ok(!uninstallScript.includes('npm uninstall -g'), 'uninstall must not remove shared global npm packages');
+assert.ok(!uninstallScript.includes('rm -rf "$HOME/flutter"'), 'uninstall must not remove shared Flutter SDKs');
 assert.ok(installScript.includes('"${1:-}" != "rebase"'), 'post-rewrite hook must only react to rebase rewrites');
 assert.ok(
   installScript.includes('Blocked push: reachable git history contains private path or secret-like references.'),
@@ -89,20 +113,22 @@ assert.ok(
 );
 assert.ok(installScript.includes("':!scripts/install.sh'"), 'pre-push history scan must ignore installer policy literals');
 assert.ok(installScript.includes("':!tests/markdown-hygiene.test.mjs'"), 'pre-push history scan must ignore hygiene leak fixture');
+assert.ok(installScript.includes('grep -n -I -F "$needle"'), 'pre-push fixed history scan must ignore binary blobs');
+assert.ok(installScript.includes('grep -n -I -i -E "$pattern"'), 'pre-push regex history scan must ignore binary blobs');
 assert.ok(installScript.includes("awk -F: '{ print $1 \":\" $2 \":\" $3 }'"), 'pre-push hook must avoid printing matched secret content');
 assert.ok(installScript.includes('scan_history_fixed'), 'pre-push history scan must avoid giant revision argv');
-assert.ok(autoSyncScript.includes('git rev-parse --git-path agent-config-auto-sync.lock'), 'auto-sync lock must be repo-local');
+assert.ok(autoSyncScript.includes('git rev-parse --git-path hard-eng-auto-sync.lock'), 'auto-sync lock must be repo-local');
 assert.ok(autoSyncScript.includes('git pull --ff-only origin main'), 'auto-sync must pull main with ff-only');
 assert.ok(autoSyncScript.includes('scripts/update-submodules.sh" --remote'), 'auto-sync must bump submodules to tracked upstreams');
-assert.ok(autoSyncScript.includes('ABID_AGENTS_SKIP_SUBMODULE_BUMP'), 'auto-sync must allow disabling upstream submodule bumps');
-assert.ok(autoSyncScript.includes('ABID_AGENTS_SKIP_NO_MISTAKES_UPDATE'), 'auto-sync must allow disabling no-mistakes updates');
-assert.ok(autoSyncScript.includes('ABID_AGENTS_NO_MISTAKES_BIN'), 'auto-sync must allow overriding the no-mistakes binary path');
+assert.ok(autoSyncScript.includes('HARD_ENG_SKIP_SUBMODULE_BUMP'), 'auto-sync must allow disabling upstream submodule bumps');
+assert.ok(autoSyncScript.includes('HARD_ENG_SKIP_NO_MISTAKES_UPDATE'), 'auto-sync must allow disabling no-mistakes updates');
+assert.ok(autoSyncScript.includes('HARD_ENG_NO_MISTAKES_BIN'), 'auto-sync must allow overriding the no-mistakes binary path');
 assert.ok(autoSyncScript.includes('update_treehouse'), 'auto-sync must update Treehouse');
-assert.ok(autoSyncScript.includes('ABID_AGENTS_SKIP_TREEHOUSE_UPDATE'), 'auto-sync must allow disabling Treehouse updates');
-assert.ok(autoSyncScript.includes('ABID_AGENTS_TREEHOUSE_BIN'), 'auto-sync must allow overriding the Treehouse binary path');
+assert.ok(autoSyncScript.includes('HARD_ENG_SKIP_TREEHOUSE_UPDATE'), 'auto-sync must allow disabling Treehouse updates');
+assert.ok(autoSyncScript.includes('HARD_ENG_TREEHOUSE_BIN'), 'auto-sync must allow overriding the Treehouse binary path');
 assert.ok(autoSyncScript.includes('NO_MISTAKES_NO_UPDATE_CHECK=1'), 'auto-sync must avoid nested no-mistakes update checks');
 assert.ok(autoSyncScript.includes('update --yes'), 'auto-sync must update no-mistakes non-interactively');
-assert.ok(autoSyncScript.includes('ABID_AGENTS_SKIP_PREREQ_INSTALL=1'), 'auto-sync local refresh must not run prerequisite installers from cron');
+assert.ok(autoSyncScript.includes('HARD_ENG_SKIP_PREREQ_INSTALL=1'), 'auto-sync local refresh must not run prerequisite installers from cron');
 assert.ok(autoSyncScript.includes('git diff --name-only -- .gitmodules vendor/skill-upstreams'), 'auto-sync private-path scan must be scoped to submodule update outputs');
 assert.ok(!autoSyncScript.includes('mapfile'), 'auto-sync must stay compatible with macOS Bash 3');
 assert.ok(autoSyncScript.includes('git commit -m "Auto-update skill submodules"'), 'auto-sync must commit changed submodule pins');
@@ -111,10 +137,10 @@ assert.ok(
   autoSyncScript.includes('private path or secret-like reference found after submodule update'),
   'auto-sync must block secret-like submodule updates before committing'
 );
-assert.ok(cronScript.includes('# BEGIN agent-config auto-sync'), 'cron installer must manage a marked crontab block');
+assert.ok(cronScript.includes('# BEGIN hard-eng auto-sync'), 'cron installer must manage a marked crontab block');
 assert.ok(cronScript.includes('scripts/auto-sync.sh'), 'cron installer must run auto-sync');
-assert.ok(cronScript.includes('Agent-config auto-sync cron already installed'), 'cron installer must no-op when current cron matches');
-assert.ok(cronScript.includes('ABID_AGENTS_CRON_INSTALL_TIMEOUT_SECONDS'), 'cron installer must bound crontab writes');
+assert.ok(cronScript.includes('Hard Eng auto-sync cron already installed'), 'cron installer must no-op when current cron matches');
+assert.ok(cronScript.includes('HARD_ENG_CRON_INSTALL_TIMEOUT_SECONDS'), 'cron installer must bound crontab writes');
 assert.ok(cronScript.includes('crontab "$TMP_CRON"'), 'cron installer must install a temp crontab file');
 assert.ok(subtreeSyncScript.includes('Subtree skills migrated to submodules'), 'legacy subtree command must explain migration');
 assert.ok(subtreeSyncScript.includes('scripts/update-submodules.sh" --remote'), 'legacy subtree command must route to submodule updates');
@@ -152,7 +178,8 @@ if (fs.existsSync(prePushHook)) {
   const text = fs.readFileSync(prePushHook, 'utf8');
   assert.ok((stat.mode & 0o111) !== 0, 'installed pre-push hook must be executable');
   assert.ok(text.includes('node "$repo/tests/codex-config-sync.test.mjs"'), 'installed pre-push hook must test live Codex config sync');
-  assert.ok(text.includes('ABID_AGENTS_CHECK_SUBMODULES_BEFORE_PUSH'), 'installed pre-push hook must keep submodule status opt-in');
+  assert.ok(text.includes('node "$repo/scripts/check-project-quality-gates.mjs" --require-push-gate "$repo"'), 'installed pre-push hook must run deterministic project quality gate checks');
+  assert.ok(text.includes('HARD_ENG_CHECK_SUBMODULES_BEFORE_PUSH'), 'installed pre-push hook must keep submodule status opt-in');
   assert.ok(text.includes('Blocked push: reachable git history contains private path or secret-like references.'));
   assert.ok(text.includes("':!scripts/install.sh'"), 'installed pre-push hook must ignore installer policy literals');
   assert.ok(text.includes("':!tests/markdown-hygiene.test.mjs'"), 'installed pre-push hook must ignore hygiene leak fixture');
@@ -181,7 +208,7 @@ if (fs.existsSync(postRewriteHook)) {
   assert.ok((stat.mode & 0o111) !== 0, 'installed post-rewrite hook must be executable');
   assert.ok(text.includes('"${1:-}" != "rebase"'), 'installed post-rewrite hook must only handle rebases');
   assert.ok(text.includes('scripts/update-submodules.sh'), 'installed post-rewrite hook must update pinned submodules');
-  assert.ok(text.includes('ABID_AGENTS_SKIP_SUBMODULE_UPDATE'), 'installed post-rewrite hook must support skipping submodule updates');
+  assert.ok(text.includes('HARD_ENG_SKIP_SUBMODULE_UPDATE'), 'installed post-rewrite hook must support skipping submodule updates');
 }
 
 for (const relativePath of ['scripts/auto-sync.sh', 'scripts/ensure-worktree-ready.sh', 'scripts/install-cron.sh', 'scripts/update-submodules.sh', 'scripts/setup.sh', 'scripts/setup-new-user.sh', 'codex/bin/codex-watchdog', 'codex/bin/codex-health']) {

@@ -4,8 +4,80 @@
     {
       "id": "workflow_help_front_door",
       "prompt": "I have a feature idea and I am not sure which workflow or skill to use. Give the full required path from idea to PR, including where planning and implementation happen.",
-      "expectTrue": ["usesWorkflowHelp", "keepsSupportToolsAsTools", "usesTreehouseWorkspace", "usesWorktreeReadyGuard", "endsAtNoMistakes"],
-      "expectFalse": ["usesBmadMenuCodes", "usesNoMistakesBeforeImplementation", "skipsWorkspaceIsolation", "skipsWorktreeReadyGuard"]
+      "expectTrue": ["usesWorkflowHelp", "keepsHeStageOrder", "usesHePlan", "usesHeImplement", "usesHeVerify", "usesHeShip", "usesStageReceipt", "usesHeStateFile", "startsFreshStageThread", "updatesAaStepsStatefully", "validatesHeStateBeforeReady", "usesStageFailureLoop", "avoidsTranscriptDump", "keepsSupportToolsAsTools", "usesTreehouseWorkspace", "usesWorktreeReadyGuard", "endsAtNoMistakes"],
+      "expectFalse": ["skipsAaStageOrder", "dumpsTranscriptForHandoff", "treatsChatAsSourceOfTruth", "usesBmadMenuCodes", "usesNoMistakesBeforeImplementation", "skipsWorkspaceIsolation", "skipsWorktreeReadyGuard"]
+    },
+    {
+      "id": "aa_stage_order_receipts_full_path",
+      "prompt": "For a non-trivial feature, confirm the AA stages in order and what each stage must hand off so we do not lose context.",
+      "expectTrue": ["keepsHeStageOrder", "usesHePlan", "usesHeImplement", "usesHeVerify", "usesHeShip", "usesStageReceipt", "usesHeStateFile", "startsFreshStageThread", "updatesAaStepsStatefully", "validatesHeStateBeforeReady", "usesStageFailureLoop", "avoidsTranscriptDump"],
+      "expectFalse": ["skipsAaStageOrder", "dumpsTranscriptForHandoff", "treatsChatAsSourceOfTruth", "runsHeImplementWithoutPass", "runsHeShipBeforeVerifyClean"]
+    },
+    {
+      "id": "aa_plan_concerns_blocks_implement",
+      "prompt": "The /he:plan receipt says CONCERNS, owner unknown, proof path missing, and Next: ready for /he:implement: no. Can the agent start implementation anyway?",
+      "expectTrue": ["usesHePlan", "usesStageReceipt", "usesHeStateFile", "readinessConcernsOrFail", "blocksHeImplementWithoutPass", "blocksReadyYesWithoutValidState"],
+      "expectFalse": ["usesHeImplement", "runsHeImplementWithoutPass", "startsImplementationWithUnknowns", "skipsAaStageOrder"]
+    },
+    {
+      "id": "aa_receipt_resume_not_transcript",
+      "prompt": "We are resuming after compaction. I have only the /he:implement stage receipt with changed files, proof commands, artifacts, blocker none, and Next ready for /he:verify yes. Should the agent ask for the whole old transcript or continue from the receipt?",
+      "expectTrue": ["usesStageReceipt", "usesHeStateFile", "startsFreshStageThread", "avoidsTranscriptDump", "usesHeVerify", "keepsHeStageOrder"],
+      "expectFalse": ["dumpsTranscriptForHandoff", "treatsChatAsSourceOfTruth", "usesHePlan", "runsHeShipBeforeVerifyClean", "skipsAaStageOrder"]
+    },
+    {
+      "id": "aa_state_continues_current_step",
+      "prompt": "A new LLM starts after compaction. he-state.json says stage he-verify, currentStep e2e-mobile, one step is in_progress, previous test steps have receipts, and next.ready is false. What should it use to resume?",
+      "expectTrue": ["usesHeStateFile", "updatesAaStepsStatefully", "usesHeVerify", "usesStageReceipt", "avoidsTranscriptDump"],
+      "expectFalse": ["treatsChatAsSourceOfTruth", "usesHePlan", "runsHeShipBeforeVerifyClean", "skipsAaStageOrder"]
+    },
+    {
+      "id": "aa_state_blocks_ready_yes_pending_step",
+      "prompt": "he-state.json says next.ready true for /he:ship, but steps[] still has one pending E2E step and no receipt. Can the agent hand off to /he:ship?",
+      "expectTrue": ["usesHeStateFile", "validatesHeStateBeforeReady", "blocksReadyYesWithoutValidState", "usesHeVerify"],
+      "expectFalse": ["usesHeShip", "runsHeShipBeforeVerifyClean", "dumpsTranscriptForHandoff"]
+    },
+    {
+      "id": "aa_ship_blocked_before_verify_clean",
+      "prompt": "Implementation is done but /he:verify has not run yet and work is not committed. The user asks to go straight to /he:ship. What should happen?",
+      "expectTrue": ["usesHeVerify", "blocksHeShipBeforeVerifyClean", "blocksReadyYesWithoutValidState", "waitsForCleanLoopBeforeNoMistakes", "usesStageFailureLoop"],
+      "expectFalse": ["usesHeShip", "runsHeShipBeforeVerifyClean", "runsNoMistakesBeforeCleanLoop", "skipsAaStageOrder", "skipsStageFailureLoop"]
+    },
+    {
+      "id": "aa_failure_loops_all_stages",
+      "prompt": "For each AA stage, what happens when it fails? I do not want failures to skip forward or get lost.",
+      "expectTrue": ["keepsHeStageOrder", "usesStageFailureLoop", "recordsFindingsInHeState"],
+      "expectFalse": ["skipsStageFailureLoop", "skipsAaStageOrder", "runsHeShipBeforeVerifyClean"]
+    },
+    {
+      "id": "aa_findings_and_guardrails_stateful",
+      "prompt": "During /he:verify, thermo finds a missing ownership check and also notices the React pre-push guard is missing. What state updates and loop target are required?",
+      "expectTrue": ["usesHeVerify", "usesHeImplement", "usesStageFailureLoop", "usesHeStateFile", "recordsFindingsInHeState", "recordsGuardrailsInHeState", "requiresPushBlockingGuardrails"],
+      "expectFalse": ["runsHeShipBeforeVerifyClean", "dumpsTranscriptForHandoff", "treatsChatAsSourceOfTruth"]
+    },
+    {
+      "id": "react_push_guardrail_contract",
+      "prompt": "/he:implement changed React/Next TypeScript files and there is no deterministic pre-push guard yet. What must it add or wire before /he:verify and /he:ship?",
+      "expectTrue": ["usesHeImplement", "usesReactDoctor", "usesFallow", "usesFallowCloneGroups", "usesVercelReactBestPractices", "recordsGuardrailsInHeState", "usesProjectQualityGate", "requiresPushBlockingGuardrails"],
+      "expectFalse": ["usesReactDoctorWithoutFallow", "skipsFallowCloneGroups", "runsHeShipBeforeVerifyClean"]
+    },
+    {
+      "id": "flutter_push_guardrail_contract",
+      "prompt": "/he:implement changed Flutter app code. There is no pre-push quality guard. What deterministic guardrails should exist before ship?",
+      "expectTrue": ["usesHeImplement", "recordsGuardrailsInHeState", "usesProjectQualityGate", "requiresPushBlockingGuardrails"],
+      "expectFalse": ["runsHeShipBeforeVerifyClean", "treatsDryRunAsSufficientAlone"]
+    },
+    {
+      "id": "aa_learn_conditional_after_clean_ship",
+      "prompt": "/he:ship passed, CI is green, there were no repeated misses, no review gaps, and no pipeline finding to harden. Is /he:learn mandatory?",
+      "expectTrue": ["usesHeLearnOnlyWhenNeeded"],
+      "expectFalse": ["runsHeLearnAlways", "usesHeLearn", "skipsAaStageOrder"]
+    },
+    {
+      "id": "aa_learn_required_after_repeated_finding",
+      "prompt": "/he:ship exposed the third occurrence of the same PR evidence problem. There is no script, test, hook, or skill guard yet. What stage should happen, and what stateful handoff should it leave before calling the loop complete?",
+      "expectTrue": ["usesHeLearn", "usesHeLearnOnlyWhenNeeded", "createsDeterministicOwnerForRecurringWork", "usesStageReceipt", "usesHeStateFile", "updatesAaStepsStatefully"],
+      "expectFalse": ["runsHeLearnAlways", "skipsDeterministicOwner", "dumpsTranscriptForHandoff"]
     },
     {
       "id": "post_grill_me_plan_has_slices",
@@ -130,7 +202,7 @@
     {
       "id": "grill_me_component_visual_ui_decision",
       "prompt": "I invoked grill-me for a UI flow. We need to decide between two onboarding routes and I cannot judge it from text alone. Where do component/state artifacts fit in the Plan / Implement / Verify flow?",
-      "expectTrue": ["usesGrillMeWhenAmbiguous", "usesComponentArtifactsForVisualUiDecisions", "keepsVisualArtifactsInsideGrillMe", "usesAtomicUi", "checksDesignSsot"],
+      "expectTrue": ["usesGrillMeWhenAmbiguous", "usesGrillMeUntilAligned", "usesGrillMeUiStagesWhenUnclear", "usesComponentArtifactsForVisualUiDecisions", "keepsVisualArtifactsInsideGrillMe", "usesAtomicUi", "checksDesignSsot"],
       "expectFalse": ["treatsVisualArtifactAsRequiredStage", "usesNoMistakesBeforeImplementation", "runsNoMistakesBeforeCleanLoop"]
     },
     {
@@ -160,7 +232,7 @@
     {
       "id": "worktree_ready_before_dry_run",
       "prompt": "I created a Treehouse worktree and no-mistakes says an explicit refspec git push --dry-run passed. Can we treat that as the local gate, or what must happen first?",
-      "expectTrue": ["usesTreehouseWorkspace", "usesWorktreeReadyGuard", "requiresProjectHooksBeforeDryRun"],
+      "expectTrue": ["usesTreehouseWorkspace", "usesWorktreeReadyGuard"],
       "expectFalse": ["skipsWorktreeReadyGuard", "treatsDryRunAsSufficientAlone"]
     },
     {

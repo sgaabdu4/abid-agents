@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
-# Managed by abid-agents installer.
+# Managed by hard-eng installer.
 set -euo pipefail
 
-ROOT="${ABID_AGENTS_ROOT:-$HOME/.agents}"
+ROOT="${HARD_ENG_ROOT:-$HOME/.agents}"
 PATH="/opt/homebrew/bin:/usr/local/bin:$HOME/.npm-global/bin:$HOME/.local/bin:$HOME/flutter/bin:$HOME/Workspaces/flutter/bin:$HOME/.pub-cache/bin:/usr/bin:/bin:/usr/sbin:/sbin:${PATH:-}"
 export PATH
 mode="update"
@@ -13,7 +13,7 @@ case "${1:-}" in
     ;;
   --repair|--manual|--after-manual-update)
     mode="repair"
-    export ABID_AGENTS_SKIP_SUBMODULE_INIT="${ABID_AGENTS_SKIP_SUBMODULE_INIT:-1}"
+    export HARD_ENG_SKIP_SUBMODULE_INIT="${HARD_ENG_SKIP_SUBMODULE_INIT:-1}"
     ;;
   -h|--help)
     cat <<'USAGE'
@@ -155,7 +155,7 @@ PY
 
 CBM_MCP_PROBE_TIMEOUT_MS="${CBM_MCP_PROBE_TIMEOUT_MS:-30000}" \
   node "$ROOT/scripts/probe-codebase-memory-mcp.mjs" "$HOME/.codex/bin/codebase-memory-mcp"
-ABID_AGENTS_ROOT="$ROOT" "$ROOT/codex/bin/codex-context-mode-health"
+HARD_ENG_ROOT="$ROOT" "$ROOT/codex/bin/codex-context-mode-health"
 
 python3 <<'PY'
 import os

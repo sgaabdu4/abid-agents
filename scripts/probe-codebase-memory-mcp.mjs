@@ -56,7 +56,7 @@ const initialize = {
   params: {
     protocolVersion: '2024-11-05',
     capabilities: {},
-    clientInfo: { name: 'abid-agents-probe', version: '1.0.0' },
+    clientInfo: { name: 'hard-eng-probe', version: '1.0.0' },
   },
 };
 const initialized = { jsonrpc: '2.0', method: 'notifications/initialized', params: {} };

@@ -5,9 +5,9 @@ ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 MODE="${1:---pull}"
 
 cd "$ROOT"
-LOCK_DIR="$(git rev-parse --git-path agent-config-auto-sync.lock)"
+LOCK_DIR="$(git rev-parse --git-path hard-eng-auto-sync.lock)"
 
-if [[ "${ABID_AGENTS_SKIP_AUTO_SYNC:-}" == "1" ]]; then
+if [[ "${HARD_ENG_SKIP_AUTO_SYNC:-}" == "1" ]]; then
   exit 0
 fi
 
@@ -24,7 +24,7 @@ if [[ "$(basename "$ROOT")" != ".agents" ]]; then
 fi
 
 if ! mkdir "$LOCK_DIR" 2>/dev/null; then
-  echo "Another agent-config auto-sync is running; skipping."
+  echo "Another hard-eng auto-sync is running; skipping."
   exit 0
 fi
 trap 'rmdir "$LOCK_DIR"' EXIT
@@ -32,11 +32,11 @@ trap 'rmdir "$LOCK_DIR"' EXIT
 update_no_mistakes() {
   local binary
 
-  if [[ "${ABID_AGENTS_SKIP_NO_MISTAKES_UPDATE:-}" == "1" ]]; then
+  if [[ "${HARD_ENG_SKIP_NO_MISTAKES_UPDATE:-}" == "1" ]]; then
     return 0
   fi
 
-  binary="${ABID_AGENTS_NO_MISTAKES_BIN:-}"
+  binary="${HARD_ENG_NO_MISTAKES_BIN:-}"
   if [[ -z "$binary" ]]; then
     if command -v no-mistakes >/dev/null 2>&1; then
       binary="$(command -v no-mistakes)"
@@ -60,11 +60,11 @@ update_no_mistakes() {
 update_treehouse() {
   local binary
 
-  if [[ "${ABID_AGENTS_SKIP_TREEHOUSE_UPDATE:-}" == "1" ]]; then
+  if [[ "${HARD_ENG_SKIP_TREEHOUSE_UPDATE:-}" == "1" ]]; then
     return 0
   fi
 
-  binary="${ABID_AGENTS_TREEHOUSE_BIN:-}"
+  binary="${HARD_ENG_TREEHOUSE_BIN:-}"
   if [[ -z "$binary" ]]; then
     if command -v treehouse >/dev/null 2>&1; then
       binary="$(command -v treehouse)"
@@ -80,16 +80,16 @@ update_treehouse() {
 }
 
 refresh_local_install() {
-  if [[ "${ABID_AGENTS_SKIP_AUTO_INSTALL:-}" == "1" ]]; then
+  if [[ "${HARD_ENG_SKIP_AUTO_INSTALL:-}" == "1" ]]; then
     return 0
   fi
 
-  if ! ABID_AGENTS_SKIP_NPM_INSTALL=1 \
-    ABID_AGENTS_SKIP_PREREQ_INSTALL=1 \
-    ABID_AGENTS_SKIP_SUBMODULE_INIT=1 \
-    ABID_AGENTS_SKIP_CRON=1 \
+  if ! HARD_ENG_SKIP_NPM_INSTALL=1 \
+    HARD_ENG_SKIP_PREREQ_INSTALL=1 \
+    HARD_ENG_SKIP_SUBMODULE_INIT=1 \
+    HARD_ENG_SKIP_CRON=1 \
     "$ROOT/scripts/install.sh"; then
-    echo "Agent-config local install refresh failed; run $ROOT/scripts/install.sh manually." >&2
+    echo "Hard Eng local install refresh failed; run $ROOT/scripts/install.sh manually." >&2
   fi
 }
 
@@ -109,13 +109,13 @@ update_treehouse
 git fetch origin main
 
 if [[ "$MODE" == "--pull" ]]; then
-  ABID_AGENTS_SKIP_AUTO_SYNC=1 git pull --ff-only origin main
+  HARD_ENG_SKIP_AUTO_SYNC=1 git pull --ff-only origin main
   refresh_local_install
 elif [[ "$MODE" == "--after-pull" ]]; then
   refresh_local_install
 fi
 
-if [[ "${ABID_AGENTS_SKIP_SUBMODULE_BUMP:-}" == "1" ]]; then
+if [[ "${HARD_ENG_SKIP_SUBMODULE_BUMP:-}" == "1" ]]; then
   "$ROOT/scripts/update-submodules.sh" --init
   echo "Auto-sync complete."
   exit 0

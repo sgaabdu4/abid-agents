@@ -38,9 +38,9 @@
 - Flutter/Dart/Riverpod/Freezed/GoRouter/pubspec -> `building-flutter-apps`.
 - Appwrite/Auth/TablesDB/Storage/Functions/Realtime -> `appwrite-backend`.
 - Online/current info -> `tavily-cli`.
-- Repeated fixes/project learning -> `repeated-failure-learning`; skill authoring/evals -> `skill-creator`.
+- Repeats -> `repeated-failure-learning`; skills/evals -> `skill-creator`.
 - Workflow/skill/next-step -> `workflow-help`.
-- Features -> Treehouse/`grill-me`, plan, build/verify loop; PR -> `no-mistakes`.
+- Features -> `he-plan`/`he-implement`/`he-verify`; ship:`he-ship`; learn:`he-learn`.
 - Hard bugs/failures/flakes/regressions -> `diagnosing-bugs`.
 - Boundaries/interfaces/ownership/wrappers -> `codebase-design`.
 - Post-`grill-me`: clear skip; brief `to-prd`; missing -> `to-issues`; sliced -> build; big -> both.

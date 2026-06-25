@@ -51,12 +51,12 @@
 
     .summary {
       display: grid;
-      grid-template-columns: repeat(4, minmax(0, 1fr));
+      grid-template-columns: repeat(5, minmax(0, 1fr));
       gap: 10px;
       margin-top: 14px;
     }
 
-    .summary div, .step, .decision, .checklist, .support {
+    .summary div, .step, .checklist {
       border: 1px solid var(--line);
       border-radius: 8px;
       background: var(--panel);
@@ -98,6 +98,9 @@
 
     .step h2 { font-size: 22px; line-height: 1.15; }
     .step p { margin-top: 8px; color: var(--muted); line-height: 1.5; }
+    .invokes { margin-top: 10px; color: var(--ink); font-size: 13px; line-height: 1.45; }
+    .invokes strong { display: block; margin-bottom: 3px; }
+    .invokes span { color: var(--muted); }
 
     .terminal {
       align-self: start;
@@ -126,137 +129,6 @@
 
     .terminal code { display: block; padding: 12px; color: oklch(82% 0.11 156); white-space: pre-wrap; }
 
-    .decision {
-      display: grid;
-      grid-column: 2 / -1;
-      grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
-      gap: 10px;
-      padding: 12px;
-      background: var(--soft-green);
-    }
-
-    .decision h3 { grid-column: 1 / -1; font-size: 16px; }
-    .choice { padding: 10px; border: 1px solid oklch(84% 0.032 156); border-radius: 8px; background: white; }
-    .choice strong { display: block; margin-bottom: 4px; font-size: 14px; }
-    .choice span { color: var(--muted); font-size: 13px; line-height: 1.35; }
-
-    .support {
-      display: grid;
-      grid-column: 2 / -1;
-      grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
-      gap: 10px;
-      padding: 12px;
-      background: var(--soft-amber);
-    }
-
-    .support div { padding: 10px; border: 1px solid oklch(84% 0.045 78); border-radius: 8px; background: white; }
-    .support strong { display: block; margin-bottom: 4px; }
-    .support span { color: var(--muted); font-size: 13px; line-height: 1.35; }
-
-    .loop-diagram {
-      display: grid;
-      grid-column: 2 / -1;
-      gap: 8px;
-      padding: 12px;
-      border: 1px solid oklch(84% 0.028 250);
-      border-radius: 8px;
-      background: var(--soft-blue);
-      font-size: 13px;
-      line-height: 1.35;
-    }
-
-    .loop-chain {
-      display: grid;
-      grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr) auto minmax(0, 1fr) auto minmax(0, 1fr);
-      gap: 8px;
-    }
-
-    .loop-step-arrow {
-      position: relative;
-      align-self: center;
-      width: 24px;
-      height: 2px;
-      background: var(--muted);
-    }
-
-    .loop-step-arrow::after {
-      position: absolute;
-      right: 0;
-      top: -4px;
-      width: 8px;
-      height: 8px;
-      border-top: 2px solid var(--muted);
-      border-right: 2px solid var(--muted);
-      content: "";
-      transform: rotate(45deg);
-    }
-
-    .loop-node {
-      min-height: 58px;
-      padding: 8px;
-      border: 1px solid var(--line);
-      border-radius: 8px;
-      background: white;
-    }
-
-    .loop-node strong {
-      display: block;
-      margin-bottom: 4px;
-      font-weight: 800;
-    }
-
-    .loop-node span {
-      color: var(--muted);
-      font-size: 12px;
-    }
-
-    .loop-outcomes {
-      display: grid;
-      grid-column: 1 / -1;
-      gap: 8px;
-    }
-
-    .loop-decision {
-      padding: 8px;
-      border-radius: 6px;
-      font-weight: 800;
-    }
-
-    .loop-return {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      background: var(--soft-rose);
-      color: var(--rose);
-      text-align: left;
-    }
-
-    .loop-pass {
-      background: var(--soft-green);
-      color: var(--green);
-      text-align: left;
-    }
-
-    .return-arrow {
-      position: relative;
-      flex: 0 0 auto;
-      width: 34px;
-      height: 2px;
-      background: var(--rose);
-    }
-
-    .return-arrow::before {
-      position: absolute;
-      left: 0;
-      top: -4px;
-      width: 8px;
-      height: 8px;
-      border-left: 2px solid var(--rose);
-      border-top: 2px solid var(--rose);
-      content: "";
-      transform: rotate(-45deg);
-    }
-
     .checklist {
       display: grid;
       gap: 10px;
@@ -272,10 +144,7 @@
       main { padding: 20px 14px 34px; }
       .summary { grid-template-columns: 1fr 1fr; }
       .step { grid-template-columns: 36px minmax(0, 1fr); }
-      .terminal, .decision, .support, .loop-diagram { grid-column: 1 / -1; }
-      .decision { grid-template-columns: 1fr; }
-      .loop-chain, .loop-outcomes { grid-template-columns: 1fr; }
-      .loop-step-arrow { display: none; }
+      .terminal { grid-column: 1 / -1; }
     }
 
     @media (max-width: 560px) {
@@ -288,7 +157,7 @@
     @media print {
       html, body { background: white; }
       main { max-width: none; padding: 0; }
-      .step, .decision, .support, .checklist { break-inside: avoid; }
+      .step, .checklist { break-inside: avoid; }
       * { print-color-adjust: exact; -webkit-print-color-adjust: exact; }
     }
   </style>
@@ -297,109 +166,111 @@
   <main>
     <header class="hero">
       <div class="eyebrow">Single feature workflow</div>
-      <h1>Plan, Implement, Verify</h1>
-      <p>Use three stages for feature work. Plan enough to know the owner and proof path, implement in the canonical owner, then loop between fixes and verification until local blockers are gone. No-mistakes is the final gate.</p>
+      <h1>Plan, Implement, Verify, Ship, Learn</h1>
+      <p>Run one <code>/he:*</code> command per stage. Start each stage in a fresh thread with the prior <code>he-state.json</code>; the stage skill handles supporting skills, state updates, validation, receipts, and parallel subagents when work can safely split.</p>
     </header>
 
     <section class="summary" aria-label="Workflow summary">
-      <div><strong>1. Plan</strong><span>Treehouse and the worktree readiness guard gate non-trivial work; component/state artifacts help UI choices when text is not enough.</span></div>
-      <div><strong>2. Implement</strong><span>Change owner; violations leave lint/scanner/gate.</span></div>
-      <div><strong>3. Verify Loop</strong><span>Test, review, fix, then run E2E last when needed.</span></div>
-      <div><strong>4. Final Gate</strong><span>No-mistakes runs after the local loop is clean and committed.</span></div>
+      <div><strong>1. Plan</strong><span>Decide owner, proof, risk, and readiness.</span></div>
+      <div><strong>2. Implement</strong><span>Change the canonical owner.</span></div>
+      <div><strong>3. Verify</strong><span>Prove behavior and loop on blockers.</span></div>
+      <div><strong>4. Ship</strong><span>Run the final gate and CI follow-through.</span></div>
+      <div><strong>5. Learn</strong><span>Add a durable guard when needed.</span></div>
+    </section>
+
+    <section class="checklist" aria-label="Automatic behavior">
+      <h2>Automatic Work</h2>
+      <ul>
+        <li>Loads the required specialist skills for the touched area.</li>
+        <li>Updates <code>he-state.json</code> before and after each internal step.</li>
+        <li>Records findings with an owner repair stage and guardrails with command, status, evidence, and push-blocking status.</li>
+        <li>Uses parallel subagents when tasks are independent.</li>
+        <li>Validates state before any ready-yes handoff.</li>
+        <li>Ends with a compact receipt: stage, state path, decision, owner/proof, artifacts, blocker, next.</li>
+      </ul>
     </section>
 
     <ol class="flow" aria-label="Feature workflow steps">
       <li class="step">
         <div>
           <h2>Plan the work</h2>
-          <p>For non-trivial feature work, start in Treehouse, run the worktree readiness guard, and use Grill Me when outcome, scope, proof, or risk is unclear. For UI flow or visual choices that need to be seen, inspect the design SSOT and use a project-local component/state artifact inside Grill Me. Pick the lightest planning artifact that makes the work buildable.</p>
+          <p>Decides scope, owner, blast radius, proof path, risk route, and whether implementation is ready.</p>
+          <div class="invokes"><strong>Invokes automatically</strong><span>Treehouse and worktree readiness for isolation; <code>grill-me</code> for unclear outcome, scope, proof, risk, UI flow, or visual direction; <code>to-prd</code> or <code>to-issues</code> only when the plan needs that artifact.</span></div>
+          <div class="invokes"><strong>Grill Me behavior</strong><span>Grill Me owns <code>session_state.md</code>, its stage map, and the one-question loop. It asks as many one-by-one questions as needed until aligned or the user parks the unknown.</span></div>
         </div>
-        <pre class="terminal" aria-label="Plan commands"><code>$ treehouse &lt;feature-name&gt;
-"$HOME/.agents/scripts/ensure-worktree-ready.sh" &lt;path&gt;
-/grill-me</code></pre>
-        <div class="decision" aria-label="Planning decision">
-          <h3>Pick one planning path</h3>
-          <div class="choice"><strong>Small and clear</strong><span>Skip this step.</span></div>
-          <div class="choice"><strong>Need a brief</strong><span>Use <code>/to-prd</code>.</span></div>
-          <div class="choice"><strong>Need missing slices</strong><span>Use <code>/to-issues</code>.</span></div>
-          <div class="choice"><strong>Plan has slices</strong><span>Go to readiness, then implement the first slice.</span></div>
-          <div class="choice"><strong>Big feature</strong><span>Use <code>/to-prd</code>, then <code>/to-issues</code>.</span></div>
-          <div class="choice"><strong>Need UI review</strong><span>Use <code>atomic-ui</code> and <code>impeccable</code> inside <code>/grill-me</code>.</span></div>
-        </div>
+        <pre class="terminal" aria-label="Plan commands"><code>/he:plan
+Next: ready for /he:implement: yes/no</code></pre>
       </li>
 
       <li class="step">
         <div>
           <h2>Implement with touched-area skills</h2>
-          <p>Change owner first. Each violation leaves lint, scanner, and gate coverage. Existing deterministic owners run before new reasoning; load only touched-area skills.</p>
+          <p>Changes the canonical owner, runs deterministic owners first, and leaves lint/scanner/gate coverage where needed.</p>
+          <div class="invokes"><strong>Invokes automatically</strong><span><code>codebase-design</code> when ownership is unclear; deterministic scripts/tests/hooks before fresh reasoning; touched-area skills such as React, Flutter, Appwrite, UI, Sentry, security, or performance based on the files and risk.</span></div>
+          <div class="invokes"><strong>Guardrails</strong><span>React/Next gets React Doctor, Fallow audit/dupes, lint, and typecheck. Flutter gets package-root <code>dart analyze</code> with <code>flutter_skill_lints</code> and tests when present. Missing repeatable checks become scripts, tests, hooks, or evals.</span></div>
         </div>
-        <pre class="terminal" aria-label="Implementation commands"><code>/codebase-design
-/atomic-ui
-/impeccable
-npx react-doctor@latest --verbose
-fallow dupes --format json --quiet 2&gt;/dev/null || true</code></pre>
-        <div class="support" aria-label="Specialist skills">
-          <div><strong>Violation found</strong><span>Add/update lint, scanner, gate.</span></div>
-          <div><strong>UI touched</strong><span>Use <code>atomic-ui</code> and <code>impeccable</code>; locate or create the design SSOT before reusable styling.</span></div>
-          <div><strong>React app touched</strong><span>Run React Doctor, Fallow JS/TS health, and Vercel best practices.</span></div>
-          <div><strong>Duplication suspected</strong><span>Use Fallow dupes or clone-group checks before consolidating copy-pasted UI/code.</span></div>
-          <div><strong>Platform touched</strong><span>Use Flutter, Appwrite, Sentry, PDF, video, or research skills.</span></div>
-        </div>
+        <pre class="terminal" aria-label="Implementation commands"><code>/he:implement
+Next: ready for /he:verify: yes/no</code></pre>
       </li>
 
       <li class="step">
         <div>
           <h2>Verify in a loop</h2>
-          <p>Run tests, requested or touched risk reviews, thermo review, then E2E. Any blocker goes back to implementation; repeat until clean.</p>
+          <p>Runs the proof loop: tests, touched risk reviews, maintainability review, and E2E when user-visible flows changed.</p>
+          <div class="invokes"><strong>Invokes automatically</strong><span><code>test-quality</code> for assertions and gaps; security/performance review when touched; thermo review before expensive UI proof; <code>e2e</code> last for real user-visible flows and artifacts.</span></div>
+          <div class="invokes"><strong>Guardrail proof</strong><span>Runs every <code>guardrails[]</code> command plus <code>check-project-quality-gates.mjs --require-push-gate</code>; missing or failing guardrails route back to <code>/he:implement</code>.</span></div>
+          <div class="invokes"><strong>Auto-fix loop</strong><span>Diagnose failures, route code changes back through <code>/he:implement</code>, update <code>he-state.json</code>, rerun only affected proof, and repeat until clean or blocked.</span></div>
         </div>
-        <pre class="terminal" aria-label="Verify commands"><code>/test-quality
-/security-review
-/performance-rescue
-/thermo-nuclear-code-quality-review
-/e2e</code></pre>
-        <div class="loop-diagram" aria-label="Verify loop path">
-          <div class="loop-chain">
-            <div class="loop-node"><strong>3a. Targeted tests</strong><span>Use test-quality for design, gaps, or repairs.</span></div>
-            <div class="loop-step-arrow" aria-hidden="true"></div>
-            <div class="loop-node"><strong>3b. Risk reviews</strong><span>Security/perf if requested or touched.</span></div>
-            <div class="loop-step-arrow" aria-hidden="true"></div>
-            <div class="loop-node"><strong>3c. Thermo review</strong><span>Maintainability before E2E.</span></div>
-            <div class="loop-step-arrow" aria-hidden="true"></div>
-            <div class="loop-node"><strong>3d. E2E</strong><span>Run last for user-visible flows and artifacts.</span></div>
-          </div>
-          <div class="loop-outcomes">
-            <div class="loop-decision loop-return"><span class="return-arrow" aria-hidden="true"></span><span>If any fail: back to 2. Implement, then rerun Verify.</span></div>
-            <div class="loop-decision loop-pass">Pass: go to 4. Final Gate.</div>
-          </div>
-        </div>
+        <pre class="terminal" aria-label="Verify commands"><code>/he:verify
+Next: ready for /he:ship: yes/no</code></pre>
       </li>
 
       <li class="step">
         <div>
-          <h2>Finish with no-mistakes</h2>
-          <p>After the local verify loop is clean, status and secrets are checked, and the work is committed, rerun the readiness guard before no-mistakes. A push dry-run only counts after project hooks are active.</p>
+          <h2>Ship with no-mistakes</h2>
+          <p>Runs status/secrets checks, hook readiness, no-mistakes, PR evidence repair, and CI follow-through.</p>
+          <div class="invokes"><strong>Invokes automatically</strong><span><code>ensure-worktree-ready.sh --check --require-pre-push</code> and <code>check-project-quality-gates.mjs --require-push-gate</code> prove project hooks before <code>no-mistakes</code>; PR evidence repair handles hosted screenshots and video; CI follow-up batches fixes and reruns the fewest checks.</span></div>
         </div>
-        <pre class="terminal" aria-label="No mistakes command"><code>"$HOME/.agents/scripts/ensure-worktree-ready.sh" .
-/no-mistakes</code></pre>
+        <pre class="terminal" aria-label="No mistakes command"><code>/he:ship
+Next: ready for /he:learn: yes
+OR Next: loop complete: yes</code></pre>
+      </li>
+
+      <li class="step">
+        <div>
+          <h2>Learn and tighten</h2>
+          <p>Runs only when <code>he-state.json</code> has an open learning finding. If learning is empty, ship closes the loop.</p>
+          <div class="invokes"><strong>Invokes automatically</strong><span><code>repeated-failure-learning</code> captures the pattern; <code>skill-creator</code> updates stage skills when they are the owner; otherwise the guard goes into the narrow script, test, hook, route map, or source owner.</span></div>
+        </div>
+        <pre class="terminal" aria-label="Learn commands"><code>/he:learn
+Next: loop complete: yes/no</code></pre>
       </li>
     </ol>
 
-    <section class="checklist" aria-label="Before no-mistakes checklist">
-      <h2>Before no-mistakes</h2>
+    <section class="checklist" aria-label="Guardrails">
+      <h2>Guardrails</h2>
       <ul>
-        <li>Treehouse and Grill Me gate was used or explicitly skipped for small clear work.</li>
-        <li><code>ensure-worktree-ready.sh</code> passed for the active checkout.</li>
-        <li>Planning artifact decision is explicit: skipped, PRD, issues, component/state UI review, or a combination.</li>
-        <li>If the plan already has accepted slices, do not rerun <code>/to-issues</code> unless publishing issue cards.</li>
-        <li>Owner, blast radius, guardrail triad, and UI design SSOT were checked.</li>
-        <li>React app changes ran React Doctor and Fallow; duplication used dupes or clone-group checks.</li>
-        <li>Tests, review, and required E2E are clean after the latest fix.</li>
-        <li>E2E evidence exists for changed user-visible flows.</li>
-        <li>Worktree changes are committed with no secrets or unrelated files.</li>
+        <li><code>/he:implement</code> starts only after <code>/he:plan</code> is <code>PASS</code>.</li>
+        <li><code>/he:ship</code> starts only after verification is clean and work is committed.</li>
+        <li>State validation blocks false ready-yes handoffs.</li>
+        <li>Push dry-runs count only after project hooks are active and push-blocking guardrails pass.</li>
+        <li>Verify failures loop back through <code>/he:implement</code>; proof reruns after each fix.</li>
+        <li>Parallel subagents are used only for independent work and merge back through the active <code>he-*</code> stage.</li>
       </ul>
     </section>
 
-    <p class="footer">Single source for feature delivery workflow. Updated 2026-06-25.</p>
+    <section class="checklist" aria-label="Failure loops">
+      <h2>Failure Loops</h2>
+      <ul>
+        <li><code>/he:plan</code> stays in planning until missing owner, scope, proof, risk, or Grill Me alignment is resolved.</li>
+        <li><code>/he:implement</code> loops in implementation unless owner or scope changed, then it returns to planning.</li>
+        <li><code>/he:verify</code> sends fixes through implementation, then reruns only affected proof.</li>
+        <li><code>/he:ship</code> uses the no-mistakes loop; code findings go to implementation, proof gaps to verify, gate evidence stays in ship.</li>
+        <li><code>/he:learn</code> stays in learning until the durable guard owner exists and passes.</li>
+      </ul>
+    </section>
+
+    <p class="footer">Visual quick reference derived from <code>skills/workflow-help/references/route-map.md</code>. Updated 2026-06-25.</p>
   </main>
 </body>
 </html>

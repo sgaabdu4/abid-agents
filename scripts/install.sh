@@ -3,8 +3,8 @@ set -euo pipefail
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 
-if [[ "${ABID_AGENTS_SKIP_PREREQ_INSTALL:-0}" != "1" &&
-  "${ABID_AGENTS_PREREQS_READY:-0}" != "1" &&
+if [[ "${HARD_ENG_SKIP_PREREQ_INSTALL:-0}" != "1" &&
+  "${HARD_ENG_PREREQS_READY:-0}" != "1" &&
   -x "$ROOT/scripts/setup.sh" ]]; then
   "$ROOT/scripts/setup.sh" --prereqs-only
 fi
@@ -18,7 +18,7 @@ fi
 
 if git -C "$ROOT" rev-parse --git-dir >/dev/null 2>&1 &&
   [[ -f "$ROOT/.gitmodules" ]] &&
-  [[ "${ABID_AGENTS_SKIP_SUBMODULE_INIT:-}" != "1" ]]; then
+  [[ "${HARD_ENG_SKIP_SUBMODULE_INIT:-}" != "1" ]]; then
   "$ROOT/scripts/update-submodules.sh" --init
 fi
 
@@ -76,6 +76,8 @@ replace_with_link_file() {
 install_managed_executable() {
   local source="$1"
   local target="$2"
+  local old_owner
+  old_owner="abid""-agents"
   mkdir -p "$(dirname "$target")"
   if [[ -L "$target" ]]; then
     if [[ "$(readlink "$target")" == "$source" ]]; then
@@ -83,7 +85,9 @@ install_managed_executable() {
     fi
     echo "Preserving existing symlink: $target"
     return 0
-  elif [[ -e "$target" ]] && ! grep -q 'Managed by abid-agents installer' "$target" 2>/dev/null; then
+  elif [[ -e "$target" ]] &&
+    ! grep -q 'Managed by hard-eng installer' "$target" 2>/dev/null &&
+    ! grep -q "Managed by ${old_owner} installer" "$target" 2>/dev/null; then
     echo "Preserving existing file: $target"
     return 0
   fi
@@ -92,10 +96,12 @@ install_managed_executable() {
 }
 
 install_codex_watchdog() {
-  local codex_bin launch_agent launch_label old_launch_label
+  local codex_bin launch_agent launch_label old_owner old_user old_label
+  if [[ "${HARD_ENG_SKIP_WATCHDOG:-}" == "1" ]]; then
+    return 0
+  fi
   codex_bin="$HOME/.codex/bin"
-  launch_label="dev.abid-agents.codex-watchdog"
-  old_launch_label="com.abid.codex-watchdog"
+  launch_label="dev.hard-eng.codex-watchdog"
   install_managed_executable "$ROOT/codex/bin/codex-watchdog" "$codex_bin/codex-watchdog"
   install_managed_executable "$ROOT/codex/bin/codex-health" "$codex_bin/codex-health"
   install_managed_executable "$ROOT/codex/bin/codex-context-mode-health" "$codex_bin/codex-context-mode-health"
@@ -156,10 +162,12 @@ EOF
       echo "Codex watchdog installed but not loaded; run: launchctl bootstrap gui/$(id -u) $launch_agent" >&2
     }
   fi
-  if command -v launchctl >/dev/null 2>&1; then
-    launchctl bootout "gui/$(id -u)/$old_launch_label" >/dev/null 2>&1 || true
-    launchctl disable "gui/$(id -u)/$old_launch_label" >/dev/null 2>&1 || true
-  fi
+  old_owner="abid""-agents"
+  old_user="ab""id"
+  for old_label in "dev.${old_owner}.codex-watchdog" "com.${old_user}.codex-watchdog"; do
+    launchctl bootout "gui/$(id -u)/$old_label" >/dev/null 2>&1 || true
+    launchctl disable "gui/$(id -u)/$old_label" >/dev/null 2>&1 || true
+  done
 }
 
 resolve_codebase_memory_mcp_command() {
@@ -324,6 +332,23 @@ replace_with_link_file "$ROOT/AGENTS.md" "$HOME/.copilot/AGENTS.md"
 replace_with_link_file "$ROOT/AGENTS.md" "$HOME/.pi/AGENTS.md"
 replace_with_link_file "$ROOT/AGENTS.md" "$HOME/.pi/agent/AGENTS.md"
 
+remove_stale_skill_links() {
+  local dir link target
+  for dir in "$HOME/.codex/skills" "$HOME/.copilot/skills" "$HOME/.pi/skills" "$HOME/.pi/agent/skills"; do
+    [[ -d "$dir" ]] || continue
+    find "$dir" -maxdepth 1 -type l | while IFS= read -r link; do
+      target="$(readlink "$link")"
+      case "$target" in
+        "$ROOT/skills"/*)
+          [[ -e "$target" ]] || rm -f "$link"
+          ;;
+      esac
+    done
+  done
+}
+
+remove_stale_skill_links
+
 for skill in "$ROOT"/skills/*; do
   [[ -d "$skill" ]] || continue
   if git -C "$ROOT" check-ignore -q "$skill" 2>/dev/null; then
@@ -357,13 +382,10 @@ if git -C "$ROOT" rev-parse --git-dir >/dev/null 2>&1; then
   install_hook() {
     local hook="$hooks_dir/$1"
     local tmp
-    local legacy_owner
-    legacy_owner="abid""-agents"
     tmp="$(mktemp)"
     cat >"$tmp"
     if [[ -e "$hook" ]] &&
-      ! grep -q 'Managed by agent-config installer' "$hook" &&
-      ! grep -q "Managed by ${legacy_owner} installer" "$hook" &&
+      ! grep -q 'Managed by hard-eng installer' "$hook" &&
       ! grep -q 'scripts/sync-subtrees.sh' "$hook" &&
       ! grep -q 'scripts/auto-sync.sh' "$hook"; then
       mv "$hook" "$hook.backup.$(date +%Y%m%d%H%M%S)"
@@ -374,12 +396,12 @@ if git -C "$ROOT" rev-parse --git-dir >/dev/null 2>&1; then
 
   install_hook post-merge <<'EOF'
 #!/usr/bin/env bash
-# Managed by agent-config installer.
+# Managed by hard-eng installer.
 set -euo pipefail
 
 repo="$(git rev-parse --show-toplevel)"
 if [[ "$(basename "$repo")" == ".agents" ]]; then
-  if [[ "${ABID_AGENTS_SKIP_SUBMODULE_UPDATE:-}" == "1" ]]; then
+  if [[ "${HARD_ENG_SKIP_SUBMODULE_UPDATE:-}" == "1" ]]; then
     exit 0
   fi
   "$repo/scripts/update-submodules.sh" --init
@@ -388,7 +410,7 @@ EOF
 
   install_hook post-rewrite <<'EOF'
 #!/usr/bin/env bash
-# Managed by agent-config installer.
+# Managed by hard-eng installer.
 set -euo pipefail
 
 if [[ "${1:-}" != "rebase" ]]; then
@@ -397,7 +419,7 @@ fi
 
 repo="$(git rev-parse --show-toplevel)"
 if [[ "$(basename "$repo")" == ".agents" ]]; then
-  if [[ "${ABID_AGENTS_SKIP_SUBMODULE_UPDATE:-}" == "1" ]]; then
+  if [[ "${HARD_ENG_SKIP_SUBMODULE_UPDATE:-}" == "1" ]]; then
     exit 0
   fi
   "$repo/scripts/update-submodules.sh" --init
@@ -406,7 +428,7 @@ EOF
 
   install_hook pre-push <<'EOF'
 #!/usr/bin/env bash
-# Managed by agent-config installer.
+# Managed by hard-eng installer.
 set -euo pipefail
 
 repo="$(git rev-parse --show-toplevel)"
@@ -414,26 +436,27 @@ if [[ "$(basename "$repo")" != ".agents" ]]; then
   exit 0
 fi
 
-ABID_AGENTS_SKIP_NPM_INSTALL=1 \
-  ABID_AGENTS_SKIP_PREREQ_INSTALL=1 \
-  ABID_AGENTS_SKIP_SUBMODULE_INIT=1 \
-  ABID_AGENTS_SKIP_CRON=1 \
+HARD_ENG_SKIP_NPM_INSTALL=1 \
+  HARD_ENG_SKIP_PREREQ_INSTALL=1 \
+  HARD_ENG_SKIP_SUBMODULE_INIT=1 \
+  HARD_ENG_SKIP_CRON=1 \
   "$repo/scripts/install.sh"
 node "$repo/tests/codex-config-sync.test.mjs"
+node "$repo/scripts/check-project-quality-gates.mjs" --require-push-gate "$repo"
 
 history_pathspecs=(. ':!scripts/install.sh' ':!tests/markdown-hygiene.test.mjs')
 
 scan_history_fixed() {
   local needle="$1"
   git -C "$repo" rev-list --all | while read -r rev; do
-    git -C "$repo" grep -n -F "$needle" "$rev" -- "${history_pathspecs[@]}" 2>/dev/null || true
+    git -C "$repo" grep -n -I -F "$needle" "$rev" -- "${history_pathspecs[@]}" 2>/dev/null || true
   done
 }
 
 scan_history_regex() {
   local pattern="$1"
   git -C "$repo" rev-list --all | while read -r rev; do
-    git -C "$repo" grep -n -i -E "$pattern" "$rev" -- "${history_pathspecs[@]}" 2>/dev/null || true
+    git -C "$repo" grep -n -I -i -E "$pattern" "$rev" -- "${history_pathspecs[@]}" 2>/dev/null || true
   done
 }
 
@@ -450,14 +473,14 @@ if [[ -n "$matches" ]]; then
   exit 1
 fi
 
-if [[ "${ABID_AGENTS_CHECK_SUBMODULES_BEFORE_PUSH:-}" == "1" ]]; then
+if [[ "${HARD_ENG_CHECK_SUBMODULES_BEFORE_PUSH:-}" == "1" ]]; then
   "$repo/scripts/update-submodules.sh" --status
 fi
 EOF
 
   install_hook pre-commit <<'EOF'
 #!/usr/bin/env bash
-# Managed by agent-config installer.
+# Managed by hard-eng installer.
 set -euo pipefail
 
 repo="$(git rev-parse --show-toplevel)"
@@ -476,6 +499,13 @@ if git diff --cached --quiet --exit-code; then
   exit 0
 fi
 
+is_binary_staged() {
+  git diff --cached --numstat -- "$1" | awk '
+    NR == 1 { exit !($1 == "-" && $2 == "-") }
+    END { if (NR == 0) exit 1 }
+  '
+}
+
 oversized=""
 forbidden=""
 secret_files=""
@@ -484,15 +514,18 @@ while IFS= read -r file; do
   if [[ "$mode" == "160000" ]]; then
     continue
   fi
-  lines="$(git show ":$file" 2>/dev/null | wc -l | tr -d ' ')"
-  if [[ "$lines" =~ ^[0-9]+$ && "$lines" -gt 700 ]]; then
-    oversized="${oversized}${oversized:+$'\n'}${file}:${lines}"
-  fi
   case "$file" in
     .env|.env.*|*/.env|*/.env.*|CHANGELOG.md|*/CHANGELOG.md|generated/*|*/generated/*)
       forbidden="${forbidden}${forbidden:+$'\n'}${file}"
       ;;
   esac
+  if is_binary_staged "$file"; then
+    continue
+  fi
+  lines="$(git show ":$file" 2>/dev/null | wc -l | tr -d ' ')"
+  if [[ "$lines" =~ ^[0-9]+$ && "$lines" -gt 700 ]]; then
+    oversized="${oversized}${oversized:+$'\n'}${file}:${lines}"
+  fi
   content="$(git show ":$file" 2>/dev/null || true)"
   if [[ "$file" != "AGENTS.md" && "$content" == *"$generated_marker"* ]]; then
     forbidden="${forbidden}${forbidden:+$'\n'}${file}"
@@ -520,7 +553,7 @@ if [[ -n "$secret_files" ]]; then
   exit 1
 fi
 
-matches="$(git grep --cached -l -i -E "$pattern" -- "${grep_pathspecs[@]}" || true)"
+matches="$(git grep --cached -I -l -i -E "$pattern" -- "${grep_pathspecs[@]}" || true)"
 
 if [[ -n "$matches" ]]; then
   printf '%s\n' "Blocked commit: staged content contains private project/local path references."
@@ -531,7 +564,7 @@ fi
 EOF
 fi
 
-if [[ "${ABID_AGENTS_ENABLE_CRON:-}" == "1" && "${ABID_AGENTS_SKIP_CRON:-}" != "1" ]]; then
+if [[ "${HARD_ENG_ENABLE_CRON:-}" == "1" && "${HARD_ENG_SKIP_CRON:-}" != "1" ]]; then
   "$ROOT/scripts/install-cron.sh" || {
     echo "Cron install failed; run $ROOT/scripts/install-cron.sh manually." >&2
   }

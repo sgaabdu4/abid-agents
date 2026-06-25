@@ -11,8 +11,8 @@ Load `references/route-map.md` before answering.
 
 Keep the answer focused on:
 
-- current stage
-- next action
+- stage number
+- next `/he:*` handoff
 - skills to load
 - proof required
 - what not to run
@@ -25,5 +25,6 @@ Rules:
 - If a feature is ready to build, require a branch or Treehouse worktree before
   implementation.
 - If readiness is weak, return `CONCERNS` or `FAIL` and name the missing input.
-- For shipping work, end at `no-mistakes`, not direct push, unless the user
-  explicitly overrides the local gate.
+- At stage exit, use the receipt format from `route-map.md`; no transcript dump.
+- For shipping work, end at `he-ship`/`no-mistakes`, not direct push, unless
+  the user explicitly overrides the local gate.

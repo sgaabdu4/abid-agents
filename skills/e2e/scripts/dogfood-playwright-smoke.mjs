@@ -13,7 +13,7 @@ const runId = runIdIndex === -1 ? new Date().toISOString().replace(/[:.]/g, '-')
 const home = process.env.HOME || repoRoot;
 const playwrightModuleDir = path.resolve(
   moduleDirIndex === -1
-    ? process.env.PLAYWRIGHT_NODE_MODULE_DIR || path.join(home, '.cache', 'abid-agents', 'e2e-playwright', 'node_modules')
+    ? process.env.PLAYWRIGHT_NODE_MODULE_DIR || path.join(home, '.cache', 'hard-eng', 'e2e-playwright', 'node_modules')
     : args[moduleDirIndex + 1],
 );
 const requireFromPlaywright = createRequire(path.join(playwrightModuleDir, 'playwright', 'package.json'));

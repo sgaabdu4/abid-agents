@@ -43,7 +43,7 @@ const skills = fs.readdirSync(skillsRoot, { withFileTypes: true })
 
 const skillNames = skills.map((skill) => skill.name);
 for (const testCase of config.cases) {
-  for (const expected of testCase.expectedSkills) {
+  for (const expected of [...testCase.expectedSkills, ...(testCase.allowedExtraSkills || [])]) {
     if (!skillNames.includes(expected)) throw new Error(`${testCase.id} expects unknown skill ${expected}`);
   }
 }
@@ -122,11 +122,14 @@ const results = config.cases.map((testCase) => {
   const actual = actualById.get(testCase.id);
   const actualSkills = [...new Set(actual?.skills || [])].sort();
   const expectedSkills = [...testCase.expectedSkills].sort();
-  const pass = actualSkills.join("\0") === expectedSkills.join("\0");
+  const allowedSkills = new Set([...testCase.expectedSkills, ...(testCase.allowedExtraSkills || [])]);
+  const pass = expectedSkills.every((skill) => actualSkills.includes(skill)) &&
+    actualSkills.every((skill) => allowedSkills.has(skill));
   return {
     id: testCase.id,
     pass,
     expectedSkills,
+    allowedExtraSkills: [...(testCase.allowedExtraSkills || [])].sort(),
     actualSkills,
     reason: actual?.reason || "missing case",
   };

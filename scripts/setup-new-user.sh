@@ -11,4 +11,6 @@ if ! command -v curl >/dev/null 2>&1; then
   exit 1
 fi
 
-curl -fsSL https://raw.githubusercontent.com/sgaabdu4/abid-agents/main/scripts/setup.sh | bash
+tmp="${TMPDIR:-/tmp}/hard-eng-setup.sh"
+curl -fsSLo "$tmp" https://raw.githubusercontent.com/sgaabdu4/hard-eng/main/scripts/setup.sh
+exec bash "$tmp" "$@"

@@ -10,7 +10,7 @@ const result = spawnSync(health, {
   cwd: repo,
   env: {
     ...process.env,
-    ABID_AGENTS_ROOT: repo,
+    HARD_ENG_ROOT: repo,
     CONTEXT_MODE_MCP_PROBE_TIMEOUT_MS: '5000',
   },
   encoding: 'utf8',

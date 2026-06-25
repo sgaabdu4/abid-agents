@@ -12,7 +12,7 @@ const browser = browserIndex === -1 ? 'chromium' : args[browserIndex + 1];
 const home = process.env.HOME || process.cwd();
 const installDir = path.resolve(
   installDirIndex === -1
-    ? path.join(home, '.cache', 'abid-agents', 'e2e-playwright')
+    ? path.join(home, '.cache', 'hard-eng', 'e2e-playwright')
     : args[installDirIndex + 1],
 );
 

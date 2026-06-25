@@ -16,7 +16,9 @@ description: Interview one clear question before planning/building ideas, featur
   custom answer.
 - During interview, visible reply = next question only.
 - Do not batch Qs.
-- Ask what matters for the chosen depth; do not drift past the inferred mode cap.
+- Ask what matters for the chosen depth; mode caps limit scope, not question count.
+- Ask as many one-by-one Qs as needed until the active stage is aligned or the
+  user explicitly parks the unknown.
 
 ## Start
 

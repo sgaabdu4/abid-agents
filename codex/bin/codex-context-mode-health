@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
-# Managed by abid-agents installer.
+# Managed by hard-eng installer.
 set -euo pipefail
 
-ROOT="${ABID_AGENTS_ROOT:-$HOME/.agents}"
+ROOT="${HARD_ENG_ROOT:-$HOME/.agents}"
 CONTEXT_MODE_BIN="$(command -v context-mode || true)"
 
 if [[ -z "$CONTEXT_MODE_BIN" ]]; then
