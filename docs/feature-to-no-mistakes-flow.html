@@ -303,7 +303,7 @@
 
     <section class="summary" aria-label="Workflow summary">
       <div><strong>1. Plan</strong><span>Treehouse and the worktree readiness guard gate non-trivial work; component/state artifacts help UI choices when text is not enough.</span></div>
-      <div><strong>2. Implement</strong><span>Change the real owner with only needed specialist skills.</span></div>
+      <div><strong>2. Implement</strong><span>Change owner; violations leave lint/scanner/gate.</span></div>
       <div><strong>3. Verify Loop</strong><span>Test, review, fix, then run E2E last when needed.</span></div>
       <div><strong>4. Final Gate</strong><span>No-mistakes runs after the local loop is clean and committed.</span></div>
     </section>
@@ -331,7 +331,7 @@
       <li class="step">
         <div>
           <h2>Implement with touched-area skills</h2>
-          <p>Change the real owner first. Load only the specialist skills required by the files, stack, or risk you touched. Avoid wrappers, temporary modes, hidden fallback paths, and weak validation.</p>
+          <p>Change owner first. Each violation leaves lint, scanner, and gate coverage. Existing deterministic owners run before new reasoning; load only touched-area skills.</p>
         </div>
         <pre class="terminal" aria-label="Implementation commands"><code>/codebase-design
 /atomic-ui
@@ -339,7 +339,7 @@
 npx react-doctor@latest --verbose
 fallow dupes --format json --quiet 2&gt;/dev/null || true</code></pre>
         <div class="support" aria-label="Specialist skills">
-          <div><strong>Owner unclear</strong><span>Use <code>codebase-design</code>.</span></div>
+          <div><strong>Violation found</strong><span>Add/update lint, scanner, gate.</span></div>
           <div><strong>UI touched</strong><span>Use <code>atomic-ui</code> and <code>impeccable</code>; locate or create the design SSOT before reusable styling.</span></div>
           <div><strong>React app touched</strong><span>Run React Doctor, Fallow JS/TS health, and Vercel best practices.</span></div>
           <div><strong>Duplication suspected</strong><span>Use Fallow dupes or clone-group checks before consolidating copy-pasted UI/code.</span></div>
@@ -391,7 +391,7 @@ fallow dupes --format json --quiet 2&gt;/dev/null || true</code></pre>
         <li><code>ensure-worktree-ready.sh</code> passed for the active checkout.</li>
         <li>Planning artifact decision is explicit: skipped, PRD, issues, component/state UI review, or a combination.</li>
         <li>If the plan already has accepted slices, do not rerun <code>/to-issues</code> unless publishing issue cards.</li>
-        <li>Canonical owner, blast radius, and UI design SSOT were checked.</li>
+        <li>Owner, blast radius, guardrail triad, and UI design SSOT were checked.</li>
         <li>React app changes ran React Doctor and Fallow; duplication used dupes or clone-group checks.</li>
         <li>Tests, review, and required E2E are clean after the latest fix.</li>
         <li>E2E evidence exists for changed user-visible flows.</li>
@@ -399,7 +399,7 @@ fallow dupes --format json --quiet 2&gt;/dev/null || true</code></pre>
       </ul>
     </section>
 
-    <p class="footer">Single source for feature delivery workflow. Updated 2026-06-24.</p>
+    <p class="footer">Single source for feature delivery workflow. Updated 2026-06-25.</p>
   </main>
 </body>
 </html>

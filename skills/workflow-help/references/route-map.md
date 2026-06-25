@@ -5,9 +5,9 @@
 | Stage | When | Do | Exit |
 | --- | --- | --- | --- |
 | Plan | New feature or unclear work starts. | Create a Treehouse worktree before planning/coding, then run `"$HOME/.agents/scripts/ensure-worktree-ready.sh" <path>`. Use `grill-me` when outcome, scope, proof, or risk is unclear. For UI choices that cannot be judged from text, inspect the project design SSOT and use a local component/state artifact inside Grill Me. Pick the lightest artifact: none, `to-prd`, `to-issues` only for missing agent-ready slices, or both. State `PASS`, `CONCERNS`, or `FAIL`. | Owner, blast radius, proof path, risk routing, and next action are known. |
-| Implement | Readiness is `PASS` and code changes are needed. | Change the canonical owner. Repeat work runs its deterministic owner first; if recurring and missing, add script/test/hook/eval. Use `codebase-design` when owner/abstraction is unclear. Add exact specialist skills by touched area. | Root owner changed, not wrappers, temporary modes, hidden fallbacks, or weak validation. |
+| Implement | Readiness is `PASS` and code changes are needed. | Change the canonical owner. Repeat work runs its deterministic owner first. Every violation gets lint/scanner/gate (script/test/hook/eval). Use `codebase-design` when owner/abstraction is unclear. Add needed skills. | Root owner changed, not wrappers, temporary modes, hidden fallbacks, or weak validation. |
 | Verify loop | Implementation or review fixes changed behavior. | Run targeted tests and use `test-quality` for test design or gap review. Run `security-review` or `performance-rescue` when requested or when those risks were touched, then `thermo-nuclear-code-quality-review`, then `e2e` last when a user-visible flow changed. Loop back to Implement until tests, reviews, and required E2E are clean. | Affected proof was rerun, no known blockers remain, and required artifacts exist. |
-| Final gate | Local verify loop is clean and work is committed. | Run `"$HOME/.agents/scripts/ensure-worktree-ready.sh" .`, then use `no-mistakes`; respond to its findings through its own loop. Dry-run push only counts after project hooks are active. For GitHub Actions/`gh` CI, parallelize independent log reads/jobs where possible, batch fixes locally, and rerun the fewest checks. | Automated review, checks, PR, and CI evidence. |
+| Final gate | Local verify loop is clean and work is committed. | Run `"$HOME/.agents/scripts/ensure-worktree-ready.sh" .`, then use `no-mistakes`; respond to its findings through its own loop. Dry-run push only counts after project hooks are active. For GitHub Actions/`gh` CI, parallelize independent logs/jobs, batch fixes locally, rerun fewest checks. | Automated review, checks, PR, and CI evidence. |
 
 ## Exact Specialist Routing
 
@@ -31,7 +31,7 @@ Stop and reroute when:
 
 - scope expands mid-implementation
 - the owner or blast radius is unknown
-- known repeat work skips an existing deterministic owner
+- known repeat work skips an owner or violation lacks lint/scanner/gate
 - new feature work has no Treehouse worktree
 - `to-issues` is being treated as required when the accepted `plan.md` already has vertical slices or task waves
 - a support tool is being treated like a workflow stage

@@ -3,18 +3,18 @@
 ## Stops
 - Destructive state needs explicit approval. Concrete delete/remove/cleanup approves only that scope. Native delete; no quarantine. Broad cleanup, DB writes, reset/checkout, deletion scripts, temp/build cleanup need fresh approval.
 - Never edit `CHANGELOG.md`, `generated/`, or `AUTO-GENERATED`; fix source.
-- Pre-commit: inspect `git status --short`; if `.env*`, keys/tokens/secret-like files appear, stop.
+- Pre-commit: `git status --short`; `.env*`, keys/tokens/secrets -> stop.
 - No pure pass-through wrappers. Adapters need validation, transform, owner boundary, or platform integration.
 - Do not weaken trust/security/a11y/data-loss validation.
 - Touched/connected files >700 lines must end <700.
 - `SKILL.md`: no 3+ step workflows; move to `references/*.md` or scripts.
 - UI edits with no design SSOT: create/import token/theme/style owner first.
-- Browser/E2E driver fail/deny -> one isolated-profile retry, then E2E fallback or target-app `computer-use`.
+- Browser/E2E fail/deny -> one isolated retry, then E2E fallback or target-app `computer-use`.
 
 ## Core
 - Read before claim/edit; uncited=unknown. Tool absent -> say once; fallback.
 - Fix root owner. Prefer canonical behavior; delete concepts before modes/wrappers.
-- Validation >= scope; repeat work -> run/add script/test/hook/eval; GH CI -> parallel logs/jobs, batch fixes, rerun least.
+- Validation >= scope; violation -> lint/scanner/gate; repeat -> run/add script/test/hook/eval; GH CI -> parallel logs/jobs, batch fixes, least reruns.
 - Commit msgs: no co-author, em dash, dash-only prefix, decorative dashes.
 - Project AGENTS.md overrides global; repo facts only, <=600 o200k.
 

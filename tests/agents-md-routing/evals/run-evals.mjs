@@ -28,7 +28,7 @@ const policyFiles = [
   'skills/workflow-help/references/route-map.md',
 ];
 
-const policyDigestPattern = /workflow-help|grill-me|to-prd|to-issues|readiness|ensure-worktree-ready|worktree readiness|project hooks|push dry-run|PASS|CONCERNS|FAIL|correct course|scope expands|deterministic|repeat work|script\/test\/hook\/eval|codebase-memory|context-mode|support tools|not stages|project `AGENTS\.md`|repo-specific|global|canonical|root owner|wrappers|duplicat|local gate|AGENTS hygiene|budget|tokens|o200k|600|component\/state|component library|visual review|UI choices|UI\/components|design-system|design SSOT|atomic-ui|theme|hardcoded|react-doctor|fallow|clone groups|dupes|duplication|vercel-react-best-practices|sentry-workflow|sentry-cli|sentry-sdk-setup|sentry-feature-setup|security-review|performance-rescue|e2e|real UI|screenshots|events|regression command|thermo-nuclear-code-quality-review|maintainability|no-mistakes|committed|GitHub Actions|gh.*CI|GH CI|parallel|batch fixes|rerun|fewest|least|BMAD|menu codes|Treehouse|700|blast radius|surrounding issues|Report:|Why:|What:|Risk:|Proof:/i;
+const policyDigestPattern = /workflow-help|grill-me|to-prd|to-issues|readiness|ensure-worktree-ready|project hooks|push dry-run|PASS|CONCERNS|FAIL|correct course|scope expands|deterministic|repeat work|lint|scanner|gate|script\/test\/hook\/eval|codebase-memory|context-mode|support tools|not stages|AGENTS\.md|repo-specific|global|canonical|root owner|wrappers|duplicat|budget|tokens|o200k|600|component\/state|visual review|UI choices|design-system|design SSOT|atomic-ui|theme|hardcoded|react-doctor|fallow|dupes|duplication|vercel-react-best-practices|sentry|security-review|performance-rescue|e2e|real UI|screenshots|events|regression command|thermo|maintainability|no-mistakes|committed|GitHub Actions|gh.*CI|GH CI|parallel|batch fixes|rerun|fewest|least|BMAD|menu codes|Treehouse|700|blast radius|surrounding issues|Report:|Why:|What:|Risk:|Proof:/i;
 
 const policyText = policyFiles
   .map((rel) => {
@@ -76,11 +76,11 @@ const keyDefinitions = [
   'keepsVisualArtifactsInsideGrillMe: treats visual decision artifacts as support inside grill-me, not as their own Plan/Implement/Verify stage',
   'treatsVisualArtifactAsRequiredStage: incorrectly requires a visual artifact for every feature or makes it a standalone workflow stage',
   'usesAtomicUi: includes atomic-ui for UI components, reusable controls, design-system, token, or styling work',
-  'checksDesignSsot: the policy explicitly requires locating or creating the UI design SSOT, such as tokens, theme, primitives, component library, or atomic hierarchy, before reusable UI styling edits',
+  'checksDesignSsot: requires locating or creating the UI design SSOT before reusable UI styling edits',
   'skipsDesignSsot: incorrectly allows UI styling or reusable component work without checking or creating the project-local design SSOT',
   'usesReactDoctor: includes react-doctor for React or Next.js implementation/review',
   'usesFallow: includes fallow for JS/TS code health, cleanup, risk, or architecture checks',
-  'usesFallowCloneGroups: the policy explicitly requires fallow duplication or clone-group checks such as fallow dupes, clone groups, or duplicated components for React/JS/TS code health; generic fallow is not enough',
+  'usesFallowCloneGroups: requires fallow dupes, clone groups, or duplication checks for React/JS/TS code health',
   'usesReactDoctorWithoutFallow: incorrectly runs React Doctor alone for React app code health when fallow is also required',
   'skipsFallowCloneGroups: incorrectly omits fallow duplication or clone-group checks when duplication or copy-paste is part of the React/JS/TS request',
   'usesVercelReactBestPractices: includes Vercel React best-practices for React/Next performance guidance',
@@ -101,14 +101,14 @@ const keyDefinitions = [
   'treatsRiskReviewsAsDefaultStages: incorrectly requires security-review or performance-rescue for every feature regardless of touched risk',
   'usesVerifyLoop: requires a local verify loop between implementation and proof until blockers are gone',
   'usesDeterministicOwner: runs an existing deterministic owner such as a script, test, hook, or eval before fresh reasoning for known repeat work',
-  'createsDeterministicOwnerForRecurringWork: adds a script, test, hook, or eval when a recurring deterministic process has no owner yet',
+  'createsDeterministicOwnerForRecurringWork: adds lint, scanner, and a script/test/hook/eval gate when a recurring deterministic violation has no owner',
   'skipsDeterministicOwner: incorrectly uses fresh LLM-only reasoning while an existing deterministic owner should run',
-  'createsPassThroughWrapper: incorrectly adds a wrapper that only passes through to another command without validation, transformation, owner boundary, or integration',
+  'createsPassThroughWrapper: incorrectly adds a wrapper with no validation, transform, owner boundary, or integration',
   'keepsProjectAgentsRepoSpecific: keeps project AGENTS.md limited to repo-specific additions instead of restating global workflow, hygiene, or token-budget policy',
   'reusesGlobalAgentsHygieneOwner: recognizes that global .agents owns general AGENTS.md hygiene, compactness, and token-budget enforcement unless a project-only gap is proven',
   'allowsProjectSpecificAgentsFacts: allows project AGENTS.md to keep concrete repo-specific facts such as project keys, setup commands, out-of-scope paths, local CLI wrappers, or backend invariants',
   'requiresProjectAgentsTokenCap: requires project AGENTS.md to stay at or under the global repo-specific cap of 600 o200k tokens',
-  'duplicatesGlobalPolicyInProjectAgents: incorrectly copies or restates global workflow, skill routing, AGENTS hygiene, token-budget, or generic best-practice policy into a project AGENTS.md',
+  'duplicatesGlobalPolicyInProjectAgents: incorrectly copies global workflow, skill routing, AGENTS hygiene, token-budget, or generic policy into project AGENTS.md',
   'wouldAddProjectLocalAgentsGate: incorrectly chooses to add a project-local AGENTS budget/check script, package hook, or token gate when global .agents already owns the rule and no project-only gap was proven',
   'acceptsOverBudgetProjectAgents: incorrectly allows a project AGENTS.md to exceed the global 600 o200k token cap',
   'runsThermoBeforeE2E: runs thermo-nuclear-code-quality-review before expensive E2E in the local verify loop',
@@ -130,8 +130,8 @@ const keyDefinitions = [
   'routesBackToPlanning: uses grill-me, to-prd, to-issues, or codebase-design for expanded or unclear scope',
   'silentlyExpandsScope: continues implementation after scope expansion without rerouting',
   'usesNoMistakes: routes committed validation, push, PR, or CI to no-mistakes',
-  'usesCostAwareGhCi: for GitHub Actions or gh CI, inspects failing checks/logs, parallelizes independent log reads or jobs where possible, batches local fixes, and reruns the fewest checks',
-  'wastesGithubActions: incorrectly pushes speculative commits, reruns checks repeatedly, or serializes independent GitHub Actions work when the policy says to batch and parallelize where possible',
+  'usesCostAwareGhCi: GH Actions/gh CI reads failing logs first, parallelizes independent logs/jobs, batches fixes, reruns fewest checks',
+  'wastesGithubActions: pushes speculative commits, repeats reruns, or serializes independent CI work wastefully',
   'endsAtNoMistakes: feature-to-PR flow ends at no-mistakes after implementation/review proof',
   'requiresCommittedWorkBeforeNoMistakes: states no-mistakes validates committed implementation work',
   'usesNoMistakesBeforeImplementation: incorrectly starts no-mistakes before implementation proof',

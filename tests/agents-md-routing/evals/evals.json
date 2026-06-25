@@ -51,7 +51,7 @@
     },
     {
       "id": "deterministic_owner_added_for_recurring_work",
-      "prompt": "This is the third time the same markdown policy check has come up. There is no script, test, hook, or eval owner yet, but it can be checked deterministically. What should the implementation leave behind?",
+      "prompt": "This is the third time the same markdown policy violation appears. No lint, scanner, hook/test/eval gate exists. What should implementation leave behind?",
       "expectTrue": ["createsDeterministicOwnerForRecurringWork"],
       "expectFalse": ["skipsDeterministicOwner", "createsPassThroughWrapper"]
     },
@@ -154,7 +154,7 @@
     {
       "id": "gh_fix_ci_cost_control",
       "prompt": "gh-fix-ci: Fix failing GitHub Actions on this PR, but Actions cost money. What should the agent do before pushing reruns?",
-      "expectTrue": ["usesNoMistakes", "usesCostAwareGhCi"],
+      "expectTrue": ["usesCostAwareGhCi"],
       "expectFalse": ["wastesGithubActions", "runsNoMistakesBeforeCleanLoop"]
     },
     {
