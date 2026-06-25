@@ -19,7 +19,7 @@ const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'markdown-hygiene-'));
 fs.mkdirSync(path.join(tmp, 'skills', 'demo'), { recursive: true });
 fs.writeFileSync(
   path.join(tmp, 'AGENTS.md'),
-  '# Agent Rules\n\n## Stops\nThis arbitrary explanation is not a rule and should fail.\n- Rule.\n',
+  '# Agent Rules\n\n## Stops\nThis arbitrary explanation is not a rule and should fail.\n- Rule\n',
 );
 fs.writeFileSync(path.join(tmp, 'skills', 'demo', 'SKILL.md'), '# Demo\n');
 
@@ -34,7 +34,7 @@ assert.match(fail.stderr, /bullet, heading, or fenced template/);
 
 const skillTmp = fs.mkdtempSync(path.join(os.tmpdir(), 'markdown-hygiene-skill-'));
 fs.mkdirSync(path.join(skillTmp, 'skills', 'demo'), { recursive: true });
-fs.writeFileSync(path.join(skillTmp, 'AGENTS.md'), '# Agent Rules\n\n## Stops\n- Rule.\n');
+fs.writeFileSync(path.join(skillTmp, 'AGENTS.md'), '# Agent Rules\n\n## Stops\n- Rule\n');
 fs.writeFileSync(
   path.join(skillTmp, 'skills', 'demo', 'SKILL.md'),
   [
@@ -56,7 +56,7 @@ assert.notEqual(skillFail.status, 0, 'checker must fail bloated skill descriptio
 assert.match(skillFail.stderr, /description must stay at or under 30 tokens/);
 
 const leakTmp = fs.mkdtempSync(path.join(os.tmpdir(), 'markdown-hygiene-leak-'));
-fs.writeFileSync(path.join(leakTmp, 'AGENTS.md'), '# Agent Rules\n\n## Stops\n- Rule.\n');
+fs.writeFileSync(path.join(leakTmp, 'AGENTS.md'), '# Agent Rules\n\n## Stops\n- Rule\n');
 fs.writeFileSync(path.join(leakTmp, 'README.md'), `This session said to use ${os.homedir()}/tmp.\n`);
 const leak = spawnSync(checker, {
   cwd: leakTmp,
@@ -66,5 +66,16 @@ const leak = spawnSync(checker, {
 assert.notEqual(leak.status, 0, 'checker must fail ownerless leakage in any Markdown file');
 assert.match(leak.stderr, /local machine path requires explicit/);
 assert.match(leak.stderr, /conversation state requires explicit/);
+
+const bulletTmp = fs.mkdtempSync(path.join(os.tmpdir(), 'markdown-hygiene-bullet-'));
+fs.writeFileSync(path.join(bulletTmp, 'AGENTS.md'), '# Agent Rules\n\n## Stops\n- Rule\n');
+fs.writeFileSync(path.join(bulletTmp, 'README.md'), '- No trailing full stop.\n');
+const bulletFail = spawnSync(checker, {
+  cwd: bulletTmp,
+  env: { ...process.env, AGENTS_HYGIENE_ROOT: bulletTmp },
+  encoding: 'utf8',
+});
+assert.notEqual(bulletFail.status, 0, 'checker must fail bullets ending with full stops');
+assert.match(bulletFail.stderr, /bullet must not end with a full stop/);
 
 console.log('markdown-hygiene-test: pass');

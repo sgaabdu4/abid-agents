@@ -300,12 +300,12 @@ for (const needle of [
 ]) assertIncludes(projectWorkflowGatesHtml, needle);
 assertIncludes(hePlanText, 'check-project-context-gates.mjs --require-all');
 assertIncludes(hePlanText, 'he-state.json.context');
-assertIncludes(hePlanText, 'Product changes update `PRODUCT.md`; design/UI/token changes update `DESIGN.md` and the token owner.');
+assertIncludes(hePlanText, 'Product changes update `PRODUCT.md`; design/UI/token changes update `DESIGN.md` and the token owner');
 assertIncludes(grillFinalPlanText, 'Sliced plan -> readiness');
 assertIncludes(grillFinalPlanText, '`to-issues` only for missing');
 assertIncludes(grillFinalPlanText, '## Product/Design Context');
-assertIncludes(grillFinalPlanText, 'Plan cannot hand off to implementation without PRODUCT.md, DESIGN.md, and token/design-system owner evidence.');
-assertIncludes(grillFinalPlanText, 'Product behavior changes update `PRODUCT.md`; design/UI/token changes update `DESIGN.md` and the token owner.');
+assertIncludes(grillFinalPlanText, 'Plan cannot hand off to implementation without PRODUCT.md, DESIGN.md, and token/design-system owner evidence');
+assertIncludes(grillFinalPlanText, 'Product behavior changes update `PRODUCT.md`; design/UI/token changes update `DESIGN.md` and the token owner');
 assertNotIncludes(fs.readFileSync(path.join(repo, '.gitmodules'), 'utf8'), 'vendor/skill-upstreams/lavish-axi');
 assert.ok(!fs.existsSync(path.join(repo, 'vendor', 'skill-upstreams', 'lavish-axi')), 'Lavish upstream skill must not be vendored');
 assertIncludes(grillUiFlowText, 'project-local route/component/state');

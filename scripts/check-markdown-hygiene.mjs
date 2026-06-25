@@ -123,6 +123,11 @@ function checkGlobalMarkdown(file, text) {
       fail(file, `${rule.name} requires explicit markdown-hygiene: ${rule.marker}`);
     }
   }
+  for (const [index, line] of text.split('\n').entries()) {
+    if (/^\s*[-*+]\s+.*\.\s*$/.test(line)) {
+      fail(file, `line ${index + 1} bullet must not end with a full stop`);
+    }
+  }
 }
 
 function checkAgents(file, text) {
