@@ -11,8 +11,16 @@ This repo is designed to be cloned to `~/.agents`. From there it links one set o
 New machine:
 
 ```sh
-curl -fsSLO https://raw.githubusercontent.com/sgaabdu4/abid-agents/main/scripts/setup.sh && less setup.sh && bash setup.sh
+curl -fsSLO https://raw.githubusercontent.com/sgaabdu4/abid-agents/main/scripts/setup.sh && bash setup.sh
 ```
+
+Optional inspection before install:
+
+```sh
+less setup.sh
+```
+
+Press `q` to leave `less`.
 
 Existing clone:
 

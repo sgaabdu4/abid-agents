@@ -79,7 +79,7 @@ without stopping for each `ask-user` finding.
 
 If the CI log says `all CI checks passed - still monitoring until merged or
 closed` while GitHub PR checks are green and findings are empty, treat the run
-as PR-ready. Do not wait for a human merge, and do not abort solely because the
+as PR-ready: do not wait for human merge, and do not abort solely because the
 status still says `ci,running`.
 
 ## Inspecting state

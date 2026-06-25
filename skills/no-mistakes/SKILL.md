@@ -46,5 +46,10 @@ node "$HOME/.agents/skills/no-mistakes/scripts/repair-pr-evidence.mjs"
 node "$HOME/.agents/skills/no-mistakes/scripts/repair-pr-evidence.mjs" --e2e-video-required --videos "<local or hosted 2x video>"
 ```
 
-If a command fails, read the returned `help` lines and continue from the exact
-state reported by `no-mistakes`.
+## Output notes
+
+- Output is TOON; follow returned `help` lines instead of guessing.
+- `checks-passed` means checks are green and the PR is ready for human review.
+- `failed` or `cancelled` means inspect logs, fix, commit, then rerun.
+- `Directory not empty` is a recovery state; preserve data and follow tool help.
+- Use `--yes` only with user consent for unattended actionable gates.

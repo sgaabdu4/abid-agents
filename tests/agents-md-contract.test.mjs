@@ -128,7 +128,8 @@ for (const executable of [cleanupPath, updateStackPath, contextHealthPath, cbmPr
 assertIncludes(setupText, '--prereqs-only', 'setup.sh must expose a prerequisite-only mode');
 assertIncludes(setupText, 'ABID_AGENTS_ALLOW_HOMEBREW_BOOTSTRAP');
 assertNotIncludes(setupText, 'ABID_AGENTS_SKIP_HOMEBREW_INSTALL');
-assertIncludes(readmeText, 'curl -fsSLO https://raw.githubusercontent.com/sgaabdu4/abid-agents/main/scripts/setup.sh && less setup.sh && bash setup.sh');
+assertIncludes(readmeText, 'curl -fsSLO https://raw.githubusercontent.com/sgaabdu4/abid-agents/main/scripts/setup.sh && bash setup.sh');
+assertNotIncludes(readmeText, 'less setup.sh && bash setup.sh');
 assertNotIncludes(readmeText, 'curl -fsSL https://raw.githubusercontent.com/sgaabdu4/abid-agents/main/scripts/setup.sh | bash');
 assertIncludes(readmeText, 'scripts/ensure-worktree-ready.sh');
 assertIncludes(readmeText, 'when slices are missing or should be published as work items');

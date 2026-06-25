@@ -63,6 +63,11 @@ assert.ok(setupScript.includes('ABID_AGENTS_NO_MISTAKES_REPOS'), 'new-user setup
 assert.ok(setupScript.includes('ensure_worktree_ready_repo'), 'setup must run the shared worktree readiness guard');
 assert.ok(setupScript.includes('ABID_AGENTS_SKIP_WORKTREE_READY'), 'setup must allow skipping worktree readiness only by explicit env');
 assert.ok(setupScript.includes('ABID_AGENTS_WORKTREE_READY_INSTALL'), 'setup must make dependency install for readiness explicit');
+assert.ok(setupScript.includes('if [[ "${#args[@]}" -gt 0 ]]'), 'setup must avoid empty array expansion under macOS Bash 3 set -u');
+assert.ok(setupScript.includes('"$script" "$repo"'), 'setup must call worktree readiness with no empty array when no flags are set');
+assert.ok(setupScript.includes('run_no_mistakes_with_isolated_agent_home'), 'setup must isolate no-mistakes skill writes from repo-owned skill symlinks');
+assert.ok(setupScript.includes('CODEX_HOME="$isolated_home/.codex"'), 'isolated no-mistakes init must not write through real Codex skill symlinks');
+assert.ok(setupScript.includes('NM_HOME="${NM_HOME:-$NO_MISTAKES_HOME}"'), 'isolated no-mistakes init must keep the real no-mistakes state home');
 assert.ok(worktreeReadyScript.includes('core.hooksPath'), 'worktree readiness must inspect active Git hook path');
 assert.ok(worktreeReadyScript.includes('/.no-mistakes/repos/'), 'worktree readiness must reject no-mistakes gate hook paths');
 assert.ok(worktreeReadyScript.includes('.githooks'), 'worktree readiness must support generic tracked hook dirs');

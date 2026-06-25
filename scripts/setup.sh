@@ -471,6 +471,36 @@ no_mistakes_binary() {
   fi
 }
 
+run_no_mistakes_with_isolated_agent_home() {
+  local binary="$1"
+  shift
+  local isolated_home cleanup status
+  isolated_home="${ABID_AGENTS_NO_MISTAKES_AGENT_HOME:-}"
+  cleanup=0
+
+  if [[ -z "$isolated_home" ]]; then
+    isolated_home="$(mktemp -d "${TMPDIR:-/tmp}/abid-agents-no-mistakes-home.XXXXXX")"
+    cleanup=1
+  fi
+
+  mkdir -p "$isolated_home"
+  set +e
+  HOME="$isolated_home" \
+    CODEX_HOME="$isolated_home/.codex" \
+    NM_HOME="${NM_HOME:-$NO_MISTAKES_HOME}" \
+    NO_MISTAKES_TELEMETRY="${NO_MISTAKES_TELEMETRY:-0}" \
+    NO_MISTAKES_NO_UPDATE_CHECK=1 \
+    "$binary" "$@"
+  status=$?
+  set -e
+
+  if [[ "$cleanup" == "1" ]]; then
+    rm -rf "$isolated_home"
+  fi
+
+  return "$status"
+}
+
 ensure_worktree_ready_repo() {
   local repo="$1"
   local script="$ROOT/scripts/ensure-worktree-ready.sh"
@@ -489,7 +519,11 @@ ensure_worktree_ready_repo() {
     args+=("--install")
   fi
 
-  "$script" "${args[@]}" "$repo"
+  if [[ "${#args[@]}" -gt 0 ]]; then
+    "$script" "${args[@]}" "$repo"
+  else
+    "$script" "$repo"
+  fi
 }
 
 init_no_mistakes_repo() {
@@ -519,9 +553,7 @@ init_no_mistakes_repo() {
 
   (
     cd "$repo"
-    NO_MISTAKES_TELEMETRY="${NO_MISTAKES_TELEMETRY:-0}" \
-      NO_MISTAKES_NO_UPDATE_CHECK=1 \
-      "$binary" init
+    run_no_mistakes_with_isolated_agent_home "$binary" init
   )
 
   ensure_worktree_ready_repo "$repo"
