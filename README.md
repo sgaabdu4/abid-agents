@@ -1,75 +1,71 @@
-# Abid Agents
+<p align="center">
+  <img src="docs/images/hard-eng-hero.png" alt="hard-eng workflow hero" width="920">
+</p>
 
-Shared global agent config for Codex, Claude, Copilot, Pi, and compatible coding-agent runtimes.
+# Hard Eng
 
-This repo is designed to be cloned to `~/.agents`. From there it links one set of rules, skills, hooks, and MCP defaults into each agent home so every machine behaves the same way.
+Hard Eng is a stateful agentic engineering workflow for local coding agents. It installs one shared rule, skill, hook, and MCP surface into the agent homes on a machine, then routes real work through `/he:plan`, `/he:implement`, `/he:verify`, `/he:ship`, and `/he:learn`.
 
----
+<a id="tested-scope"></a>
+> Tested scope: this repo has only been tested on Codex running on macOS. Other linked runtimes are installed by the scripts, but Codex on macOS is the validated path today.
 
-## 1. Install
+[![Workflow](https://img.shields.io/badge/workflow-stateful-0891b2)](#he-workflow)
+[![Platform](https://img.shields.io/badge/tested-Codex%20%2B%20macOS-111827)](#tested-scope)
+[![Gates](https://img.shields.io/badge/gates-hooks%20%2B%20no--mistakes-16a34a)](#shipping-and-safety)
 
-New machine:
+## Install
+
+Download the setup script first, then run one mode.
 
 ```sh
-curl -fsSLO https://raw.githubusercontent.com/sgaabdu4/abid-agents/main/scripts/setup.sh && bash setup.sh
+curl -fsSLO https://raw.githubusercontent.com/sgaabdu4/hard-eng/main/scripts/setup.sh
+bash setup.sh --full
 ```
 
-Optional inspection before install:
+Use the lighter install when you only want the shared rules, skills, configs, and local repo hooks:
 
 ```sh
-less setup.sh
+curl -fsSLO https://raw.githubusercontent.com/sgaabdu4/hard-eng/main/scripts/setup.sh
+bash setup.sh --skills-only
 ```
-
-Press `q` to leave `less`.
 
 Existing clone:
 
 ```sh
 cd "$HOME/.agents"
-./scripts/setup.sh
+./scripts/setup.sh --full
 ```
 
-The setup script detects whether `~/.agents` already exists. On macOS it installs missing bootstrap prerequisites first: Xcode Command Line Tools prompt, Homebrew, Git, Node/npm, Dart, Flutter, and a managed shell PATH block. It then clones or updates the repo, initializes pinned submodules, installs MCP tools, links agent configs and skills, installs local Git hooks, installs or updates [`Treehouse`](https://github.com/kunchenguid/treehouse) and [`no-mistakes`](https://github.com/kunchenguid/no-mistakes), initializes the `.agents` repo for `git push no-mistakes`, and verifies worktree hook readiness. After the repo is available, independent setup phases run in parallel where they do not share mutable package-manager state.
+| Mode | Use it when | Installs |
+| --- | --- | --- |
+| `--full` | You want the workstation path. | prerequisites when allowed, MCP tools, skills, configs, Git hooks, watchdog, Treehouse, `no-mistakes`, optional cron, worktree readiness |
+| `--skills-only` | You only want the agent surface. | repo clone/update, pinned skill submodules, linked `AGENTS.md`, linked skills/configs, local hooks |
+| `--prereqs-only` | You are repairing setup dependencies. | prerequisite tools only |
+| `--uninstall --yes` | You want to remove what Hard Eng installed. | managed links, skills, hooks, cron blocks, watchdog, managed bins, cache, shell PATH block |
 
-When run in a terminal, setup asks whether to install `Treehouse`, install `no-mistakes`, enable cron, and initialize extra repos. In non-interactive runs, defaults are safe: `Treehouse` on, `no-mistakes` on, cron off, extra repos only from env vars.
+`--skills-only` intentionally skips cron, watchdog, Treehouse, `no-mistakes`, MCP npm installs, prerequisite repair, and worktree repair.
 
-The setup is conservative:
+## Uninstall
 
-- links agent `AGENTS.md` files to the canonical `~/.agents/AGENTS.md`
-- preserves existing non-managed config files and conflicting skill folders instead of overwriting them
-- initializes pinned submodules
-- installs local Git hooks for this repo
-- verifies portable worktree hook readiness with `scripts/ensure-worktree-ready.sh`
-- leaves cron disabled unless you explicitly enable it
-- initializes extra `no-mistakes` repos only when `ABID_AGENTS_NO_MISTAKES_REPOS=/repo/a:/repo/b` is set
+From the repo:
 
-Useful setup switches:
+```sh
+./scripts/uninstall.sh --yes
+```
 
-| Variable | Effect |
-| --- | --- |
-| `ABID_AGENTS_ENABLE_CRON=1` | Install the optional auto-sync cron during setup. |
-| `ABID_AGENTS_SKIP_PREREQ_INSTALL=1` | Skip prerequisite repair. |
-| `ABID_AGENTS_ALLOW_HOMEBREW_BOOTSTRAP=1` | Allow setup to run the upstream Homebrew bootstrap when Homebrew is missing. |
-| `ABID_AGENTS_SKIP_FLUTTER_INSTALL=1` | Skip Flutter SDK installation. |
-| `ABID_AGENTS_FLUTTER_HOME=/path/to/flutter` | Install or detect Flutter at a custom path. |
-| `ABID_AGENTS_SKIP_SHELL_PATH_UPDATE=1` | Do not write the managed `~/.zshenv` PATH block. |
-| `ABID_AGENTS_SETUP_TREEHOUSE=0` | Answer no to the setup-time Treehouse question. |
-| `ABID_AGENTS_SKIP_TREEHOUSE=1` | Skip installing or updating Treehouse during setup. |
-| `ABID_AGENTS_SETUP_NO_MISTAKES=0` | Answer no to the setup-time `no-mistakes` question. |
-| `ABID_AGENTS_SKIP_NPM_INSTALL=1` | Skip MCP tool installation. |
-| `ABID_AGENTS_SKIP_NO_MISTAKES=1` | Skip installing and initializing `no-mistakes`. |
-| `ABID_AGENTS_SKIP_NO_MISTAKES_INIT=1` | Install `no-mistakes` but skip repo initialization. |
-| `ABID_AGENTS_NO_MISTAKES_REPOS=/repo/a:/repo/b` | Initialize extra repos for `git push no-mistakes`. |
-| `ABID_AGENTS_SKIP_WORKTREE_READY=1` | Skip shared worktree readiness checks during setup. |
-| `ABID_AGENTS_WORKTREE_READY_INSTALL=1` | Allow readiness repair to run `npm ci` when a hook manager needs it. |
+From a downloaded setup script:
 
----
+```sh
+bash setup.sh --uninstall --yes
+```
 
-## 2. What gets linked
+Uninstall removes Hard Eng-managed links, skill symlinks, local hooks, cron blocks, watchdog LaunchAgent/plist, managed Codex bin files, `~/.cache/hard-eng`, and the managed shell PATH block. It does not remove shared tools such as Homebrew, Git, Node, Dart, Flutter, Treehouse, or `no-mistakes`.
 
-Agent instruction files are symlinks to `~/.agents/AGENTS.md`. Keep local overrides in project-level `AGENTS.md` files, not in installed global copies.
+## What Gets Linked
 
-| Agent/runtime | Linked config |
+Agent instruction files are symlinks to `~/.agents/AGENTS.md`. Keep repo-specific overrides in project-level `AGENTS.md` files.
+
+| Runtime | Linked config |
 | --- | --- |
 | Codex | `~/.codex/AGENTS.md`, `~/.codex/mcp-config.json`, `~/.codex/hooks.json`, `~/.codex/skills/*` |
 | Claude | `~/.claude/AGENTS.md`, `~/.claude/CLAUDE.md` |
@@ -77,17 +73,71 @@ Agent instruction files are symlinks to `~/.agents/AGENTS.md`. Keep local overri
 | Pi | `~/.pi/AGENTS.md`, `~/.pi/skills/*` |
 | Pi agent | `~/.pi/agent/AGENTS.md`, `~/.pi/agent/skills/*` |
 
-`~/.claude/CLAUDE.md` should include:
+`~/.claude/CLAUDE.md` is reduced to:
 
 ```md
 @AGENTS.md
 ```
 
-That keeps Claude pointed at the same global rules as the other runtimes.
+## HE Workflow
 
----
+Run one `/he:*` command per stage. Start each stage in a fresh thread with the prior `he-state.json` path; the state file is the source of truth, not the old chat transcript. The full HTML flow lives at [docs/project-workflow-gates.html](docs/project-workflow-gates.html).
 
-## 3. What is inside
+<p align="center">
+  <img src="docs/images/project-workflow-gates.png" alt="Full Hard Eng workflow gates" width="920">
+</p>
+
+`he-state.json` tracks:
+
+- `steps[]`: every internal step and receipt.
+- `findings[]`: failures, review findings, planning concerns, and the owner repair stage.
+- `guardrails[]`: deterministic scripts, tests, lints, scanners, hooks, evals, command status, evidence, and whether they block push.
+
+Every stage ends with a compact receipt: `Stage`, `State`, `Decision`, `Owner/proof`, `Artifacts`, `Blocker`, and `Next`. `he-state.mjs validate` must pass before any ready-yes handoff.
+
+| Stage | Command | What it does | Invokes automatically | Exit |
+| --- | --- | --- | --- | --- |
+| 1. Plan | `/he:plan` | Decides scope, owner, blast radius, proof path, risk route, and readiness. | Treehouse/worktree readiness; `grill-me` for unclear outcome, scope, proof, risk, UI flow, or visual direction; `to-prd` or `to-issues` only when that artifact is needed. | `Next: ready for /he:implement: yes/no` |
+| 2. Implement | `/he:implement` | Changes the canonical owner and wires deterministic guardrails. | `codebase-design` when ownership is unclear; existing scripts/tests/hooks before fresh reasoning; touched-area skills. | `Next: ready for /he:verify: yes/no` |
+| 3. Verify | `/he:verify` | Runs the proof loop until every required test, review, guardrail, and E2E check is clean or explicitly blocked. | `test-quality`, security/perf when touched, thermo review, E2E last, and subagents for independent proof. | `Next: ready for /he:ship: yes/no` |
+| 4. Ship | `/he:ship` | Runs status/secrets checks, hook readiness, quality gates, `no-mistakes`, PR evidence repair, and CI follow-through. | `ensure-worktree-ready.sh --check --require-pre-push`, `check-project-quality-gates.mjs --require-push-gate`, `no-mistakes`. | `Next: ready for /he:learn: yes` or `Next: loop complete: yes` |
+| 5. Learn | `/he:learn` | Adds a durable guard only when state has an open learning finding. | `repeated-failure-learning`; `skill-creator` only when a skill/stage contract is the owner. | `Next: loop complete: yes/no` |
+
+Grill Me stays inside Plan. It owns `session_state.md`, its stage map, and the one-question loop. It asks as many one-by-one questions as needed until aligned or the user explicitly parks the unknown. UI uncertainty goes through Grill Me UI flow or visual design stages before implementation guesses.
+
+Verify is the main fix loop. If any proof fails, `/he:verify` records a finding, routes code changes back through `/he:implement`, then reruns only the affected proof. `/he:ship` starts only after the verify loop is clean and work is committed.
+
+React/Next guardrails include React Doctor, Fallow audit/dupes, lint, and typecheck. Flutter guardrails include package-root `dart analyze` with `flutter_skill_lints` and tests when present. Missing repeatable checks become scripts, tests, hooks, or evals.
+
+## Specialist Routing
+
+| Need | Use |
+| --- | --- |
+| Choose the next workflow, skill, or stage | `workflow-help` |
+| Clarify ambiguous work before building | `grill-me` |
+| Diagnose hard bugs, flakes, regressions | `diagnosing-bugs` |
+| Decide module ownership or abstraction shape | `codebase-design` |
+| Turn resolved context into a spec | `to-prd` |
+| Split a plan into vertical-slice issues when slices are missing or should be published as work items | `to-issues` |
+| Design or repair tests | `test-quality` |
+| UI systems, tokens, or product polish | `atomic-ui` + `impeccable` |
+| React app or Next.js implementation/review | `react-doctor` + `fallow`; include `fallow dupes` / clone-group checks for duplication; use `vercel-react-best-practices` for performance/composition |
+| Flutter/Dart app work | `building-flutter-apps` |
+| Appwrite backend work | `appwrite-backend` |
+| Sentry or observability work | `sentry-workflow` |
+| User-like UI regression proof | `e2e` |
+| Latency or efficiency work | `performance-rescue` |
+| Security, auth, secrets, or data exposure | `security-review` |
+| Strict maintainability review | `thermo-nuclear-code-quality-review` |
+| Direct no-mistakes validation details | `no-mistakes` |
+
+BMAD and Compound Engineering inspiration, local rules win:
+
+- Steal: help/front-door routing, readiness checks, next-action clarity, sharper vertical slices, and visible loop structure.
+- Do not steal: personas, menu codes, generated story state, or planning ceremony that slows implementation.
+- Local delivery stays stricter: code evidence, state receipts, owner-first implementation, deterministic guardrails, E2E proof, thermo review, and `no-mistakes`.
+
+## Repo Layout
 
 | Path | Role |
 | --- | --- |
@@ -99,92 +149,30 @@ That keeps Claude pointed at the same global rules as the other runtimes.
 | `codex/bin/` | Token-free Codex watchdog and health scripts installed under `~/.codex/bin`. |
 | `mcp-config.json` | Shared MCP defaults for `context-mode` and `codebase-memory-mcp`. |
 | `agents/` | Subagent role prompts. |
-| `scripts/` | Install, submodule update, cron, and compatibility helpers. |
-| `tests/` | Contract checks for symlinks, hooks, env behavior, and repo policy. |
+| `scripts/` | Install, uninstall, submodule update, cron, and compatibility helpers. |
+| `tests/` | Contract checks for symlinks, hooks, env behavior, README links, workflow state, and repo policy. |
 
-Ignored local state includes hook logs, backups, caches, `.skill-lock.json`, MCP indexes, and machine-specific files.
+## Setup Switches
 
----
-
-## 4. Skills
-
-The active skill list lives in `skills/`.
-
-There are two types:
-
-- Local skills: owned by this repo and kept small.
-- Upstream skills: pinned as submodules and exposed through symlinks.
-- Tool-installed skills: written by their CLI owner, such as `no-mistakes`.
-
-Workflow defaults: use `workflow-help` when the next step is unclear, `grill-me` to clarify ambiguous work before building, run `scripts/ensure-worktree-ready.sh` after creating a worktree, then use [`no-mistakes`](https://github.com/kunchenguid/no-mistakes) through `/no-mistakes` or `git push no-mistakes` to validate committed shipping work after implementation.
-
-Planning and engineering helpers:
-
-- `diagnosing-bugs`: isolate hard bugs before patching.
-- `workflow-help`: choose the next stage, skill, proof path, and what not to run.
-- `codebase-design`: decide module ownership, public interfaces, and abstraction shape.
-- `to-prd`: turn resolved context into a PRD or implementation brief.
-- `to-issues`: split an accepted plan into vertical-slice issues when slices are missing or should be published as work items.
-
-Quick routing:
-
-| Need | Use |
+| Variable | Effect |
 | --- | --- |
-| Choose the next workflow, skill, or stage | `workflow-help` |
-| Clarify ambiguous work before building | `grill-me` |
-| Diagnose hard bugs, flakes, regressions | `diagnosing-bugs` |
-| Decide module ownership or abstraction shape | `codebase-design` |
-| Turn resolved context into a spec | `to-prd` |
-| Split a plan into missing agent-ready slices | `to-issues` |
-| Design or repair tests | `test-quality` |
-| UI systems, tokens, or product polish | `atomic-ui` + `impeccable` |
-| React app or Next.js implementation/review | `react-doctor` + `fallow`; include `fallow dupes` / clone-group checks for duplication; use `vercel-react-best-practices` for performance/composition |
-| Sentry or observability work | `sentry-workflow` |
-| User-like UI regression proof | `e2e` |
-| Latency or efficiency work | `performance-rescue` |
-| Security, auth, secrets, or data exposure | `security-review` |
-| Strict maintainability review | `thermo-nuclear-code-quality-review` |
-| Final validation, push, PR, or CI gate | `no-mistakes` |
+| `HARD_ENG_ENABLE_CRON=1` | Install the optional auto-sync cron during setup. |
+| `HARD_ENG_SKIP_PREREQ_INSTALL=1` | Skip prerequisite repair. |
+| `HARD_ENG_ALLOW_HOMEBREW_BOOTSTRAP=1` | Allow setup to run the upstream Homebrew bootstrap when Homebrew is missing. |
+| `HARD_ENG_SKIP_FLUTTER_INSTALL=1` | Skip Flutter SDK installation. |
+| `HARD_ENG_FLUTTER_HOME=/path/to/flutter` | Install or detect Flutter at a custom path. |
+| `HARD_ENG_SKIP_SHELL_PATH_UPDATE=1` | Do not write the managed `~/.zshenv` PATH block. |
+| `HARD_ENG_SETUP_TREEHOUSE=0` | Answer no to the setup-time Treehouse question. |
+| `HARD_ENG_SKIP_TREEHOUSE=1` | Skip installing or updating Treehouse during setup. |
+| `HARD_ENG_SETUP_NO_MISTAKES=0` | Answer no to the setup-time `no-mistakes` question. |
+| `HARD_ENG_SKIP_NPM_INSTALL=1` | Skip MCP tool installation. |
+| `HARD_ENG_SKIP_NO_MISTAKES=1` | Skip installing and initializing `no-mistakes`. |
+| `HARD_ENG_SKIP_NO_MISTAKES_INIT=1` | Install `no-mistakes` but skip repo initialization. |
+| `HARD_ENG_NO_MISTAKES_REPOS=/repo/a:/repo/b` | Initialize extra repos for `git push no-mistakes`. |
+| `HARD_ENG_SKIP_WORKTREE_READY=1` | Skip shared worktree readiness checks during setup. |
+| `HARD_ENG_WORKTREE_READY_INSTALL=1` | Allow readiness repair to run `npm ci` when a hook manager needs it. |
 
-BMAD inspiration, local rules win:
-
-- Steal: help/front-door routing, readiness checks, next-action clarity, and sharper vertical slices.
-- Do not steal: BMAD personas, menu codes, generated story state, or planning ceremony that slows implementation.
-- Local delivery stays stricter: code evidence, readiness, owner-first implementation, E2E proof, thermo review, and `no-mistakes`.
-
-Local skill budget:
-
-- `SKILL.md` under 100 lines
-- preferably under 1,200 `o200k_base` tokens
-- description under 300 characters
-- detailed workflows moved to `references/*.md` or scripts
-
-Upstream and tool-installed skills are updated from their source repos or CLI owners. Do not compress or patch them locally unless the change belongs upstream.
-
----
-
-## 5. Upstream skill pins
-
-| Skill link | Upstream repo | Source path |
-| --- | --- | --- |
-| `skills/vercel-react-best-practices` | `vercel-labs/agent-skills` | `skills/react-best-practices` |
-| `skills/impeccable` | `pbakaus/impeccable` | `.agents/skills/impeccable` |
-| `skills/fallow` | `fallow-rs/fallow-skills` | `fallow/skills/fallow` |
-| `skills/react-doctor` | `millionco/react-doctor` | `skills/react-doctor` |
-| `skills/skill-creator` | `anthropics/skills` | `skills/skill-creator` |
-| `skills/tavily-cli` | `tavily-ai/skills` | `skills/tavily-cli` |
-| `skills/appwrite-backend` | `sgaabdu4/appwrite-backend` | repo root |
-| `skills/building-flutter-apps` | `sgaabdu4/building-flutter-apps` | repo root |
-| `skills/sentry-workflow` | `getsentry/sentry-for-ai` | `skills/sentry-workflow` |
-| `skills/sentry-cli` (support only) | `getsentry/cli` | `plugins/sentry-cli/skills/sentry-cli` |
-| `skills/sentry-feature-setup` (support only) | `getsentry/sentry-for-ai` | `skills/sentry-feature-setup` |
-| `skills/sentry-sdk-setup` (support only) | `getsentry/sentry-for-ai` | `skills/sentry-sdk-setup` |
-
-User-facing Sentry work routes through `sentry-workflow`. The setup, feature, and CLI skills stay linked as implementation details for the Sentry workflow to use when needed.
-
----
-
-## 6. Updating skills
+## Updating Skills
 
 Initialize or repair pinned submodules:
 
@@ -204,45 +192,25 @@ git push origin main
 
 `--remote` refuses to run when tracked files or the index are dirty.
 
----
-
-## 7. Optional cron sync
+## Optional Cron Sync
 
 Enable local auto-sync:
 
 ```sh
-ABID_AGENTS_ENABLE_CRON=1 ./scripts/install.sh
+HARD_ENG_ENABLE_CRON=1 ./scripts/install.sh
 ```
 
 Set a custom schedule:
 
 ```sh
-ABID_AGENTS_CRON_SCHEDULE="*/30 * * * *" ./scripts/install-cron.sh
+HARD_ENG_CRON_SCHEDULE="*/30 * * * *" ./scripts/install-cron.sh
 ```
 
 Cron runs `scripts/auto-sync.sh`. It updates Treehouse and `no-mistakes`, pulls `main`, bumps submodules, scans for private paths and secret-like values, commits changed pins, and pushes `main`.
 
-Useful switches:
+## Shipping And Safety
 
-| Variable | Effect |
-| --- | --- |
-| `ABID_AGENTS_SKIP_NPM_INSTALL=1` | Skip MCP tool installation. |
-| `ABID_AGENTS_SKIP_SUBMODULE_INIT=1` | Skip install-time submodule init. |
-| `ABID_AGENTS_SKIP_SUBMODULE_UPDATE=1` | Skip pull-hook submodule updates. |
-| `ABID_AGENTS_SKIP_SUBMODULE_BUMP=1` | Cron uses pinned commits only. |
-| `ABID_AGENTS_SKIP_TREEHOUSE_UPDATE=1` | Skip cron-time Treehouse update. |
-| `ABID_AGENTS_TREEHOUSE_BIN=/path/to/treehouse` | Override the CLI path used by cron. |
-| `ABID_AGENTS_SKIP_NO_MISTAKES_UPDATE=1` | Skip cron-time `no-mistakes update`. |
-| `ABID_AGENTS_NO_MISTAKES_BIN=/path/to/no-mistakes` | Override the CLI path used by cron. |
-| `ABID_AGENTS_CHECK_SUBMODULES_BEFORE_PUSH=1` | Print submodule status before push. |
-| `ABID_AGENTS_ENABLE_CRON=1` | Install the optional cron job during install. |
-
----
-
-## 8. Shipping and safety checks
-
-Default shipping path: use [`no-mistakes`](https://github.com/kunchenguid/no-mistakes) through `/no-mistakes` or `git push no-mistakes` after a repo has been initialized with `no-mistakes init`. Before trusting a push dry-run, run `scripts/ensure-worktree-ready.sh`; it rejects private or no-mistakes-owned hook paths and repairs known portable hook managers.
-Use direct `git push origin ...` only when explicitly requested or when the gate is unavailable.
+Default shipping path: use `he-ship`, which runs [`no-mistakes`](https://github.com/kunchenguid/no-mistakes) after local verification is clean, work is committed, and a repo has been initialized with `no-mistakes init`. Before trusting a push dry-run, run `scripts/ensure-worktree-ready.sh`; it rejects private or no-mistakes-owned hook paths and repairs known portable hook managers.
 
 Run:
 
@@ -252,6 +220,8 @@ git diff --check
 node tests/agents-md-contract.test.mjs
 node tests/codex-hooks-contract.test.mjs
 node tests/git-hooks-contract.test.mjs
+node tests/he-state.test.mjs
+node tests/project-quality-gates.test.mjs
 node tests/security-pretooluse-env.test.mjs
 node tests/protect-secrets-env.test.mjs
 ```
@@ -264,14 +234,3 @@ rg -n --hidden --glob '!.git/**' --glob '!**/.git/**' '(github_pat_[A-Za-z0-9_]+
 ```
 
 Never commit secrets, personal paths, runtime logs, local MCP state, generated caches, private repo data, or machine-local lock state.
-
----
-
-## 9. Daily workflow
-
-```sh
-cd "$HOME/.agents"
-./scripts/setup.sh
-```
-
-Change this repo for global behavior. Add a project-local `AGENTS.md` when one project needs different rules.
