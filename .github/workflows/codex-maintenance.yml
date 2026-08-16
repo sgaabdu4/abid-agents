@@ -24,6 +24,11 @@ jobs:
           repo="$GITHUB_REPOSITORY"
           report="dependabot-report.md"
           : > "$report"
+          default_branch=$(gh repo view "$repo" --json defaultBranchRef --jq .defaultBranchRef.name)
+          if [ "$default_branch" != "main" ] && [ "$default_branch" != "master" ]; then
+            echo "Skipped Dependabot merging because the default branch is $default_branch, not main or master." >> "$report"
+            exit 0
+          fi
 
           mapfile -t prs < <(
             gh api --paginate "/repos/$repo/pulls?state=open&per_page=100" \
@@ -82,6 +87,11 @@ jobs:
           set -uo pipefail
           repo="$GITHUB_REPOSITORY"
           default_branch=$(gh repo view "$repo" --json defaultBranchRef --jq .defaultBranchRef.name)
+          if [ "$default_branch" != "main" ] && [ "$default_branch" != "master" ]; then
+            echo "Skipped version bump because the default branch is $default_branch, not main or master." >> dependabot-report.md
+            cat dependabot-report.md >> "$GITHUB_STEP_SUMMARY"
+            exit 0
+          fi
           cutoff=$(date -u -d '7 days ago' +%Y-%m-%d)
           merged=$(gh api --paginate "/repos/$repo/pulls?state=closed&sort=updated&direction=desc&per_page=100")
           recent_messages=$(gh api --paginate "/repos/$repo/commits?sha=$default_branch&per_page=100" --jq '.[].commit.message' || true)
